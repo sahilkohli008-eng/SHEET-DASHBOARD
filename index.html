@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Live Tracker</title>
+  <title>Dashboard</title>
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -11,20 +11,20 @@
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Live Tracker" />
+  <meta name="apple-mobile-web-app-title" content="Dashboard" />
 
   <style>
     :root {
-      --bg: #0b1120;
-      --card-bg: #162032;
-      --card-alt: #1e293b;
-      --accent: #38bdf8;
-      --purple: #818cf8;
-      --green: #34d399;
-      --text: #f8fafc;
-      --subtext: #94a3b8;
-      --border: #243248;
-      --error: #ef4444;
+      /* Native iOS Dark Mode Palette */
+      --bg: #000000;
+      --card-bg: #1c1c1e;
+      --card-alt: #2c2c2e;
+      --accent: #0a84ff;   /* iOS System Blue */
+      --purple: #bf5af2;   /* iOS System Purple */
+      --green: #30d158;    /* iOS System Green */
+      --text: #ffffff;
+      --subtext: #8e8e93;  /* iOS System Gray */
+      --border: #38383a;
     }
     * {
       box-sizing: border-box;
@@ -36,49 +36,54 @@
     body {
       background: var(--bg);
       color: var(--text);
-      padding: calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 30px);
+      padding: calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 30px);
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
+      padding-top: 4px;
     }
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.75rem;
       font-weight: 700;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.5px;
     }
     .status {
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: var(--subtext);
       margin-top: 2px;
-      max-width: 200px;
     }
-    .status.error {
-      color: var(--error);
-      font-weight: 600;
-    }
+    
+    /* Clean iOS Icon Button */
     button.refresh-btn {
       background: var(--card-alt);
-      border: 1px solid var(--border);
       color: var(--accent);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 600;
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
+      transition: opacity 0.2s;
     }
-    button.refresh-btn:active { opacity: 0.6; }
+    button.refresh-btn:active { opacity: 0.5; }
+    button.refresh-btn svg {
+      width: 18px;
+      height: 18px;
+    }
 
     /* Horizontal Month Pill Tabs */
     .month-tabs {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 14px;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
@@ -86,47 +91,45 @@
     .month-tab {
       flex: 0 0 auto;
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--subtext);
-      padding: 9px 18px;
-      border-radius: 22px;
-      font-size: 0.82rem;
-      font-weight: 700;
+      color: var(--text);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: none;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .month-tab.active {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
+      background: var(--accent);
       color: #ffffff;
-      border-color: #38bdf8;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     }
 
     /* 4 KPI Summary Cards */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 20px;
     }
     .stat-card {
       background: var(--card-bg);
-      border-radius: 14px;
-      padding: 12px;
-      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
     }
     .stat-card .label {
-      font-size: 0.62rem;
+      font-size: 0.65rem;
       color: var(--subtext);
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       font-weight: 600;
     }
     .stat-card .value {
-      font-size: 1.25rem;
+      font-size: 1.4rem;
       font-weight: 700;
-      margin-top: 5px;
+      margin-top: 6px;
       color: var(--accent);
+      letter-spacing: -0.2px;
     }
     .stat-card .value.cntr-val { color: var(--text); }
     .stat-card .value.teu-val { color: var(--purple); }
@@ -137,78 +140,82 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
     select.filter-select {
       background: var(--card-bg);
-      border: 1px solid var(--border);
       color: var(--text);
-      padding: 9px 12px;
-      border-radius: 10px;
-      font-size: 0.8rem;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.85rem;
       font-weight: 600;
+      border: none;
       outline: none;
       flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
     }
     .mini-pills {
       display: flex;
       background: var(--card-bg);
       border-radius: 10px;
-      padding: 2px;
-      border: 1px solid var(--border);
+      padding: 3px;
     }
     .mini-pill {
       background: transparent;
       border: none;
-      color: var(--subtext);
-      padding: 6px 10px;
-      font-size: 0.72rem;
+      color: var(--text);
+      padding: 6px 12px;
+      font-size: 0.75rem;
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
     }
     .mini-pill.active {
-      background: var(--card-alt);
-      color: var(--accent);
+      background: #48484a; /* iOS segmented control active state */
     }
 
     /* Master Table View */
     .customer-table-wrap {
       background: var(--card-bg);
-      border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
+      padding-bottom: 8px;
     }
     table.cust-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
     table.cust-table th {
-      background: #0f172a;
       color: var(--subtext);
       font-size: 0.65rem;
       text-transform: uppercase;
-      padding: 12px 6px;
+      padding: 14px 10px 10px 10px;
       text-align: right;
       border-bottom: 1px solid var(--border);
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
+      font-weight: 600;
     }
-    table.cust-table th:first-child { text-align: left; padding-left: 10px; }
+    table.cust-table th:first-child { text-align: left; padding-left: 16px; }
     table.cust-table td {
-      padding: 12px 6px;
-      border-bottom: 1px solid #1e293b;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
       text-align: right;
       font-weight: 600;
-      font-size: 0.75rem;
     }
+    table.cust-table tr:last-child td { border-bottom: none; }
     table.cust-table td:first-child {
       text-align: left;
-      padding-left: 10px;
-      font-weight: 700;
+      padding-left: 16px;
+      font-weight: 600;
       color: var(--text);
-      max-width: 120px;
+      max-width: 140px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -219,10 +226,15 @@
 
   <header>
     <div>
-      <h1>Live Tracker</h1>
+      <h1>Dashboard</h1>
       <div class="status" id="lastUpdated">Updating...</div>
     </div>
-    <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">↻ Refresh</button>
+    <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+      </svg>
+    </button>
   </header>
 
   <div class="month-tabs" id="monthTabs">
@@ -277,7 +289,7 @@
 
   <script>
     // =========================================================================
-    // PASTE YOUR NEW APPS SCRIPT WEB APP URL HERE:
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
     // =========================================================================
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec";
 
@@ -305,8 +317,7 @@
 
     async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
-      statusEl.classList.remove("error");
-      statusEl.textContent = "Fetching live data...";
+      statusEl.textContent = "Fetching data...";
 
       try {
         if (APPS_SCRIPT_URL.includes("PASTE_")) {
@@ -315,7 +326,6 @@
 
         const liveUrl = APPS_SCRIPT_URL + "?_cb=" + new Date().getTime();
         
-        // redirect: "follow" ensures iOS Safari accurately fetches from Google's redirect servers
         const resp = await fetch(liveUrl, { redirect: "follow" });
         const text = await resp.text();
         
@@ -323,22 +333,21 @@
         try {
           rawJson = JSON.parse(text);
         } catch (parseError) {
-          // SMART ERROR DETECTOR: Tells you exactly why the fetch failed
           if (text.includes("<!DOCTYPE html>") || text.includes("<html")) {
-            throw new Error("Script Blocked: Make sure 'Who has access' is set to 'Anyone'");
+            throw new Error("Script Blocked: Check sharing permissions");
           }
           throw new Error("Invalid format returned by Google");
         }
 
         if (rawJson.error) {
-          throw new Error("Apps Script Error: " + rawJson.error);
+          throw new Error("Error: " + rawJson.error);
         }
 
         dataByMonth = {};
         const sheetNames = Object.keys(rawJson);
         
         if (sheetNames.length === 0) {
-           throw new Error("Spreadsheet is empty or no tabs found");
+           throw new Error("Spreadsheet is empty");
         }
 
         sheetNames.forEach(sheetName => {
@@ -360,16 +369,15 @@
             return idx !== -1 ? idx : fallbackIdx;
           };
 
-          // Matches exact columns from your screenshot
-          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0); // Col A
-          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); // Col B
-          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5); // Col F
-          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6); // Col G
-          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9); // Col J
-          const vslIdx    = findCol(["vsl", "vessel"], 12); // Col M
+          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0);
+          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1);
+          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5);
+          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
+          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
+          const vslIdx    = findCol(["vsl", "vessel"], 12);
           const buyIdx    = findCol(["buy", "cost"], -1);
           const sellIdx   = findCol(["sell", "rate"], -1);
-          const marginIdx = findCol(["margin", "profit", "earning", "net"], -1); 
+          const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -377,7 +385,6 @@
             const bookingVal = String(r[bookIdx] || "").trim();
             const partyVal = String(r[partyIdx] || "").trim();
 
-            // Safely skips the manual Total row so nothing counts twice
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
             if (!bookingVal && !partyVal) continue;
 
@@ -415,7 +422,6 @@
         statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
       } catch (err) {
         console.error(err);
-        statusEl.classList.add("error");
         statusEl.textContent = err.message || "Error fetching data";
       }
     }
