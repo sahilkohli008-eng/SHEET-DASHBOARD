@@ -51,113 +51,55 @@
       -webkit-font-smoothing: antialiased;
     }
     
-    /* Deep Dark Canvas to Maximize Frosted Glass Contrast */
-    html, body {
-      background-color: #07090e;
-      color: var(--text-light);
-    }
+    /* Deep Dark Canvas */
+    html, body { background-color: #07090e; color: var(--text-light); }
     body {
       padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
+      min-height: 100vh; position: relative; overflow-x: hidden;
     }
     
-    /* Subtle Ambient Backlight for Glass Refraction */
+    /* Ambient Backlight */
     body::before {
-      content: "";
-      position: fixed;
-      top: -15%; left: -15%; width: 130%; height: 130%;
+      content: ""; position: fixed; top: -15%; left: -15%; width: 130%; height: 130%;
       background: 
         radial-gradient(circle at 18% 22%, rgba(56, 189, 248, 0.14) 0%, transparent 42%),
         radial-gradient(circle at 82% 65%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
         radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.10) 0%, transparent 45%);
-      filter: blur(50px);
-      z-index: -2;
-      pointer-events: none;
+      filter: blur(50px); z-index: -2; pointer-events: none;
     }
 
-    /* Core Ultra-Premium iOS Glassmorphism Class */
+    /* Base Glassmorphism */
     .liquid-glass {
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-main);
+      background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-main);
       color: var(--text-light);
     }
-
     .liquid-pill { border-radius: var(--radius-pill) !important; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
     
-    .menu-btn {
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-pill);
-      color: var(--text-light);
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.15s ease;
+    .menu-btn, button.refresh-btn {
+      background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-pill);
+      color: var(--text-light); cursor: pointer; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease;
     }
-    .menu-btn:active { transform: scale(0.95); }
+    .menu-btn:active, button.refresh-btn:active { transform: scale(0.95); }
     .menu-btn svg { width: 22px; height: 22px; }
+    button.refresh-btn svg { width: 18px; height: 18px; transform-origin: center; }
     
     h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; margin: 0; }
     
-    .status {
-      font-size: 0.72rem;
-      color: var(--subtext-light);
-      font-weight: 500;
-      margin-top: 4px;
-    }
-    
-    button.refresh-btn {
-      background: var(--glass-bg);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-pill);
-      color: var(--text-light);
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-    button.refresh-btn:active { transform: scale(0.95); }
-    button.refresh-btn svg { width: 18px; height: 18px; transform-origin: center; }
-
-    /* Spinning Animation for Refresh Icon */
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
 
-    /* Interactive Sidebar Drawer */
+    /* Sidebar Drawer */
     #overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 998;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
     }
     #overlay.active { opacity: 1; visibility: visible; }
 
@@ -165,45 +107,38 @@
       position: fixed; top: 0; left: 0; bottom: 0; width: 78vw; max-width: 320px;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
       backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border-right: 0.5px solid rgba(255, 255, 255, 0.15);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 12px 0 32px rgba(0, 0, 0, 0.5);
+      border-right: 0.5px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 12px 0 32px rgba(0, 0, 0, 0.5);
       z-index: 999; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       padding: calc(env(safe-area-inset-top) + 20px) 20px 20px; display: flex; flex-direction: column;
     }
     #sidebar.active { transform: translateX(0); }
     
-    .sidebar-header {
-      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px;
-    }
+    .sidebar-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
     .sidebar-title-group { display: flex; flex-direction: column; }
-    .sidebar-title-group h2 {
-      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; color: var(--text-light); margin: 0;
-    }
+    .sidebar-title-group h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; color: var(--text-light); margin: 0; }
+    
+    .status { font-size: 0.72rem; color: var(--subtext-light); font-weight: 500; margin-top: 4px; }
     
     .close-btn {
-      background: var(--glass-bg); border: var(--glass-border); box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-pill); color: var(--text-light); cursor: pointer;
-      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-top: -2px;
+      background: var(--glass-bg); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-pill);
+      color: var(--text-light); cursor: pointer; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-top: -2px;
     }
     .close-btn svg { width: 18px; height: 18px; }
     
     .sidebar-content { display: flex; flex-direction: column; gap: 18px; }
-    .filter-group { display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-    .filter-label {
-      font-size: 0.7rem; text-transform: uppercase; color: var(--subtext-light);
-      font-weight: 600; letter-spacing: 0.5px;
-    }
+    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+    .filter-label { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 600; letter-spacing: 0.5px; }
 
-    /* Standard Selects for Month & Container Type */
+    /* Standard Select */
     select.filter-select {
       color: var(--text-light); padding: 12px 36px 12px 14px; font-size: 0.9rem; font-weight: 600;
       outline: none; -webkit-appearance: none; appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 12px center; background-size: 15px; width: 100%;
     }
-    select.filter-select option { background-color: #111520; color: #ffffff; }
+    select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* CUSTOM SEARCHABLE DROPDOWNS (Glassmorphism) */
+    /* Custom Searchable Dropdowns */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -213,20 +148,15 @@
     }
     .custom-dropdown-menu {
       display: none; flex-direction: column; position: absolute; top: calc(100% + 6px); left: 0; width: 100%;
-      background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      border: var(--glass-border); border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       z-index: 1000; overflow: hidden;
     }
     .custom-dropdown-menu.active { display: flex; }
-    .search-input-wrapper {
-      padding: 8px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.2);
-    }
+    .search-input-wrapper { padding: 8px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.2); }
     .search-input-wrapper input {
       width: 100%; background: rgba(255, 255, 255, 0.1); border: 0.5px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem; outline: none;
     }
     .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
-    
     .custom-options-list { max-height: 200px; overflow-y: auto; }
     .custom-option {
       padding: 12px 14px; font-size: 0.85rem; font-weight: 500; color: var(--text-light);
@@ -238,17 +168,15 @@
     /* Bento KPI Cards Layout */
     .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
     .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
-    
-    .stat-card { padding: 16px; border-radius: var(--radius-main); }
-    .stat-card.small-card { padding: 14px 12px; border-radius: var(--radius-main); }
+    .stat-card { padding: 16px; }
+    .stat-card.small-card { padding: 14px 12px; }
     
     .stat-card .label-row { display: flex; justify-content: space-between; align-items: center; }
     .stat-card .label { font-size: 0.68rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
     .trend-badge {
-      font-size: 0.62rem; padding: 3px 7px; border-radius: var(--radius-pill); font-weight: 700;
-      display: inline-flex; align-items: center;
+      font-size: 0.62rem; padding: 3px 7px; border-radius: var(--radius-pill); font-weight: 700; display: inline-flex; align-items: center;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
       border: 0.5px solid rgba(255, 255, 255, 0.15);
     }
@@ -257,7 +185,6 @@
     .trend-badge.down { color: var(--red); }
     .trend-badge.neutral { color: var(--subtext-light); }
 
-    /* High-Contrast KPI Values */
     .stat-card .value { font-size: 1.65rem; font-weight: 700; margin-top: 8px; letter-spacing: -0.4px; }
     .stat-card.small-card .value { font-size: 1.25rem; margin-top: 6px; }
     
@@ -271,19 +198,18 @@
     
     .sub-value { font-size: 0.7rem; color: var(--subtext-light); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
 
-    /* Line Chart Summary Panel */
-    .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
+    /* Chart Summary */
+    .chart-container { padding: 18px; margin-bottom: 20px; display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .chart-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; color: var(--text-light); }
     select.mini-select { padding: 8px 30px 8px 12px; font-size: 0.78rem; width: auto; }
     canvas { width: 100%; max-height: 220px; }
 
-    /* Bottom Controls Bar */
+    /* Controls Bar & Physical Switch */
     .controls-bar { margin-bottom: 14px; }
     .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .controls-top-row select { flex: 1; }
     
-    /* Glossy Glass Segmented Switch */
     .switch-track {
       display: flex; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
       border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-pill); padding: 3px;
@@ -297,8 +223,8 @@
       border: 0.5px solid rgba(255, 255, 255, 0.2); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.25);
     }
     
-    /* Master Data Table Panel */
-    .customer-table-wrap { overflow: hidden; padding-bottom: 6px; border-radius: var(--radius-main); }
+    /* Master Table */
+    .customer-table-wrap { overflow: hidden; padding-bottom: 6px; }
     table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     table.cust-table th {
       color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase; padding: 16px 12px 12px 12px;
@@ -349,7 +275,7 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
-          <div class="custom-dropdown-menu" id="vesselDropdown">
+          <div class="custom-dropdown-menu liquid-glass liquid-pill" id="vesselDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="vesselSearch" placeholder="Search Vessel..." onkeyup="filterCustomOptions('vessel')">
             </div>
@@ -366,7 +292,7 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
-          <div class="custom-dropdown-menu" id="podDropdown">
+          <div class="custom-dropdown-menu liquid-glass liquid-pill" id="podDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="podSearch" placeholder="Search Port..." onkeyup="filterCustomOptions('pod')">
             </div>
@@ -509,14 +435,13 @@
     let sortBy = "teu"; 
     let lineChartInstance = null;
 
-    // Sidebar & Custom Dropdown Logic
+    // Sidebar & Custom Search Dropdown Logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
       sidebar.classList.toggle("active");
       overlay.classList.toggle("active");
       
-      // Close any open custom dropdowns when closing sidebar
       if(!sidebar.classList.contains("active")) {
         document.querySelectorAll(".custom-dropdown-menu").forEach(menu => menu.classList.remove("active"));
       }
@@ -538,7 +463,6 @@
       document.getElementById(type + "SelectLabel").textContent = label;
       document.getElementById(type + "Dropdown").classList.remove("active");
       
-      // Update selected state visually
       const options = document.getElementById(type + "OptionsList").children;
       for(let opt of options) {
         if(opt.textContent === label) opt.classList.add("selected");
@@ -556,7 +480,6 @@
       }
     }
 
-    // Close dropdowns when clicking outside
     document.addEventListener("click", function(event) {
       if (!event.target.closest(".custom-select-wrapper")) {
         document.querySelectorAll(".custom-dropdown-menu").forEach(menu => menu.classList.remove("active"));
@@ -656,6 +579,11 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            
+            let deducedEqp = "MIXED";
+            if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
+            else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
+            else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
 
             normalizedRows.push({
               vsl: vslName,
@@ -667,6 +595,7 @@
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
+              eqpType: deducedEqp,
               margin: margin
             });
           }
@@ -703,25 +632,22 @@
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
-      // Month
       const monthSel = document.getElementById("mainMonthSelect");
       monthSel.innerHTML = `<option value="ALL">All Months Overview</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
       monthSel.value = months.includes(activeMonth) ? activeMonth : "ALL";
 
-      // Custom Searchable Vessel List
+      // Populate Searchable Vessel List
       const vslList = document.getElementById("vesselOptionsList");
       let vslHtml = `<div class="custom-option ${activeVessel === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('vessel', 'ALL', 'All Vessels')">All Vessels</div>`;
       vsls.forEach(v => {
-        // Escaping potential single quotes in vessel names
         const safeV = v.replace(/'/g, "\\'");
         vslHtml += `<div class="custom-option ${activeVessel === v ? 'selected' : ''}" onclick="selectCustomOption('vessel', '${safeV}', '${safeV}')">${v}</div>`;
       });
       vslList.innerHTML = vslHtml;
-      
       document.getElementById("vesselFilter").value = vsls.includes(activeVessel) ? activeVessel : "ALL";
       document.getElementById("vesselSelectLabel").textContent = (activeVessel === "ALL" || !vsls.includes(activeVessel)) ? "All Vessels" : activeVessel;
 
-      // Custom Searchable Port List
+      // Populate Searchable Port List
       const podList = document.getElementById("podOptionsList");
       let podHtml = `<div class="custom-option ${activePod === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('pod', 'ALL', 'All Ports')">All Ports</div>`;
       pods.forEach(p => {
@@ -729,7 +655,6 @@
         podHtml += `<div class="custom-option ${activePod === p ? 'selected' : ''}" onclick="selectCustomOption('pod', '${safeP}', '${safeP}')">${p}</div>`;
       });
       podList.innerHTML = podHtml;
-      
       document.getElementById("podFilter").value = pods.includes(activePod) ? activePod : "ALL";
       document.getElementById("podSelectLabel").textContent = (activePod === "ALL" || !pods.includes(activePod)) ? "All Ports" : activePod;
     }
@@ -756,8 +681,8 @@
 
     function applyGlobalFilters() {
       activeMonth = document.getElementById("mainMonthSelect").value;
-      activeVessel = document.getElementById("vesselFilter").value; // Hidden input
-      activePod = document.getElementById("podFilter").value;       // Hidden input
+      activeVessel = document.getElementById("vesselFilter").value;
+      activePod = document.getElementById("podFilter").value;
       activeEqp = document.getElementById("eqpFilter").value;
 
       updateKPIsAndTrends();
@@ -947,4 +872,22 @@
           scales: {
             y: { 
               grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false }, 
-              ticks: { color: 'rgba(255,255,255,0.6)', font: { size
+              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: 'system-ui, -apple-system' } }, 
+              beginAtZero: true 
+            },
+            x: { 
+              grid: { display: false }, 
+              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: 'system-ui, -apple-system' } } 
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById("summaryChartContainer").style.display = "block";
+    setInterval(fetchMasterSheet, 5 * 60 * 1000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchMasterSheet(); });
+    window.addEventListener("DOMContentLoaded", fetchMasterSheet);
+  </script>
+</body>
+</html>
