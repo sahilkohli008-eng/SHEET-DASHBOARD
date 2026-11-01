@@ -16,8 +16,11 @@
     :root {
       --bg: #0b1120;
       --card-bg: #162032;
+      --card-alt: #1e293b;
       --accent: #38bdf8;
+      --purple: #818cf8;
       --green: #34d399;
+      --amber: #fbbf24;
       --text: #f8fafc;
       --subtext: #94a3b8;
       --border: #243248;
@@ -32,8 +35,10 @@
     body {
       background: var(--bg);
       color: var(--text);
-      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 24px);
+      padding: calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 30px);
     }
+
+    /* Header */
     header {
       display: flex;
       justify-content: space-between;
@@ -43,53 +48,61 @@
     h1 {
       font-size: 1.4rem;
       font-weight: 700;
+      letter-spacing: -0.3px;
     }
     .status {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--subtext);
       margin-top: 2px;
     }
     button.refresh-btn {
-      background: #1e293b;
+      background: var(--card-alt);
       border: 1px solid var(--border);
       color: var(--accent);
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 20px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
     }
     button.refresh-btn:active { opacity: 0.6; }
 
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    /* Horizontal Month Pill Tabs (Replaces Dropdown List) */
+    .month-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
       margin-bottom: 14px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    select.custom-select {
-      width: 100%;
+    .month-tabs::-webkit-scrollbar { display: none; }
+    .month-tab {
+      flex: 0 0 auto;
       background: var(--card-bg);
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 11px 12px;
-      border-radius: 12px;
+      color: var(--subtext);
+      padding: 9px 18px;
+      border-radius: 22px;
       font-size: 0.82rem;
-      font-weight: 600;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .month-tab.active {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     }
 
+    /* Top 3 KPI Summary Cards */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .stat-card {
       background: var(--card-bg);
@@ -98,7 +111,7 @@
       border: 1px solid var(--border);
     }
     .stat-card .label {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       color: var(--subtext);
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -110,26 +123,167 @@
       margin-top: 5px;
       color: var(--accent);
     }
+    .stat-card .value.teu-val { color: var(--purple); }
     .stat-card .value.margin-val { color: var(--green); }
 
+    /* Pie Chart Section */
     .chart-container {
       background: var(--card-bg);
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px;
       border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .chart-header {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
+      margin-bottom: 12px;
     }
     .chart-title {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .mini-pills {
+      display: flex;
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 2px;
+      border: 1px solid var(--border);
+    }
+    .mini-pill {
+      background: transparent;
+      border: none;
+      color: var(--subtext);
+      padding: 4px 8px;
+      font-size: 0.68rem;
       font-weight: 600;
-      margin-bottom: 12px;
-      width: 100%;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .mini-pill.active {
+      background: var(--card-alt);
+      color: var(--accent);
     }
     canvas {
       max-width: 100%;
-      max-height: 310px;
+      max-height: 250px;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Customer Section Header & View Switcher */
+    .section-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .controls-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Customer Cards Grid View (2-Column Bento Cards) */
+    .customer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .cust-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .cust-rank {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+    .cust-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .cust-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      background: #0f172a;
+      padding: 8px 6px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .m-label {
+      font-size: 0.55rem;
+      color: var(--subtext);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .m-val {
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .m-val.b-col { color: var(--accent); }
+    .m-val.t-col { color: var(--purple); }
+    .m-val.p-col { color: var(--green); }
+
+    /* Compact Table View Alternative */
+    .customer-table-wrap {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: none;
+    }
+    table.cust-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+    }
+    table.cust-table th {
+      background: #0f172a;
+      color: var(--subtext);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 10px 8px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+    table.cust-table th:first-child { text-align: left; }
+    table.cust-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #1e293b;
+      text-align: right;
+      font-weight: 600;
+    }
+    table.cust-table td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: var(--text);
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   </style>
 </head>
@@ -143,54 +297,114 @@
     <button class="refresh-btn" onclick="fetchAllWorkbooks()">↻ Refresh</button>
   </header>
 
-  <div class="controls-grid">
-    <select class="custom-select" id="monthSelect" onchange="renderActiveData()">
-      <option value="ALL">All Sheets & Tabs</option>
-    </select>
-
-    <select class="custom-select" id="groupBySelect" onchange="renderActiveData()">
-      <option value="party">By Party Name</option>
-      <option value="pod">By POD (Port)</option>
-      <option value="vsl">By Vessel</option>
-    </select>
+  <!-- Curated Single Month-Wise Pill Bar -->
+  <div class="month-tabs" id="monthTabs">
+    <button class="month-tab active" onclick="selectMonth('ALL')">ALL MONTHS</button>
   </div>
 
+  <!-- Top Summary KPIs -->
   <div class="card-grid">
     <div class="stat-card">
       <div class="label">BOOKINGS</div>
       <div class="value" id="statCount">--</div>
     </div>
     <div class="stat-card">
-      <div class="label">VOLUME / QTY</div>
-      <div class="value" id="statVolume">--</div>
+      <div class="label">TOTAL TEUs</div>
+      <div class="value teu-val" id="statVolume">--</div>
     </div>
     <div class="stat-card">
-      <div class="label">TOTAL MARGIN</div>
+      <div class="label">EARNING PROFIT</div>
       <div class="value margin-val" id="statMargin">--</div>
     </div>
   </div>
 
+  <!-- Interactive Doughnut Chart -->
   <div class="chart-container">
-    <div class="chart-title" id="chartTitle">Breakdown</div>
+    <div class="chart-header">
+      <div class="chart-title" id="chartTitle">Breakdown</div>
+      <div class="mini-pills">
+        <button class="mini-pill active" id="grp-party" onclick="setChartGroup('party')">Customer</button>
+        <button class="mini-pill" id="grp-pod" onclick="setChartGroup('pod')">POD</button>
+        <button class="mini-pill" id="grp-vsl" onclick="setChartGroup('vsl')">Vessel</button>
+      </div>
+    </div>
     <canvas id="pieChart"></canvas>
+  </div>
+
+  <!-- Customer Breakdown Section (Card Grid + Table Toggle) -->
+  <div class="section-bar">
+    <div class="section-title" id="custSectionTitle">Customer Performance</div>
+    <div class="controls-row">
+      <div class="mini-pills">
+        <button class="mini-pill active" id="sort-teu" onclick="setSortBy('teu')">By TEUs</button>
+        <button class="mini-pill" id="sort-profit" onclick="setSortBy('profit')">By Profit</button>
+      </div>
+      <div class="mini-pills">
+        <button class="mini-pill active" id="view-cards" onclick="setDisplayMode('cards')">Cards</button>
+        <button class="mini-pill" id="view-table" onclick="setDisplayMode('table')">Table</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2-Column Customer Card Grid -->
+  <div class="customer-grid" id="customerCardsContainer"></div>
+
+  <!-- Customer Table View -->
+  <div class="customer-table-wrap" id="customerTableContainer">
+    <table class="cust-table">
+      <thead>
+        <tr>
+          <th>Customer Name</th>
+          <th>Bkgs</th>
+          <th>TEUs</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody id="customerTableBody"></tbody>
+    </table>
   </div>
 
   <script>
     // =========================================================================
-    // PASTE YOUR TWO PUBLISHED GOOGLE SHEET LINKS RIGHT HERE:
+    // PASTE YOUR TWO PUBLISHED GOOGLE SHEET LINKS BELOW:
+    // Both sheets will automatically merge by Month (e.g., Aug + AUG -> AUG)
     // =========================================================================
     const WORKBOOK_URLS = [
-      { prefix: "Sheet 1", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSA7Ust8ut8lwSDfgzbacQ3biTKRy5YBNWY87cfGJp4JOKEsGx1kEjQcnEn1xuhKxzlZVtBNzfQTFaO/pub?output=csv" },
-      { prefix: "Sheet 2", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoSpmbzsEN8-Vxcg1DqZNLcmN-V8Yy3P10YyTGDk2yegMLRfSG2qCgS44_hRm2sAUh3A7aNvOQP9jU/pub?output=xlsx" }
+      { url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSA7Ust8ut8lwSDfgzbacQ3biTKRy5YBNWY87cfGJp4JOKEsGx1kEjQcnEn1xuhKxzlZVtBNzfQTFaO/pub?output=csv" },
+      { url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoSpmbzsEN8-Vxcg1DqZNLcmN-V8Yy3P10YyTGDk2yegMLRfSG2qCgS44_hRm2sAUh3A7aNvOQP9jU/pub?output=xlsx" }
     ];
 
-    let loadedDataByTab = {};
+    const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+    let dataByMonth = {};
+    let activeMonth = "ALL";
+    let chartGroup = "party"; // 'party', 'pod', 'vsl'
+    let sortBy = "teu";       // 'teu', 'profit'
+    let displayMode = "cards"; // 'cards', 'table'
     let chartInstance = null;
 
     function toMultiTabUrl(rawUrl) {
       if (!rawUrl || rawUrl.includes("PASTE_")) return "";
       const base = rawUrl.split("?")[0];
       return `${base}?output=xlsx&_cb=${Date.now()}`;
+    }
+
+    // Standardizes tab names so "Sheet 1: Aug" and "Sheet 2: AUG" merge into "AUG"
+    function normalizeMonthName(rawName) {
+      const clean = String(rawName || "").trim().toUpperCase();
+      for (const m of MONTH_ORDER) {
+        if (clean.startsWith(m) || clean.includes(m)) return m;
+      }
+      return clean;
+    }
+
+    // Safely parses numbers like "$1,200", "400", "20"
+    function parseNum(val, fallback = 0) {
+      if (typeof val === "number") return isNaN(val) ? fallback : val;
+      if (!val) return fallback;
+      const cleaned = String(val).replace(/[^0-9.-]+/g, "");
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? fallback : parsed;
     }
 
     async function fetchWorkbook(wbConfig) {
@@ -207,40 +421,64 @@
         const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
         if (rawRows.length < 2) return;
 
-        const headers = rawRows[0].map(h => String(h).trim().toLowerCase());
+        // Find header row dynamically (in case row 0 is a title)
+        let headerRowIdx = 0;
+        for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+          const rowText = rawRows[r].join(" ").toLowerCase();
+          if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin")) {
+            headerRowIdx = r;
+            break;
+          }
+        }
+
+        const headers = rawRows[headerRowIdx].map(h => String(h).trim().toLowerCase());
         const findCol = (keywords, fallbackIdx) => {
           const idx = headers.findIndex(h => keywords.some(k => h.includes(k)));
           return idx !== -1 ? idx : fallbackIdx;
         };
 
-        const bookIdx = findCol(["booking", "bkg", "bl", "sr"], 1);
-        const vslIdx = findCol(["vsl", "vessel"], 2);
-        const partyIdx = findCol(["party", "customer", "shipper", "forwarder", "client", "name"], 4);
-        const volIdx = findCol(["vol", "qty", "teu", "cntr", "container", "count"], 6);
-        const podIdx = findCol(["pod", "port", "dest", "discharge"], 8);
-        const marginIdx = findCol(["margin", "profit", "net"], 11);
+        const bookIdx   = findCol(["booking", "bkg", "bl"], 1);
+        const vslIdx    = findCol(["vsl", "vessel"], 2);
+        const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 4);
+        const volIdx    = findCol(["teu", "vol", "qty", "cntr", "container", "box", "count"], 6);
+        const podIdx    = findCol(["pod", "port", "dest", "discharge"], 8);
+        const buyIdx    = findCol(["buy", "cost"], 9);
+        const sellIdx   = findCol(["sell", "rate"], 10);
+        const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
 
         const normalizedRows = [];
-        for (let i = 1; i < rawRows.length; i++) {
+        for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
           const r = rawRows[i];
           const bookingVal = String(r[bookIdx] || "").trim();
           const partyVal = String(r[partyIdx] || "").trim();
+
+          // Skip blank rows or total summary rows
           if (!bookingVal && !partyVal) continue;
-          if (partyVal.toLowerCase().includes("total")) continue;
+          if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
+
+          const vol = parseNum(r[volIdx], 1);
+
+          // Extract Margin from Column L (or calculate Selling - Buying if Margin cell is empty)
+          let margin = parseNum(r[marginIdx], NaN);
+          if (isNaN(margin)) {
+            const buy = parseNum(r[buyIdx], NaN);
+            const sell = parseNum(r[sellIdx], NaN);
+            margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * vol : 0;
+          }
 
           normalizedRows.push({
-            vsl: String(r[vslIdx] || "Unknown").trim().toUpperCase(),
-            party: (partyVal || "Unknown").toUpperCase(),
-            vol: parseFloat(String(r[volIdx]).replace(/,/g, "")) || 1,
-            pod: String(r[podIdx] || "Unknown").trim().toUpperCase(),
-            margin: parseFloat(String(r[marginIdx]).replace(/,/g, "")) || 0
+            vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
+            party: (partyVal || "UNKNOWN CUSTOMER").toUpperCase(),
+            vol: vol,
+            pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
+            margin: margin
           });
         }
 
         if (normalizedRows.length > 0) {
-          const activeWorkbooks = WORKBOOK_URLS.filter(w => toMultiTabUrl(w.url) !== "").length;
-          const tabLabel = activeWorkbooks > 1 ? `${wbConfig.prefix}: ${sheetName}` : sheetName;
-          tabsData[tabLabel] = normalizedRows;
+          const mKey = normalizeMonthName(sheetName);
+          if (!tabsData[mKey]) tabsData[mKey] = [];
+          tabsData[mKey] = tabsData[mKey].concat(normalizedRows);
         }
       });
       return tabsData;
@@ -252,90 +490,175 @@
 
       try {
         const results = await Promise.all(WORKBOOK_URLS.map(wb => fetchWorkbook(wb)));
-        loadedDataByTab = {};
-        results.forEach(tabMap => {
-          Object.assign(loadedDataByTab, tabMap);
+        dataByMonth = {};
+
+        // Merge same-month rows from Sheet 1 and Sheet 2 into one unified month key
+        results.forEach(wbMap => {
+          Object.entries(wbMap).forEach(([monthKey, rows]) => {
+            if (!dataByMonth[monthKey]) dataByMonth[monthKey] = [];
+            dataByMonth[monthKey] = dataByMonth[monthKey].concat(rows);
+          });
         });
 
-        updateDropdown(Object.keys(loadedDataByTab));
+        renderMonthTabs();
         renderActiveData();
 
         const now = new Date();
         statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Make sure 'Entire Document' is published";
+        statusEl.textContent = "Error loading sheets";
       }
     }
 
-    function updateDropdown(tabNames) {
-      const select = document.getElementById("monthSelect");
-      const previousValue = select.value;
-
-      select.innerHTML = '<option value="ALL">All Sheets & Tabs Combined</option>';
-      tabNames.forEach(name => {
-        const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
-        select.appendChild(opt);
+    function renderMonthTabs() {
+      const container = document.getElementById("monthTabs");
+      const months = Object.keys(dataByMonth).sort((a, b) => {
+        const idxA = MONTH_ORDER.indexOf(a);
+        const idxB = MONTH_ORDER.indexOf(b);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        return a.localeCompare(b);
       });
 
-      if (tabNames.includes(previousValue)) {
-        select.value = previousValue;
+      if (activeMonth !== "ALL" && !months.includes(activeMonth)) {
+        activeMonth = "ALL";
       }
+
+      let html = `<button class="month-tab ${activeMonth === 'ALL' ? 'active' : ''}" onclick="selectMonth('ALL')">ALL</button>`;
+      months.forEach(m => {
+        const isActive = activeMonth === m ? "active" : "";
+        html += `<button class="month-tab ${isActive}" onclick="selectMonth('${m}')">${m}</button>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function selectMonth(m) {
+      activeMonth = m;
+      renderMonthTabs();
+      renderActiveData();
+    }
+
+    function setChartGroup(grp) {
+      chartGroup = grp;
+      ["party", "pod", "vsl"].forEach(g => {
+        document.getElementById(`grp-${g}`).classList.toggle("active", g === grp);
+      });
+      renderActiveData();
+    }
+
+    function setSortBy(s) {
+      sortBy = s;
+      ["teu", "profit"].forEach(k => {
+        document.getElementById(`sort-${k}`).classList.toggle("active", k === s);
+      });
+      renderActiveData();
+    }
+
+    function setDisplayMode(mode) {
+      displayMode = mode;
+      document.getElementById("view-cards").classList.toggle("active", mode === "cards");
+      document.getElementById("view-table").classList.toggle("active", mode === "table");
+      document.getElementById("customerCardsContainer").style.display = mode === "cards" ? "grid" : "none";
+      document.getElementById("customerTableContainer").style.display = mode === "table" ? "block" : "none";
     }
 
     function renderActiveData() {
-      const selectedTab = document.getElementById("monthSelect").value;
-      const groupBy = document.getElementById("groupBySelect").value;
-
       let rows = [];
-      if (selectedTab === "ALL") {
-        Object.values(loadedDataByTab).forEach(tRows => {
-          rows = rows.concat(tRows);
-        });
+      if (activeMonth === "ALL") {
+        Object.values(dataByMonth).forEach(mRows => { rows = rows.concat(mRows); });
       } else {
-        rows = loadedDataByTab[selectedTab] || [];
+        rows = dataByMonth[activeMonth] || [];
       }
 
       let totalBookings = rows.length;
-      let totalVolume = 0;
-      let totalMargin = 0;
-      const breakdownMap = {};
+      let totalTEUs = 0;
+      let totalProfit = 0;
+
+      const chartMap = {};
+      const customerStats = {};
 
       rows.forEach(item => {
-        totalVolume += item.vol;
-        totalMargin += item.margin;
+        totalTEUs += item.vol;
+        totalProfit += item.margin;
 
-        let key = item.party;
-        if (groupBy === "pod") key = item.pod;
-        if (groupBy === "vsl") key = item.vsl;
+        // Aggregate for Chart
+        let cKey = item.party;
+        if (chartGroup === "pod") cKey = item.pod;
+        if (chartGroup === "vsl") cKey = item.vsl;
+        chartMap[cKey] = (chartMap[cKey] || 0) + item.vol;
 
-        breakdownMap[key] = (breakdownMap[key] || 0) + item.vol;
+        // Aggregate per Customer for Curated Cards / Table
+        if (!customerStats[item.party]) {
+          customerStats[item.party] = { name: item.party, bookings: 0, teus: 0, profit: 0 };
+        }
+        customerStats[item.party].bookings += 1;
+        customerStats[item.party].teus += item.vol;
+        customerStats[item.party].profit += item.margin;
       });
 
+      // Update Top Summary Cards
       document.getElementById("statCount").textContent = totalBookings.toLocaleString();
-      document.getElementById("statVolume").textContent = Math.round(totalVolume).toLocaleString();
-      document.getElementById("statMargin").textContent = "$" + Math.round(totalMargin).toLocaleString();
+      document.getElementById("statVolume").textContent = Math.round(totalTEUs).toLocaleString();
+      document.getElementById("statMargin").textContent = "$" + Math.round(totalProfit).toLocaleString();
 
-      const sortedEntries = Object.entries(breakdownMap).sort((a, b) => b[1] - a[1]);
-      const topEntries = sortedEntries.slice(0, 8);
-      const otherEntries = sortedEntries.slice(8);
+      // Update Pie Chart
+      const sortedChart = Object.entries(chartMap).sort((a, b) => b[1] - a[1]);
+      const top8 = sortedChart.slice(0, 8);
+      const others = sortedChart.slice(8);
 
-      const labels = topEntries.map(e => e[0]);
-      const values = topEntries.map(e => e[1]);
-
-      if (otherEntries.length > 0) {
-        const otherSum = otherEntries.reduce((acc, curr) => acc + curr[1], 0);
+      const labels = top8.map(e => e[0]);
+      const values = top8.map(e => e[1]);
+      if (others.length > 0) {
         labels.push("OTHER");
-        values.push(otherSum);
+        values.push(others.reduce((sum, curr) => sum + curr[1], 0));
       }
 
-      const tabTitle = selectedTab === "ALL" ? "All Combined" : selectedTab;
-      const groupTitle = groupBy === "party" ? "Party" : (groupBy === "pod" ? "POD" : "Vessel");
-      document.getElementById("chartTitle").textContent = `${tabTitle} — Volume by ${groupTitle}`;
-
+      const mLabel = activeMonth === "ALL" ? "All Months" : activeMonth;
+      const gLabel = chartGroup === "party" ? "Customer" : (chartGroup === "pod" ? "POD" : "Vessel");
+      document.getElementById("chartTitle").textContent = `${mLabel} — TEUs by ${gLabel}`;
       updateChart(labels, values);
+
+      // Render Customer Breakdown (Cards & Table)
+      const custArray = Object.values(customerStats).sort((a, b) => {
+        return sortBy === "profit" ? (b.profit - a.profit) : (b.teus - a.teus);
+      });
+
+      document.getElementById("custSectionTitle").textContent = `${mLabel} Customers (${custArray.length})`;
+
+      const cardsHtml = custArray.map((c, idx) => `
+        <div class="cust-card">
+          <div>
+            <div class="cust-rank">#${idx + 1} CUSTOMER</div>
+            <div class="cust-name">${c.name}</div>
+          </div>
+          <div class="cust-metrics">
+            <div>
+              <div class="m-label">BKGS</div>
+              <div class="m-val b-col">${c.bookings}</div>
+            </div>
+            <div>
+              <div class="m-label">TEUs</div>
+              <div class="m-val t-col">${Math.round(c.teus)}</div>
+            </div>
+            <div>
+              <div class="m-label">PROFIT</div>
+              <div class="m-val p-col">$${Math.round(c.profit).toLocaleString()}</div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      const tableHtml = custArray.map(c => `
+        <tr>
+          <td>${c.name}</td>
+          <td style="color: var(--accent);">${c.bookings}</td>
+          <td style="color: var(--purple);">${Math.round(c.teus)}</td>
+          <td style="color: var(--green);">$${Math.round(c.profit).toLocaleString()}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("customerCardsContainer").innerHTML = cardsHtml;
+      document.getElementById("customerTableBody").innerHTML = tableHtml;
     }
 
     function updateChart(labels, values) {
@@ -357,11 +680,11 @@
         },
         options: {
           responsive: true,
-          cutout: "58%",
+          cutout: "60%",
           plugins: {
             legend: {
               position: "bottom",
-              labels: { color: "#94a3b8", font: { size: 10 }, boxWidth: 12, padding: 10 }
+              labels: { color: "#94a3b8", font: { size: 10 }, boxWidth: 10, padding: 8 }
             }
           }
         }
