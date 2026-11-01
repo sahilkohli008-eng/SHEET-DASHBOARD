@@ -339,10 +339,10 @@
 
   <div class="controls-bar">
     <select class="filter-select" id="groupBySelect" onchange="renderTableData()">
-      <option value="party">Group By: Customer</option>
-      <option value="pod">Group By: Port</option>
-      <option value="vsl">Group By: Vessel</option>
-      <option value="custType">Group By: Customer Type</option>
+      <option value="party">Customer</option>
+      <option value="pod">Port</option>
+      <option value="vsl">Vessel</option>
+      <option value="custType">Customer Type</option>
     </select>
     <div class="mini-pills">
       <button class="mini-pill active" id="sort-teu" onclick="setSortBy('teu')">TEUs</button>
@@ -634,8 +634,8 @@
       const headerNameEl = document.getElementById("colHeaderName");
 
       if (groupBy === "party") headerNameEl.textContent = "Customer Name";
-      else if (groupBy === "pod") headerNameEl.textContent = "POD (Port)";
-      else if (groupBy === "vsl") headerNameEl.textContent = "Vessel Name";
+      else if (groupBy === "pod") headerNameEl.textContent = "Port";
+      else if (groupBy === "vsl") headerNameEl.textContent = "Vessel";
       else if (groupBy === "custType") headerNameEl.textContent = "Customer Type";
 
       const rows = getFilteredRows(activeMonth, activeVessel, activePod);
