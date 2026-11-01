@@ -126,7 +126,10 @@
     .close-btn svg { width: 18px; height: 18px; }
     
     .sidebar-content { display: flex; flex-direction: column; gap: 18px; }
-    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+    
+    /* ADDED position: relative here to bound the dropdown menus */
+    .filter-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
+    
     .filter-label { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 600; letter-spacing: 0.5px; }
 
     /* Standard Select */
@@ -138,7 +141,7 @@
     }
     select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* Custom Searchable Dropdowns */
+    /* Custom Searchable Dropdowns (Fixed Background) */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -146,24 +149,32 @@
       padding: 12px 36px 12px 14px; color: var(--text-light); font-size: 0.9rem; font-weight: 600;
       cursor: pointer; user-select: none;
     }
+    
     .custom-dropdown-menu {
-      display: none; flex-direction: column; position: absolute; top: calc(100% + 6px); left: 0; width: 100%;
+      display: none; flex-direction: column; position: absolute; top: calc(100% + 8px); left: 0; width: 100%;
+      /* OPAQUE BACKGROUND TO FIX OVERLAP ISSUE */
+      background: #0f141e;
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      border-radius: 18px; 
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
       z-index: 1000; overflow: hidden;
     }
     .custom-dropdown-menu.active { display: flex; }
-    .search-input-wrapper { padding: 8px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.2); }
+    
+    .search-input-wrapper { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: #161b26; }
     .search-input-wrapper input {
-      width: 100%; background: rgba(255, 255, 255, 0.1); border: 0.5px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem; outline: none;
+      width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none;
     }
     .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
+    
     .custom-options-list { max-height: 200px; overflow-y: auto; }
     .custom-option {
-      padding: 12px 14px; font-size: 0.85rem; font-weight: 500; color: var(--text-light);
-      border-bottom: 0.5px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: background 0.2s;
+      padding: 14px 16px; font-size: 0.85rem; font-weight: 600; color: var(--text-light);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: background 0.2s;
     }
     .custom-option:last-child { border-bottom: none; }
-    .custom-option:hover, .custom-option.selected { background: rgba(255, 255, 255, 0.1); color: var(--accent-blue); font-weight: 600; }
+    .custom-option:hover, .custom-option.selected { background: rgba(255, 255, 255, 0.1); color: var(--accent-blue); font-weight: 700; }
 
     /* Bento KPI Cards Layout */
     .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
@@ -275,7 +286,8 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
-          <div class="custom-dropdown-menu liquid-glass liquid-pill" id="vesselDropdown">
+          <!-- OPAQUE DROPDOWN MENU -->
+          <div class="custom-dropdown-menu" id="vesselDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="vesselSearch" placeholder="Search Vessel..." onkeyup="filterCustomOptions('vessel')">
             </div>
@@ -292,7 +304,8 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
-          <div class="custom-dropdown-menu liquid-glass liquid-pill" id="podDropdown">
+          <!-- OPAQUE DROPDOWN MENU -->
+          <div class="custom-dropdown-menu" id="podDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="podSearch" placeholder="Search Port..." onkeyup="filterCustomOptions('pod')">
             </div>
@@ -302,7 +315,7 @@
         <input type="hidden" id="podFilter" value="ALL">
       </div>
 
-      <div class="filter-group">
+      <div class="filter-group" style="z-index: 80;">
         <label class="filter-label">Container Type</label>
         <select id="eqpFilter" class="filter-select liquid-glass liquid-pill" onchange="applyGlobalFilters()">
           <option value="ALL">All Container Types</option>
@@ -360,7 +373,7 @@
 
   <div class="card-row-2" style="margin-bottom: 24px;">
     <div class="stat-card liquid-glass">
-      <div class="label-row"><div class="label">TOTAL TEUS</div><div id="trendTeus"></div></div>
+      <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     <div class="stat-card liquid-glass" style="background: var(--card-highlight);">
@@ -632,11 +645,12 @@
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
+      // Month
       const monthSel = document.getElementById("mainMonthSelect");
       monthSel.innerHTML = `<option value="ALL">All Months Overview</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
       monthSel.value = months.includes(activeMonth) ? activeMonth : "ALL";
 
-      // Populate Searchable Vessel List
+      // Custom Searchable Vessel List
       const vslList = document.getElementById("vesselOptionsList");
       let vslHtml = `<div class="custom-option ${activeVessel === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('vessel', 'ALL', 'All Vessels')">All Vessels</div>`;
       vsls.forEach(v => {
@@ -647,7 +661,7 @@
       document.getElementById("vesselFilter").value = vsls.includes(activeVessel) ? activeVessel : "ALL";
       document.getElementById("vesselSelectLabel").textContent = (activeVessel === "ALL" || !vsls.includes(activeVessel)) ? "All Vessels" : activeVessel;
 
-      // Populate Searchable Port List
+      // Custom Searchable Port List
       const podList = document.getElementById("podOptionsList");
       let podHtml = `<div class="custom-option ${activePod === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('pod', 'ALL', 'All Ports')">All Ports</div>`;
       pods.forEach(p => {
@@ -681,8 +695,8 @@
 
     function applyGlobalFilters() {
       activeMonth = document.getElementById("mainMonthSelect").value;
-      activeVessel = document.getElementById("vesselFilter").value;
-      activePod = document.getElementById("podFilter").value;
+      activeVessel = document.getElementById("vesselFilter").value; 
+      activePod = document.getElementById("podFilter").value;       
       activeEqp = document.getElementById("eqpFilter").value;
 
       updateKPIsAndTrends();
