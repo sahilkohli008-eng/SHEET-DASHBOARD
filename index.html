@@ -127,7 +127,6 @@
     
     .sidebar-content { display: flex; flex-direction: column; gap: 18px; }
     
-    /* ADDED position: relative here to bound the dropdown menus */
     .filter-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
     
     .filter-label { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 600; letter-spacing: 0.5px; }
@@ -141,7 +140,7 @@
     }
     select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* Custom Searchable Dropdowns (Fixed Background) */
+    /* Custom Searchable Dropdowns */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -152,21 +151,40 @@
     
     .custom-dropdown-menu {
       display: none; flex-direction: column; position: absolute; top: calc(100% + 8px); left: 0; width: 100%;
-      /* OPAQUE BACKGROUND TO FIX OVERLAP ISSUE */
-      background: #0f141e;
-      border: 1px solid rgba(255, 255, 255, 0.2); 
-      border-radius: 18px; 
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
-      z-index: 1000; overflow: hidden;
+      background: #0f141e; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 18px; 
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8); z-index: 1000; overflow: hidden;
     }
     .custom-dropdown-menu.active { display: flex; }
     
-    .search-input-wrapper { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: #161b26; }
+    .search-input-wrapper { 
+      padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: #161b26; 
+      position: relative; display: flex; align-items: center;
+    }
     .search-input-wrapper input {
       width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none;
+      border-radius: 10px; padding: 10px 32px 10px 14px; color: #fff; font-size: 0.9rem; outline: none;
     }
     .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
+    
+    /* Interactive Clear Button (X) */
+    .clear-search-btn {
+      position: absolute;
+      right: 18px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: background 0.2s, transform 0.1s;
+    }
+    .clear-search-btn:hover { background: rgba(255,255,255,0.3); }
+    .clear-search-btn:active { transform: scale(0.9); }
+    .clear-search-btn svg { width: 12px; height: 12px; }
     
     .custom-options-list { max-height: 200px; overflow-y: auto; }
     .custom-option {
@@ -286,10 +304,14 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
-          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="vesselDropdown">
             <div class="search-input-wrapper">
-              <input type="text" id="vesselSearch" placeholder="Search Vessel..." onkeyup="filterCustomOptions('vessel')">
+              <input type="text" id="vesselSearch" placeholder="Search Vessel..." oninput="filterCustomOptions('vessel')">
+              <button class="clear-search-btn" id="vesselClearBtn" onclick="clearSearch('vessel')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </button>
             </div>
             <div class="custom-options-list" id="vesselOptionsList"></div>
           </div>
@@ -304,10 +326,14 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
-          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="podDropdown">
             <div class="search-input-wrapper">
-              <input type="text" id="podSearch" placeholder="Search Port..." onkeyup="filterCustomOptions('pod')">
+              <input type="text" id="podSearch" placeholder="Search Port..." oninput="filterCustomOptions('pod')">
+              <button class="clear-search-btn" id="podClearBtn" onclick="clearSearch('pod')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </button>
             </div>
             <div class="custom-options-list" id="podOptionsList"></div>
           </div>
@@ -485,12 +511,42 @@
     }
 
     function filterCustomOptions(type) {
-      const input = document.getElementById(type + "Search").value.toLowerCase();
+      const inputElement = document.getElementById(type + "Search");
+      const input = inputElement.value.toLowerCase();
+      const clearBtn = document.getElementById(type + "ClearBtn");
+      
+      // Show/Hide Clear X button dynamically
+      if (input.length > 0) {
+        clearBtn.style.display = "flex";
+      } else {
+        clearBtn.style.display = "none";
+      }
+
       const options = document.getElementById(type + "OptionsList").getElementsByClassName("custom-option");
       for (let i = 0; i < options.length; i++) {
         const text = options[i].textContent.toLowerCase();
         options[i].style.display = text.includes(input) ? "" : "none";
       }
+    }
+
+    function clearSearch(type) {
+      const inputElement = document.getElementById(type + "Search");
+      inputElement.value = "";
+      filterCustomOptions(type); // Hide button & reset visual list instantly
+      
+      // Default it back to ALL dynamically without closing the dropdown UI
+      const defaultLabel = type === 'vessel' ? 'All Vessels' : 'All Ports';
+      document.getElementById(type + "Filter").value = "ALL";
+      document.getElementById(type + "SelectLabel").textContent = defaultLabel;
+      
+      const options = document.getElementById(type + "OptionsList").children;
+      for(let opt of options) {
+        if(opt.textContent === defaultLabel) opt.classList.add("selected");
+        else opt.classList.remove("selected");
+      }
+      
+      applyGlobalFilters(); // Trigger live dashboard reset
+      inputElement.focus(); // Keep user seamlessly in the typing flow
     }
 
     document.addEventListener("click", function(event) {
