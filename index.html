@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Tracker</title>
 
-  <!-- Prevent iOS Caching -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <!-- iOS PWA Fullscreen Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Live Tracker" />
@@ -130,7 +128,7 @@
     .stat-card .value.teu-val { color: var(--purple); }
     .stat-card .value.margin-val { color: var(--green); }
 
-    /* Controls Bar (Filter Dropdown + Sort Pills) */
+    /* Controls Bar */
     .controls-bar {
       display: flex;
       justify-content: space-between;
@@ -223,12 +221,10 @@
     <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">↻ Refresh</button>
   </header>
 
-  <!-- Month Pill Bar -->
   <div class="month-tabs" id="monthTabs">
     <button class="month-tab active" onclick="selectMonth('ALL')">ALL</button>
   </div>
 
-  <!-- Top 4 KPI Cards -->
   <div class="card-grid">
     <div class="stat-card">
       <div class="label">BOOKINGS</div>
@@ -248,7 +244,6 @@
     </div>
   </div>
 
-  <!-- Filter & Sort Bar -->
   <div class="controls-bar">
     <select class="filter-select" id="groupBySelect" onchange="renderTableData()">
       <option value="party">Group By: Customer</option>
@@ -261,7 +256,6 @@
     </div>
   </div>
 
-  <!-- Master Table View -->
   <div class="customer-table-wrap">
     <table class="cust-table">
       <thead>
@@ -281,19 +275,13 @@
     // =========================================================================
     // YOUR EXACT MASTER SHEET LINK (ALREADY EMBEDDED)
     // =========================================================================
-    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDKbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=xlsx";
+    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDkbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=xlsx";
 
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     let dataByMonth = {};
     let activeMonth = "ALL";
-    let sortBy = "teu"; // 'teu' or 'profit'
-
-    function toMultiTabUrl(rawUrl) {
-      if (!rawUrl || rawUrl.includes("PASTE_")) return "";
-      const base = rawUrl.split("?")[0];
-      return `${base}?output=xlsx&_nocache=${new Date().getTime()}`;
-    }
+    let sortBy = "teu"; 
 
     function normalizeMonthName(rawName) {
       const clean = String(rawName || "").trim().toUpperCase();
@@ -316,15 +304,40 @@
       statusEl.textContent = "Fetching live data...";
 
       try {
-        const liveUrl = toMultiTabUrl(MASTER_SHEET_URL);
+        const liveUrl = `${MASTER_SHEET_URL.split("?")[0]}?output=xlsx&_nocache=${new Date().getTime()}`;
         
-        // SAFARI CORS PROXY FIX: Bypasses Apple's strict background file download block
-        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(liveUrl);
+        // Robust Multi-Proxy Fallback (Prevents empty pages from ruining the app)
+        const proxies = [
+          "https://api.codetabs.com/v1/proxy/?quest=",
+          "https://api.allorigins.win/raw?url=",
+          "https://corsproxy.io/?"
+        ];
 
-        const resp = await fetch(proxyUrl);
-        const arrayBuffer = await resp.arrayBuffer();
+        let arrayBuffer = null;
+
+        for (const proxy of proxies) {
+          try {
+            const resp = await fetch(proxy + encodeURIComponent(liveUrl));
+            if (!resp.ok) continue;
+            
+            const buffer = await resp.arrayBuffer();
+            const view = new Uint8Array(buffer);
+            
+            // SECURITY CHECK: Verify this is a real XLSX file (starts with 'PK' = 0x50 0x4B)
+            if (view[0] === 0x50 && view[1] === 0x4B) {
+              arrayBuffer = buffer;
+              break; 
+            }
+          } catch (e) {
+            console.warn("Proxy failed, trying next...");
+          }
+        }
+
+        if (!arrayBuffer) {
+          throw new Error("Could not securely download Excel file from Google.");
+        }
+
         const workbook = XLSX.read(arrayBuffer, { type: "array" });
-
         dataByMonth = {};
 
         workbook.SheetNames.forEach(sheetName => {
@@ -332,55 +345,43 @@
           const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
           if (rawRows.length < 2) return;
 
-          let headerRowIdx = 0;
+          // Attempt to locate Profit column if it exists in the first few rows
+          let profitIdx = -1;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-            const rowText = rawRows[r].join(" ").toLowerCase();
-            if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin") || rowText.includes("party")) {
-              headerRowIdx = r;
-              break;
-            }
+            const hdrs = rawRows[r].map(h => String(h).toLowerCase());
+            const idx = hdrs.findIndex(h => h.includes("profit") || h.includes("margin") || h.includes("net"));
+            if (idx !== -1) { profitIdx = idx; break; }
           }
-
-          const headers = rawRows[headerRowIdx].map(h => String(h).trim().toLowerCase());
-          const findCol = (keywords, fallbackIdx) => {
-            const idx = headers.findIndex(h => keywords.some(k => h.includes(k)));
-            return idx !== -1 ? idx : fallbackIdx;
-          };
-
-          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0);
-          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1);
-          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5);
-          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
-          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
-          const buyIdx    = findCol(["buy", "cost"], -1);
-          const sellIdx   = findCol(["sell", "rate"], -1);
-          const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
+          if (profitIdx === -1) profitIdx = 11; // Fallback to Col L if missing
 
           const normalizedRows = [];
-          for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
+          
+          for (let i = 0; i < rawRows.length; i++) {
             const r = rawRows[i];
-            const bookingVal = String(r[bookIdx] || "").trim();
-            const partyVal = String(r[partyIdx] || "").trim();
-
-            if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
-            if (!bookingVal && !partyVal) continue;
-
-            const cntrs = parseNum(r[cntrIdx], 0);
-            const teus = parseNum(r[teuIdx], 0);
             
-            let margin = parseNum(r[marginIdx], NaN);
-            if (isNaN(margin)) {
-              const buy = parseNum(r[buyIdx], NaN);
-              const sell = parseNum(r[sellIdx], NaN);
-              margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * teus : 0;
-            }
+            // Hardcoded columns strictly based on your Masterfile screenshot
+            const bookingVal = String(r[0] || "").trim(); // Col A
+            const partyVal = String(r[1] || "").trim();   // Col B
+
+            // Ignore totally empty rows, header text rows, and manual total rows
+            if (!bookingVal && !partyVal) continue;
+            if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
+            if (bookingVal.toLowerCase().includes("booking") || bookingVal.toLowerCase().includes("sr no")) continue;
+            if (partyVal.toLowerCase().includes("party") || partyVal.toLowerCase().includes("customer")) continue;
+
+            const cntrs = parseNum(r[5], 0); // Col F
+            const teus = parseNum(r[6], 0);  // Col G
+            const pod = String(r[9] || "UNKNOWN").trim().toUpperCase();  // Col J
+            const vsl = String(r[12] || "UNKNOWN").trim().toUpperCase(); // Col M
+            
+            let margin = parseNum(r[profitIdx], 0);
 
             normalizedRows.push({
-              vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
-              party: (partyVal || "UNKNOWN").toUpperCase(),
+              vsl: vsl,
+              party: partyVal.toUpperCase(),
               cntrs: cntrs,
               teus: teus,
-              pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
+              pod: pod,
               margin: margin
             });
           }
@@ -399,7 +400,7 @@
         statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Error loading master sheet";
+        document.getElementById("lastUpdated").textContent = "Error loading master sheet";
       }
     }
 
