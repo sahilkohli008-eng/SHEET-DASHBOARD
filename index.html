@@ -220,7 +220,6 @@
       <h1>Live Tracker</h1>
       <div class="status" id="lastUpdated">Updating...</div>
     </div>
-    <!-- Single tap pulls fresh data cache-busting; Double tap forces app shell reload -->
     <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">↻ Refresh</button>
   </header>
 
@@ -240,7 +239,7 @@
       <div class="value cntr-val" id="statContainers">--</div>
     </div>
     <div class="stat-card">
-      <div class="label">TOTAL TEUS</div>
+      <div class="label">TOTAL TEUs</div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     <div class="stat-card">
@@ -280,9 +279,9 @@
 
   <script>
     // =========================================================================
-    // PASTE YOUR SINGLE MASTER GOOGLE SHEET PUBLISHED LINK HERE:
+    // YOUR EXACT MASTER SHEET LINK (ALREADY EMBEDDED)
     // =========================================================================
-    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDKbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=csv";
+    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDKbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=xlsx";
 
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -293,7 +292,6 @@
     function toMultiTabUrl(rawUrl) {
       if (!rawUrl || rawUrl.includes("PASTE_")) return "";
       const base = rawUrl.split("?")[0];
-      // Powerful cache-buster guarantees fetching the newest Google Sheet stream
       return `${base}?output=xlsx&_nocache=${new Date().getTime()}`;
     }
 
@@ -319,12 +317,11 @@
 
       try {
         const liveUrl = toMultiTabUrl(MASTER_SHEET_URL);
-        if (!liveUrl) {
-          statusEl.textContent = "Paste Master Sheet URL in code";
-          return;
-        }
+        
+        // SAFARI CORS PROXY FIX: Bypasses Apple's strict background file download block
+        const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(liveUrl);
 
-        const resp = await fetch(liveUrl);
+        const resp = await fetch(proxyUrl);
         const arrayBuffer = await resp.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { type: "array" });
 
@@ -350,12 +347,11 @@
             return idx !== -1 ? idx : fallbackIdx;
           };
 
-          // Hardcoded fallbacks based perfectly on your screenshot if headers are missing
-          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0); // Col A
-          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); // Col B
-          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5); // Col F
-          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6); // Col G
-          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9); // Col J
+          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0);
+          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1);
+          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5);
+          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
+          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
           const buyIdx    = findCol(["buy", "cost"], -1);
           const sellIdx   = findCol(["sell", "rate"], -1);
           const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
@@ -366,10 +362,7 @@
             const bookingVal = String(r[bookIdx] || "").trim();
             const partyVal = String(r[partyIdx] || "").trim();
 
-            // CRITICAL FIX: Skip the manual "Total" row at the bottom so it never double-counts!
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
-            
-            // Skip completely empty rows
             if (!bookingVal && !partyVal) continue;
 
             const cntrs = parseNum(r[cntrIdx], 0);
@@ -484,13 +477,11 @@
         aggregatedMap[groupKey].profit += item.margin;
       });
 
-      // Update Top 4 KPI Cards
       document.getElementById("statCount").textContent = totalBookings.toLocaleString();
       document.getElementById("statContainers").textContent = Math.round(totalContainers).toLocaleString();
       document.getElementById("statVolume").textContent = Math.round(totalTEUs).toLocaleString();
       document.getElementById("statMargin").textContent = "$" + Math.round(totalProfit).toLocaleString();
 
-      // Sort Table Rows
       const sortedArray = Object.values(aggregatedMap).sort((a, b) => {
         return sortBy === "profit" ? (b.profit - a.profit) : (b.teus - a.teus);
       });
