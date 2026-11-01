@@ -6,13 +6,13 @@
   <title>Dashboard</title>
 
   <!-- iOS Status Bar & Caching -->
-  <meta name="theme-color" content="#0a101f" />
+  <meta name="theme-color" content="#e2e8f0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Dashboard" />
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -20,11 +20,6 @@
 
   <style>
     :root {
-      --card-bg: rgba(255, 255, 255, 0.08);
-      --card-highlight: linear-gradient(135deg, rgba(74, 158, 255, 0.2) 0%, rgba(37, 99, 235, 0.05) 100%);
-      --card-alt: rgba(255, 255, 255, 0.12);
-      --border-color: rgba(255, 255, 255, 0.15);
-      
       --accent: #5eead4;
       --accent-blue: #60a5fa; 
       --purple: #c084fc;
@@ -33,8 +28,9 @@
       --pink: #fb7185;
       --red: #f87171;
       
-      --text: #ffffff;
-      --subtext: rgba(255, 255, 255, 0.7);
+      --text-dark: #0f172a;
+      --text-light: #ffffff;
+      --subtext-light: rgba(255, 255, 255, 0.65);
     }
     
     * {
@@ -45,225 +41,185 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     }
     
-    /* Full-Screen Gradient for iOS Safari */
-    html { background-color: #0a101f; }
+    /* Light Ambient Background for Dark 3D Contrast */
+    html { background-color: #e2e8f0; }
     body {
-      color: var(--text);
+      color: var(--text-dark);
       padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
       min-height: 100vh;
       position: relative;
     }
     body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(160deg, #0a101f 0%, #11274a 50%, #1e4b8f 100%);
-      z-index: -2;
+      content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 10% 20%, rgba(226, 232, 240, 1) 0%, rgba(203, 213, 225, 1) 100%);
+      z-index: -3;
+    }
+    body::after {
+      content: ""; position: fixed; top: -10%; left: -10%; width: 120%; height: 120%;
+      background: 
+        radial-gradient(circle at 30% 20%, rgba(96, 165, 250, 0.4) 0%, transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(192, 132, 252, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.3) 0%, transparent 40%);
+      filter: blur(40px); z-index: -2;
     }
 
-    .glass {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+    /* 3D Liquid Glass Effect */
+    .liquid-glass {
+      background: linear-gradient(145deg, rgba(30, 32, 40, 0.75) 0%, rgba(10, 12, 16, 0.9) 100%);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      border-left: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 
+        inset 0 4px 8px -2px rgba(255, 255, 255, 0.4), /* Top Rim Highlight */
+        inset 0 -4px 8px -2px rgba(0, 0, 0, 0.8),       /* Bottom Rim Shadow */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),      /* Inner Core Ring */
+        0 16px 32px rgba(0, 0, 0, 0.15),                /* Drop Shadow */
+        0 0 20px rgba(96, 165, 250, 0.15);              /* Ambient Glow */
+      color: var(--text-light);
     }
     
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .liquid-capsule {
+      border-radius: 999px !important;
     }
+
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
     
     .menu-btn {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
+      background: transparent; border: none; color: var(--text-dark); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 4px;
     }
     .menu-btn svg { width: 28px; height: 28px; }
-
-    h1 { font-size: 1.85rem; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
-
-    .status {
-      font-size: 0.75rem;
-      color: var(--subtext);
-      margin-top: 2px;
-      margin-left: 44px; /* Align under Dashboard text */
-    }
+    h1 { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
+    .status { font-size: 0.75rem; color: #475569; margin-top: 2px; margin-left: 44px; font-weight: 600;}
     
     button.refresh-btn {
-      background: var(--card-alt);
-      color: var(--text);
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      border: 1px solid var(--border-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      transition: opacity 0.2s;
+      background: linear-gradient(145deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+      color: var(--text-dark); width: 42px; height: 42px; border-radius: 21px;
+      border: 1px solid rgba(255,255,255,0.8); display: flex; justify-content: center; align-items: center;
+      cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    button.refresh-btn:active { opacity: 0.5; }
+    button.refresh-btn:active { transform: scale(0.95); }
     button.refresh-btn svg { width: 18px; height: 18px; }
 
     /* Interactive Sidebar Elements */
     #overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 998;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
     }
-    #overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
+    #overlay.active { opacity: 1; visibility: visible; }
 
     #sidebar {
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      width: 75vw;
-      max-width: 320px;
-      background: rgba(13, 25, 50, 0.75);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border-right: 1px solid var(--border-color);
-      z-index: 999;
-      transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: calc(env(safe-area-inset-top) + 20px) 20px 20px;
-      display: flex;
-      flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; width: 75vw; max-width: 320px;
+      background: rgba(13, 25, 50, 0.85); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border-right: 1px solid rgba(255,255,255,0.15); z-index: 999;
+      transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: calc(env(safe-area-inset-top) + 20px) 20px 20px; display: flex; flex-direction: column;
+      box-shadow: 20px 0 40px rgba(0,0,0,0.3);
     }
-    #sidebar.active {
-      transform: translateX(0);
-    }
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .sidebar-header h2 { font-size: 1.3rem; font-weight: 700; color: var(--text); }
-    .close-btn { background: none; border: none; color: var(--subtext); cursor: pointer; padding: 4px; }
+    #sidebar.active { transform: translateX(0); }
+    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .sidebar-header h2 { font-size: 1.3rem; font-weight: 700; color: var(--text-light); }
+    .close-btn { background: none; border: none; color: var(--subtext-light); cursor: pointer; padding: 4px; }
     .close-btn svg { width: 24px; height: 24px; }
     
     .sidebar-content { display: flex; flex-direction: column; gap: 20px; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
-    .filter-label { font-size: 0.75rem; text-transform: uppercase; color: var(--subtext); font-weight: 600; letter-spacing: 0.5px; }
+    .filter-label { font-size: 0.75rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 600; letter-spacing: 0.5px; }
 
     select.filter-select {
-      background-color: var(--card-alt);
-      color: var(--text);
-      padding: 14px 16px;
-      border-radius: 16px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border: 1px solid var(--border-color);
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
+      color: var(--text-light); padding: 14px 18px; font-size: 0.95rem; font-weight: 600;
+      outline: none; -webkit-appearance: none; appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-size: 16px;
-      backdrop-filter: blur(10px);
+      background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;
       width: 100%;
     }
-    select.filter-select:focus { border-color: var(--accent-blue); }
 
     /* Bento KPI Cards Layout */
-    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
-    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 14px; }
+    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
     
-    .stat-card { border-radius: 20px; padding: 16px; }
-    .stat-card.small-card { padding: 12px; border-radius: 16px; }
+    .stat-card { padding: 18px; }
+    .stat-card.small-card { padding: 14px 12px; border-radius: 22px; }
     
     .stat-card .label-row { display: flex; justify-content: space-between; align-items: center; }
-    .stat-card .label { font-size: 0.7rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .stat-card .label { font-size: 0.7rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
     .trend-badge {
-      font-size: 0.65rem; padding: 4px 6px; border-radius: 8px;
-      font-weight: 700; display: inline-flex; align-items: center;
-      background: var(--card-alt);
+      font-size: 0.65rem; padding: 4px 6px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center;
+      background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
     }
     .stat-card.small-card .trend-badge { font-size: 0.55rem; padding: 3px 5px; }
-    .trend-badge.up { color: var(--green); }
+    .trend-badge.up { color: var(--green); text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
     .trend-badge.down { color: var(--red); }
-    .trend-badge.neutral { color: var(--subtext); }
+    .trend-badge.neutral { color: var(--subtext-light); }
 
-    .stat-card .value { font-size: 1.5rem; font-weight: 700; margin-top: 8px; color: var(--text); letter-spacing: -0.2px; }
-    .stat-card.small-card .value { font-size: 1.2rem; margin-top: 6px; }
+    .stat-card .value { font-size: 1.6rem; font-weight: 800; margin-top: 10px; letter-spacing: -0.2px; }
+    .stat-card.small-card .value { font-size: 1.25rem; margin-top: 8px; }
     
-    .stat-card .value.bkg-val { color: var(--accent-blue); }
-    .stat-card .value.teu-val { color: var(--purple); }
-    .stat-card .value.margin-val { color: var(--accent); font-size: 1.6rem; }
+    .stat-card .value.bkg-val { color: var(--accent-blue); text-shadow: 0 0 12px rgba(96,165,250,0.4); }
+    .stat-card .value.teu-val { color: var(--purple); text-shadow: 0 0 12px rgba(192,132,252,0.4); }
+    .stat-card .value.margin-val { background: linear-gradient(90deg, #5eead4, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.8rem; }
     .stat-card .value.gp-val { color: var(--accent-blue); }
     .stat-card .value.hq-val { color: var(--orange); }
     .stat-card .value.spl-val { color: var(--pink); }
-    .sub-value { font-size: 0.75rem; color: var(--subtext); margin-top: 6px; font-weight: 600; }
+    .sub-value { font-size: 0.75rem; color: var(--subtext-light); margin-top: 6px; font-weight: 600; }
 
     /* Line Chart Summary */
-    .chart-container { border-radius: 24px; padding: 20px; margin-bottom: 20px; display: none; }
+    .chart-container { padding: 20px; margin-bottom: 24px; display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .chart-title { font-size: 1rem; font-weight: 700; color: var(--text); }
-    select.mini-select {
-      background: var(--card-alt); padding: 6px 30px 6px 12px; font-size: 0.8rem;
-      border-radius: 10px; background-size: 14px; border: 1px solid var(--border-color); color: var(--text);
-    }
+    .chart-title { font-size: 1.05rem; font-weight: 700; color: var(--text-light); }
     canvas { width: 100%; max-height: 220px; }
 
     /* Bottom Table Controls */
     .controls-bar { margin-bottom: 16px; }
-    .controls-top-row {
-      display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    }
+    .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
     .controls-top-row select { flex: 1; }
+    
+    /* 3D Switch Design (Like the picture) */
     .mini-pills { 
-      display: flex; background: var(--card-alt); border-radius: 12px; padding: 4px; border: 1px solid var(--border-color);
+      display: flex; 
+      background: rgba(0,0,0,0.6); 
+      border-radius: 999px; 
+      padding: 4px; 
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), inset 0 -1px 1px rgba(255,255,255,0.1);
     }
     .mini-pill {
-      background: transparent; border: none; color: var(--subtext); padding: 6px 14px; 
-      font-size: 0.8rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+      background: transparent; border: none; color: var(--subtext-light); padding: 8px 16px; 
+      font-size: 0.8rem; font-weight: 700; border-radius: 999px; cursor: pointer; transition: all 0.3s;
     }
-    .mini-pill.active { background: rgba(255, 255, 255, 0.15); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .mini-pill.active { 
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6); 
+      color: #ffffff; 
+      box-shadow: 
+        inset 0 2px 4px rgba(255,255,255,0.4), 
+        0 4px 12px rgba(96,165,250,0.5); 
+    }
     
     /* Master Table */
-    .customer-table-wrap { border-radius: 24px; overflow: hidden; padding-bottom: 8px; }
+    .customer-table-wrap { overflow: hidden; padding-bottom: 8px; }
     table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     table.cust-table th {
-      color: var(--subtext); font-size: 0.65rem; text-transform: uppercase;
-      padding: 16px 12px 12px 12px; text-align: right; border-bottom: 1px solid var(--border-color); 
-      letter-spacing: 0.5px; font-weight: 600;
+      color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase;
+      padding: 18px 12px 14px 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); 
+      letter-spacing: 0.5px; font-weight: 700;
     }
     table.cust-table th:first-child { text-align: left; padding-left: 20px; }
     table.cust-table td {
-      padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; font-weight: 600; vertical-align: middle;
+      padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; font-weight: 600; vertical-align: middle;
     }
     table.cust-table tr:last-child td { border-bottom: none; }
     table.cust-table td:first-child {
-      text-align: left; padding-left: 20px; font-weight: 600; color: var(--text); max-width: 130px; 
+      text-align: left; padding-left: 20px; font-weight: 700; color: var(--text-light); max-width: 120px; 
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .cell-main { display: block; font-size: 0.9rem; }
-    .cell-sub { font-size: 0.65rem; color: var(--subtext); margin-top: 4px; font-weight: 600; }
+    .cell-main { display: block; font-size: 0.95rem; }
+    .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 4px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -282,25 +238,25 @@
     <div class="sidebar-content">
       <div class="filter-group">
         <label class="filter-label">Month Overview</label>
-        <select id="mainMonthSelect" class="filter-select" onchange="applyGlobalFilters()">
+        <select id="mainMonthSelect" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
           <option value="ALL">All Months Overview</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Vessels</label>
-        <select id="vesselFilter" class="filter-select" onchange="applyGlobalFilters()">
+        <select id="vesselFilter" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
           <option value="ALL">All Vessels</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Ports</label>
-        <select id="podFilter" class="filter-select" onchange="applyGlobalFilters()">
+        <select id="podFilter" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
           <option value="ALL">All Ports</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Container Type</label>
-        <select id="eqpFilter" class="filter-select" onchange="applyGlobalFilters()">
+        <select id="eqpFilter" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
           <option value="ALL">All Container Types</option>
           <option value="20GP">20 General Purpose</option>
           <option value="40HQ">40 High Cube</option>
@@ -332,37 +288,37 @@
 
   <!-- KPI Cards -->
   <div class="card-row-2">
-    <div class="stat-card glass">
+    <div class="stat-card liquid-glass">
       <div class="label-row"><div class="label">BOOKINGS</div><div id="trendBkgs"></div></div>
       <div class="value bkg-val" id="statCount">--</div>
     </div>
-    <div class="stat-card glass">
+    <div class="stat-card liquid-glass">
       <div class="label-row"><div class="label">CONTAINERS</div><div id="trendCntrs"></div></div>
       <div class="value cntr-val" id="statContainers">--</div>
     </div>
   </div>
 
   <div class="card-row-3">
-    <div class="stat-card small-card glass">
+    <div class="stat-card small-card liquid-glass">
       <div class="label-row"><div class="label">20GP</div><div id="trend20"></div></div>
       <div class="value gp-val" id="stat20">--</div>
     </div>
-    <div class="stat-card small-card glass">
+    <div class="stat-card small-card liquid-glass">
       <div class="label-row"><div class="label">40HQ</div><div id="trend40"></div></div>
       <div class="value hq-val" id="stat40">--</div>
     </div>
-    <div class="stat-card small-card glass">
+    <div class="stat-card small-card liquid-glass">
       <div class="label-row"><div class="label">SPL EQP</div><div id="trendSpl"></div></div>
       <div class="value spl-val" id="statSpl">--</div>
     </div>
   </div>
 
   <div class="card-row-2" style="margin-bottom: 24px;">
-    <div class="stat-card glass">
+    <div class="stat-card liquid-glass">
       <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
-    <div class="stat-card glass" style="background: var(--card-highlight);">
+    <div class="stat-card liquid-glass">
       <div class="label-row"><div class="label">EARNING PROFIT</div><div id="trendProfit"></div></div>
       <div class="value margin-val" id="statMargin">--</div>
       <div class="sub-value" id="statYield">--</div>
@@ -370,17 +326,17 @@
   </div>
 
   <!-- Trends Chart -->
-  <div id="summaryChartContainer" class="chart-container glass">
+  <div id="summaryChartContainer" class="chart-container liquid-glass">
     <div class="chart-header">
       <div class="chart-title">Monthly Trends</div>
-      <select id="chartMetricSelect" class="filter-select mini-select" onchange="renderLineChart()">
+      <select id="chartMetricSelect" class="filter-select liquid-glass liquid-capsule" style="padding: 8px 30px 8px 14px; font-size: 0.8rem; width: auto;" onchange="renderLineChart()">
         <option value="teus">TEUs</option>
         <option value="profit">Profit</option>
         <option value="cntrs">Containers</option>
         <option value="bookings">Bookings</option>
         <option value="gp20">20GP Units</option>
         <option value="hq40">40HQ Units</option>
-        <option value="spl">SPL Equipment</option>
+        <option value="spl">SPL Eqp</option>
       </select>
     </div>
     <canvas id="lineChart"></canvas>
@@ -389,7 +345,7 @@
   <!-- Bottom Table Controls -->
   <div class="controls-bar">
     <div class="controls-top-row">
-      <select class="filter-select glass" id="groupBySelect" onchange="renderTableData()">
+      <select class="filter-select liquid-glass liquid-capsule" id="groupBySelect" onchange="renderTableData()">
         <option value="party">Customer</option>
         <option value="pod">Port</option>
         <option value="vsl">Vessel</option>
@@ -403,7 +359,7 @@
   </div>
 
   <!-- Table -->
-  <div class="customer-table-wrap glass">
+  <div class="customer-table-wrap liquid-glass">
     <table class="cust-table">
       <thead>
         <tr>
@@ -434,7 +390,6 @@
     let sortBy = "teu"; 
     let lineChartInstance = null;
 
-    // Sidebar Logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
@@ -513,7 +468,6 @@
           const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
           const vslIdx      = findCol(["vsl", "vessel"], 12); 
           const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
-          const eqpTypeIdx  = findCol(["equipment", "eqp", "type", "size"], -1); 
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -534,12 +488,6 @@
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
-            let deducedEqp = "MIXED";
-            if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
-            else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
-            else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
-            else if (eqpTypeIdx !== -1 && r[eqpTypeIdx]) deducedEqp = String(r[eqpTypeIdx]).trim().toUpperCase();
-
             normalizedRows.push({
               vsl: vslName,
               party: partyVal.toUpperCase(),
@@ -550,7 +498,6 @@
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
-              eqpType: deducedEqp,
               margin: margin
             });
           }
@@ -740,7 +687,7 @@
         <tr>
           <td>${c.name}</td>
           <td style="color: var(--accent-blue);">${c.bookings}</td>
-          <td style="color: var(--text);">${Math.round(c.cntrs)}</td>
+          <td style="color: var(--text-light);">${Math.round(c.cntrs)}</td>
           <td style="color: var(--purple);">${Math.round(c.teus)}</td>
           <td>
             <span class="cell-main" style="color: var(--accent);">$${Math.round(c.profit).toLocaleString()}</span>
@@ -749,7 +696,7 @@
         </tr>`;
       }).join("");
 
-      document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="5" style="text-align:center; color: var(--subtext); padding: 30px;">No data available for this filter combination</td></tr>`;
+      document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="5" style="text-align:center; color: var(--subtext-light); padding: 30px;">No data available for this filter combination</td></tr>`;
     }
 
     function renderLineChart() {
