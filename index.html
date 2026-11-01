@@ -21,9 +21,9 @@
   <style>
     :root {
       /* High-Contrast Neon Accents */
-      --accent: #5eead4;      /* Mint/Cyan ($53,771 style) */
-      --accent-blue: #60a5fa; /* Crisp iOS Blue */
-      --purple: #c084fc;      /* High-Contrast Purple (1,042 style) */
+      --accent: #5eead4;      
+      --accent-blue: #60a5fa; 
+      --purple: #c084fc;      
       --green: #4ade80;
       --orange: #fb923c;
       --pink: #fb7185;
@@ -97,7 +97,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .header-left {
       display: flex;
@@ -130,12 +130,13 @@
       letter-spacing: -0.4px;
       margin: 0;
     }
+    
+    /* Status Text moved to sidebar, basic styling remains */
     .status {
       font-size: 0.72rem;
       color: var(--subtext-light);
-      margin-top: 3px;
-      margin-left: 52px;
       font-weight: 500;
+      margin-top: 4px;
     }
     
     button.refresh-btn {
@@ -155,7 +156,15 @@
       transition: transform 0.15s ease;
     }
     button.refresh-btn:active { transform: scale(0.95); }
-    button.refresh-btn svg { width: 18px; height: 18px; }
+    button.refresh-btn svg { width: 18px; height: 18px; transform-origin: center; }
+
+    /* Spinning Animation for Refresh Icon */
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
 
     /* Interactive Sidebar Drawer */
     #overlay {
@@ -185,18 +194,25 @@
       flex-direction: column;
     }
     #sidebar.active { transform: translateX(0); }
+    
     .sidebar-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       margin-bottom: 28px;
     }
-    .sidebar-header h2 {
+    .sidebar-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-title-group h2 {
       font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.3px;
       color: var(--text-light);
+      margin: 0;
     }
+    
     .close-btn {
       background: var(--glass-bg);
       border: var(--glass-border);
@@ -209,6 +225,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-top: -2px;
     }
     .close-btn svg { width: 18px; height: 18px; }
     
@@ -424,7 +441,10 @@
   <div id="overlay" onclick="toggleSidebar()"></div>
   <div id="sidebar">
     <div class="sidebar-header">
-      <h2>Global Filters</h2>
+      <div class="sidebar-title-group">
+        <h2>Global Filters</h2>
+        <div class="status" id="lastUpdated">Updating...</div>
+      </div>
       <button class="close-btn" onclick="toggleSidebar()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -463,19 +483,16 @@
   </div>
 
   <header>
-    <div>
-      <div class="header-left">
-        <button class="menu-btn" onclick="toggleSidebar()">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        <h1>Dashboard</h1>
-      </div>
-      <div class="status" id="lastUpdated">Updating...</div>
+    <div class="header-left">
+      <button class="menu-btn" onclick="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <h1>Dashboard</h1>
     </div>
     <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="23 4 23 10 17 10"></polyline>
         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
       </svg>
@@ -511,7 +528,7 @@
 
   <div class="card-row-2" style="margin-bottom: 20px;">
     <div class="stat-card liquid-glass">
-      <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
+      <div class="label-row"><div class="label">TOTAL TEUS</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     <div class="stat-card liquid-glass">
@@ -526,13 +543,13 @@
     <div class="chart-header">
       <div class="chart-title">Monthly Trends</div>
       <select id="chartMetricSelect" class="filter-select liquid-glass liquid-pill mini-select" onchange="renderLineChart()">
-        <option value="teus">TEUs</option>
+        <option value="teus">Teus</option>
         <option value="profit">Profit</option>
         <option value="cntrs">Containers</option>
         <option value="bookings">Bookings</option>
-        <option value="gp20">20GP Units</option>
-        <option value="hq40">40HQ Units</option>
-        <option value="spl">SPL Eqp</option>
+        <option value="gp20">20GP</option>
+        <option value="hq40">40HQ</option>
+        <option value="spl">Spl Eqp</option>
       </select>
     </div>
     <canvas id="lineChart"></canvas>
@@ -611,7 +628,10 @@
 
     async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
+      const refreshIcon = document.getElementById("refresh-icon");
+      
       statusEl.textContent = "Fetching data...";
+      if (refreshIcon) refreshIcon.classList.add("spinning");
 
       try {
         if (APPS_SCRIPT_URL.includes("PASTE_")) throw new Error("Missing Script URL");
@@ -683,6 +703,11 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            
+            let deducedEqp = "MIXED";
+            if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
+            else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
+            else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
 
             normalizedRows.push({
               vsl: vslName,
@@ -694,6 +719,7 @@
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
+              eqpType: deducedEqp,
               margin: margin
             });
           }
@@ -713,6 +739,8 @@
       } catch (err) {
         console.error(err);
         statusEl.textContent = err.message || "Error fetching data";
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove("spinning");
       }
     }
 
@@ -922,7 +950,7 @@
       if (lineChartInstance) lineChartInstance.destroy();
 
       let color = "#5eead4"; 
-      if (metric === 'profit') color = "#5eead4"; 
+      if (metric === 'profit') color = "#4ade80"; 
       else if (metric === 'teus') color = "#c084fc"; 
       else if (metric === 'cntrs') color = "#60a5fa"; 
       else if (metric === 'gp20') color = "#60a5fa"; 
@@ -937,7 +965,7 @@
             label: metric.toUpperCase(),
             data: dataPoints,
             borderColor: color,
-            backgroundColor: color + '28', 
+            backgroundColor: color + '26', 
             borderWidth: 2.5,
             pointBackgroundColor: color,
             pointRadius: 4.5,
