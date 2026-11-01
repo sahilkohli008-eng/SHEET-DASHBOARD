@@ -22,13 +22,13 @@
       --bg: #000000;
       --card-bg: #1c1c1e;
       --card-alt: #2c2c2e;
-      --accent: #0a84ff;   /* iOS System Blue */
-      --purple: #bf5af2;   /* iOS System Purple */
-      --green: #30d158;    /* iOS System Green */
-      --orange: #ff9f0a;   /* iOS System Orange */
-      --red: #ff453a;      /* iOS System Red */
+      --accent: #0a84ff;
+      --purple: #bf5af2;
+      --green: #30d158;
+      --orange: #ff9f0a;
+      --red: #ff453a;
       --text: #ffffff;
-      --subtext: #8e8e93;  /* iOS System Gray */
+      --subtext: #8e8e93;
       --border: #38383a;
     }
     * {
@@ -79,9 +79,7 @@
     button.refresh-btn svg { width: 18px; height: 18px; }
 
     /* Global Filters */
-    .global-filters {
-      margin-bottom: 16px;
-    }
+    .global-filters { margin-bottom: 16px; }
     select.filter-select {
       background: var(--card-bg);
       color: var(--text);
@@ -106,15 +104,10 @@
       border-radius: 14px;
       margin-bottom: 10px;
     }
-    .sub-filters {
-      display: flex;
-      gap: 10px;
-    }
-    .sub-filters select {
-      flex: 1;
-    }
+    .sub-filters { display: flex; gap: 10px; }
+    .sub-filters select { flex: 1; }
 
-    /* KPI Cards with Trend Badges */
+    /* KPI Cards */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -181,11 +174,7 @@
       align-items: center;
       margin-bottom: 12px;
     }
-    .chart-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text);
-    }
+    .chart-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
     select.mini-select {
       background: var(--card-alt);
       padding: 6px 30px 6px 10px;
@@ -193,10 +182,7 @@
       border-radius: 8px;
       background-size: 12px;
     }
-    canvas {
-      width: 100%;
-      max-height: 220px;
-    }
+    canvas { width: 100%; max-height: 220px; }
 
     /* Controls Bar */
     .controls-bar {
@@ -207,21 +193,11 @@
       margin-bottom: 16px;
     }
     .controls-bar select { flex: 1; }
-    .mini-pills {
-      display: flex;
-      background: var(--card-bg);
-      border-radius: 10px;
-      padding: 3px;
-    }
+    .mini-pills { display: flex; background: var(--card-bg); border-radius: 10px; padding: 3px; }
     .mini-pill {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
+      background: transparent; border: none; color: var(--text);
+      padding: 6px 12px; font-size: 0.75rem; font-weight: 600;
+      border-radius: 8px; cursor: pointer;
     }
     .mini-pill.active { background: #48484a; }
 
@@ -232,39 +208,22 @@
       overflow: hidden;
       padding-bottom: 8px;
     }
-    table.cust-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
+    table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     table.cust-table th {
-      color: var(--subtext);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      padding: 14px 10px 10px 10px;
-      text-align: right;
-      border-bottom: 1px solid var(--border);
-      letter-spacing: 0.4px;
-      font-weight: 600;
+      color: var(--subtext); font-size: 0.65rem; text-transform: uppercase;
+      padding: 14px 10px 10px 10px; text-align: right;
+      border-bottom: 1px solid var(--border); letter-spacing: 0.4px; font-weight: 600;
     }
     table.cust-table th:first-child { text-align: left; padding-left: 16px; }
     table.cust-table td {
-      padding: 10px 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: right;
-      font-weight: 600;
-      vertical-align: middle;
+      padding: 10px 10px; border-bottom: 1px solid var(--border);
+      text-align: right; font-weight: 600; vertical-align: middle;
     }
     table.cust-table tr:last-child td { border-bottom: none; }
     table.cust-table td:first-child {
-      text-align: left;
-      padding-left: 16px;
-      font-weight: 600;
-      color: var(--text);
-      max-width: 130px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-align: left; padding-left: 16px; font-weight: 600;
+      color: var(--text); max-width: 130px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
     }
     .cell-main { display: block; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext); margin-top: 3px; font-weight: 600; }
@@ -290,8 +249,8 @@
       <option value="ALL">All Months Overview</option>
     </select>
     <div class="sub-filters">
-      <select id="serviceFilter" class="filter-select" onchange="applyGlobalFilters()">
-        <option value="ALL">All Services</option>
+      <select id="vesselFilter" class="filter-select" onchange="applyGlobalFilters()">
+        <option value="ALL">All Vessels</option>
       </select>
       <select id="podFilter" class="filter-select" onchange="applyGlobalFilters()">
         <option value="ALL">All Ports</option>
@@ -383,7 +342,7 @@
 
     let dataByMonth = {};
     let activeMonth = "ALL";
-    let activeService = "ALL";
+    let activeVessel = "ALL";
     let activePod = "ALL";
     let sortBy = "teu"; 
     let lineChartInstance = null;
@@ -454,11 +413,8 @@
           const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
           const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
           const vslIdx    = findCol(["vsl", "vessel"], 12);
-          
-          // New Columns for Service & Container Type
           const srvIdx    = findCol(["service", "srv", "loop", "line"], -1);
           const typeIdx   = findCol(["type", "size", "eqp", "equipment"], -1);
-          
           const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
 
           const normalizedRows = [];
@@ -473,17 +429,18 @@
             const cntrs = parseNum(r[cntrIdx], 0);
             const teus = parseNum(r[teuIdx], 0);
             const margin = parseNum(r[marginIdx], 0);
-
-            const srv = srvIdx !== -1 ? String(r[srvIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            
+            const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
+            const srvName = srvIdx !== -1 ? String(r[srvIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const cType = typeIdx !== -1 ? String(r[typeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
 
             normalizedRows.push({
-              vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
+              vsl: vslName,
               party: partyVal.toUpperCase(),
               cntrs: cntrs,
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
-              srv: srv,
+              srv: srvName,
               type: cType,
               margin: margin
             });
@@ -509,7 +466,9 @@
 
     function populateFilterDropdowns() {
       const allRows = getFilteredRows("ALL", "ALL", "ALL");
-      const srvs = [...new Set(allRows.map(r => r.srv))].filter(s => s && s !== "UNKNOWN").sort();
+      
+      // Changed from Services to Vessels
+      const vsls = [...new Set(allRows.map(r => r.vsl))].filter(v => v && v !== "UNKNOWN").sort();
       const pods = [...new Set(allRows.map(r => r.pod))].filter(p => p && p !== "UNKNOWN").sort();
 
       const months = Object.keys(dataByMonth).sort((a, b) => {
@@ -518,37 +477,38 @@
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
-      // Update Month Dropdown
       const monthSel = document.getElementById("mainMonthSelect");
       monthSel.innerHTML = `<option value="ALL">All Months Overview</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
       monthSel.value = months.includes(activeMonth) ? activeMonth : "ALL";
 
-      // Update Service Dropdown
-      const srvSel = document.getElementById("serviceFilter");
-      srvSel.innerHTML = `<option value="ALL">All Services</option>` + srvs.map(s => `<option value="${s}">${s}</option>`).join("");
-      srvSel.value = srvs.includes(activeService) ? activeService : "ALL";
+      // Updated dropdown to Vessel
+      const vslSel = document.getElementById("vesselFilter");
+      vslSel.innerHTML = `<option value="ALL">All Vessels</option>` + vsls.map(v => `<option value="${v}">${v}</option>`).join("");
+      vslSel.value = vsls.includes(activeVessel) ? activeVessel : "ALL";
 
-      // Update POD Dropdown
       const podSel = document.getElementById("podFilter");
       podSel.innerHTML = `<option value="ALL">All Ports</option>` + pods.map(p => `<option value="${p}">${p}</option>`).join("");
       podSel.value = pods.includes(activePod) ? activePod : "ALL";
     }
 
-    function getFilteredRows(month, srv, pod) {
+    function getFilteredRows(month, vsl, pod) {
       let rows = [];
       if (month === "ALL") {
         Object.values(dataByMonth).forEach(mRows => rows = rows.concat(mRows));
       } else {
         rows = dataByMonth[month] || [];
       }
-      if (srv !== "ALL") rows = rows.filter(r => r.srv === srv);
+      
+      // Filter logically applies vessel instead of service now
+      if (vsl !== "ALL") rows = rows.filter(r => r.vsl === vsl);
       if (pod !== "ALL") rows = rows.filter(r => r.pod === pod);
+      
       return rows;
     }
 
     function applyGlobalFilters() {
       activeMonth = document.getElementById("mainMonthSelect").value;
-      activeService = document.getElementById("serviceFilter").value;
+      activeVessel = document.getElementById("vesselFilter").value;
       activePod = document.getElementById("podFilter").value;
 
       updateKPIsAndTrends();
@@ -574,7 +534,7 @@
     }
 
     function updateKPIsAndTrends() {
-      const currentRows = getFilteredRows(activeMonth, activeService, activePod);
+      const currentRows = getFilteredRows(activeMonth, activeVessel, activePod);
       let curBkgs = currentRows.length, curCntrs = 0, curTeus = 0, curMargin = 0;
       currentRows.forEach(r => { curCntrs += r.cntrs; curTeus += r.teus; curMargin += r.margin; });
 
@@ -586,7 +546,7 @@
         const currIdx = availableMonths.indexOf(activeMonth);
         if (currIdx > 0) {
           const prevMonth = availableMonths[currIdx - 1];
-          const prevRows = getFilteredRows(prevMonth, activeService, activePod);
+          const prevRows = getFilteredRows(prevMonth, activeVessel, activePod);
           prevBkgs = prevRows.length;
           prevRows.forEach(r => { prevCntrs += r.cntrs; prevTeus += r.teus; prevMargin += r.margin; });
           showTrend = true;
@@ -625,7 +585,7 @@
       else if (groupBy === "srv") headerNameEl.textContent = "Service";
       else if (groupBy === "type") headerNameEl.textContent = "Container Type";
 
-      const rows = getFilteredRows(activeMonth, activeService, activePod);
+      const rows = getFilteredRows(activeMonth, activeVessel, activePod);
       const aggregatedMap = {};
 
       rows.forEach(item => {
@@ -677,7 +637,7 @@
       availableMonths.forEach(m => {
         labels.push(m);
         let sum = 0;
-        const mRows = getFilteredRows(m, activeService, activePod);
+        const mRows = getFilteredRows(m, activeVessel, activePod);
         mRows.forEach(row => {
           if (metric === 'teus') sum += row.teus;
           else if (metric === 'profit') sum += row.margin;
