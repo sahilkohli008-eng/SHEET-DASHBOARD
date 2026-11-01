@@ -24,6 +24,7 @@
       --text: #f8fafc;
       --subtext: #94a3b8;
       --border: #243248;
+      --error: #ef4444;
     }
     * {
       box-sizing: border-box;
@@ -53,6 +54,11 @@
       font-size: 0.72rem;
       color: var(--subtext);
       margin-top: 2px;
+      max-width: 200px;
+    }
+    .status.error {
+      color: var(--error);
+      font-weight: 600;
     }
     button.refresh-btn {
       background: var(--card-alt);
@@ -96,7 +102,7 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     }
 
-    /* 2x2 Grid for 4 KPI Summary Cards */
+    /* 4 KPI Summary Cards */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -167,7 +173,7 @@
       color: var(--accent);
     }
 
-    /* Full Table View Container */
+    /* Master Table View */
     .customer-table-wrap {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -271,9 +277,9 @@
 
   <script>
     // =========================================================================
-    // PASTE YOUR NEW APPS SCRIPT " PASTE YOUR URL HERE " HERE:
+    // PASTE YOUR NEW APPS SCRIPT WEB APP URL HERE:
     // =========================================================================
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI1lprEQ7Spo0P7T7kyZPEqXhyztdLVTKhNzbBWt9Qqnou9TG2-F8Qm9RtTmLzDR2pIQ/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec";
 
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -299,23 +305,45 @@
 
     async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
+      statusEl.classList.remove("error");
       statusEl.textContent = "Fetching live data...";
 
       try {
         if (APPS_SCRIPT_URL.includes("PASTE_")) {
-          statusEl.textContent = "Paste Web App URL in code";
-          return;
+          throw new Error("Missing Script URL");
         }
 
-        // Direct fetch from Google - NO PROXY REQUIRED, loads instantly
-        const resp = await fetch(APPS_SCRIPT_URL + "?_cb=" + new Date().getTime());
-        const rawJson = await resp.json();
+        const liveUrl = APPS_SCRIPT_URL + "?_cb=" + new Date().getTime();
+        
+        // redirect: "follow" ensures iOS Safari accurately fetches from Google's redirect servers
+        const resp = await fetch(liveUrl, { redirect: "follow" });
+        const text = await resp.text();
+        
+        let rawJson;
+        try {
+          rawJson = JSON.parse(text);
+        } catch (parseError) {
+          // SMART ERROR DETECTOR: Tells you exactly why the fetch failed
+          if (text.includes("<!DOCTYPE html>") || text.includes("<html")) {
+            throw new Error("Script Blocked: Make sure 'Who has access' is set to 'Anyone'");
+          }
+          throw new Error("Invalid format returned by Google");
+        }
+
+        if (rawJson.error) {
+          throw new Error("Apps Script Error: " + rawJson.error);
+        }
 
         dataByMonth = {};
+        const sheetNames = Object.keys(rawJson);
+        
+        if (sheetNames.length === 0) {
+           throw new Error("Spreadsheet is empty or no tabs found");
+        }
 
-        Object.keys(rawJson).forEach(sheetName => {
+        sheetNames.forEach(sheetName => {
           const rawRows = rawJson[sheetName];
-          if (rawRows.length < 2) return;
+          if (!Array.isArray(rawRows) || rawRows.length < 2) return;
 
           let headerRowIdx = 0;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
@@ -332,14 +360,16 @@
             return idx !== -1 ? idx : fallbackIdx;
           };
 
-          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0);
-          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1);
-          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5);
-          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
-          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
+          // Matches exact columns from your screenshot
+          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0); // Col A
+          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); // Col B
+          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5); // Col F
+          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6); // Col G
+          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9); // Col J
+          const vslIdx    = findCol(["vsl", "vessel"], 12); // Col M
           const buyIdx    = findCol(["buy", "cost"], -1);
           const sellIdx   = findCol(["sell", "rate"], -1);
-          const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
+          const marginIdx = findCol(["margin", "profit", "earning", "net"], -1); 
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -347,6 +377,7 @@
             const bookingVal = String(r[bookIdx] || "").trim();
             const partyVal = String(r[partyIdx] || "").trim();
 
+            // Safely skips the manual Total row so nothing counts twice
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
             if (!bookingVal && !partyVal) continue;
 
@@ -384,7 +415,8 @@
         statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Error fetching data";
+        statusEl.classList.add("error");
+        statusEl.textContent = err.message || "Error fetching data";
       }
     }
 
