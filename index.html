@@ -100,10 +100,10 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
     }
 
-    /* Top 3 KPI Summary Cards */
+    /* 2x2 Grid for 4 KPI Summary Cards */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -121,11 +121,12 @@
       font-weight: 600;
     }
     .stat-card .value {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       margin-top: 5px;
       color: var(--accent);
     }
+    .stat-card .value.cntr-val { color: var(--text); }
     .stat-card .value.teu-val { color: var(--purple); }
     .stat-card .value.margin-val { color: var(--green); }
 
@@ -185,25 +186,27 @@
     table.cust-table th {
       background: #0f172a;
       color: var(--subtext);
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
-      padding: 12px 10px;
+      padding: 12px 6px;
       text-align: right;
       border-bottom: 1px solid var(--border);
       letter-spacing: 0.3px;
     }
-    table.cust-table th:first-child { text-align: left; }
+    table.cust-table th:first-child { text-align: left; padding-left: 10px; }
     table.cust-table td {
-      padding: 12px 10px;
+      padding: 12px 6px;
       border-bottom: 1px solid #1e293b;
       text-align: right;
       font-weight: 600;
+      font-size: 0.75rem;
     }
     table.cust-table td:first-child {
       text-align: left;
+      padding-left: 10px;
       font-weight: 700;
       color: var(--text);
-      max-width: 150px;
+      max-width: 120px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -217,7 +220,7 @@
       <h1>Live Tracker</h1>
       <div class="status" id="lastUpdated">Updating...</div>
     </div>
-    <!-- Single tap refreshes data; Double tap forces app reload -->
+    <!-- Single tap pulls fresh data cache-busting; Double tap forces app shell reload -->
     <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">↻ Refresh</button>
   </header>
 
@@ -226,14 +229,18 @@
     <button class="month-tab active" onclick="selectMonth('ALL')">ALL</button>
   </div>
 
-  <!-- Top KPI Cards -->
+  <!-- Top 4 KPI Cards -->
   <div class="card-grid">
     <div class="stat-card">
       <div class="label">BOOKINGS</div>
       <div class="value" id="statCount">--</div>
     </div>
     <div class="stat-card">
-      <div class="label">TOTAL TEUs</div>
+      <div class="label">CONTAINERS</div>
+      <div class="value cntr-val" id="statContainers">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">TOTAL TEUS</div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     <div class="stat-card">
@@ -245,7 +252,7 @@
   <!-- Filter & Sort Bar -->
   <div class="controls-bar">
     <select class="filter-select" id="groupBySelect" onchange="renderTableData()">
-      <option value="party">Group By: Customer Name</option>
+      <option value="party">Group By: Customer</option>
       <option value="pod">Group By: POD (Port)</option>
       <option value="vsl">Group By: Vessel</option>
     </select>
@@ -255,13 +262,14 @@
     </div>
   </div>
 
-  <!-- Master Table View Only -->
+  <!-- Master Table View -->
   <div class="customer-table-wrap">
     <table class="cust-table">
       <thead>
         <tr>
           <th id="colHeaderName">Customer Name</th>
           <th>Bkgs</th>
+          <th>Cntrs</th>
           <th>TEUs</th>
           <th>Profit</th>
         </tr>
@@ -274,7 +282,7 @@
     // =========================================================================
     // PASTE YOUR SINGLE MASTER GOOGLE SHEET PUBLISHED LINK HERE:
     // =========================================================================
-    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDKbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=xlsx";
+    const MASTER_SHEET_URL = "PASTE_YOUR_MASTER_SHEET_LINK_HERE";
 
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -285,7 +293,8 @@
     function toMultiTabUrl(rawUrl) {
       if (!rawUrl || rawUrl.includes("PASTE_")) return "";
       const base = rawUrl.split("?")[0];
-      return `${base}?output=xlsx&_cb=${Date.now()}`;
+      // Powerful cache-buster guarantees fetching the newest Google Sheet stream
+      return `${base}?output=xlsx&_nocache=${new Date().getTime()}`;
     }
 
     function normalizeMonthName(rawName) {
@@ -297,8 +306,8 @@
     }
 
     function parseNum(val, fallback = 0) {
+      if (val === undefined || val === null || val === "") return fallback;
       if (typeof val === "number") return isNaN(val) ? fallback : val;
-      if (!val) return fallback;
       const cleaned = String(val).replace(/[^0-9.-]+/g, "");
       const parsed = parseFloat(cleaned);
       return isNaN(parsed) ? fallback : parsed;
@@ -306,7 +315,7 @@
 
     async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
-      statusEl.textContent = "Refreshing...";
+      statusEl.textContent = "Fetching live data...";
 
       try {
         const liveUrl = toMultiTabUrl(MASTER_SHEET_URL);
@@ -329,7 +338,7 @@
           let headerRowIdx = 0;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
             const rowText = rawRows[r].join(" ").toLowerCase();
-            if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin")) {
+            if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin") || rowText.includes("party")) {
               headerRowIdx = r;
               break;
             }
@@ -341,13 +350,14 @@
             return idx !== -1 ? idx : fallbackIdx;
           };
 
-          const bookIdx   = findCol(["booking", "bkg", "bl"], 1);
-          const vslIdx    = findCol(["vsl", "vessel"], 2);
-          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 4);
-          const volIdx    = findCol(["teu", "vol", "qty", "cntr", "container", "box", "count"], 6);
-          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 8);
-          const buyIdx    = findCol(["buy", "cost"], 9);
-          const sellIdx   = findCol(["sell", "rate"], 10);
+          // Hardcoded fallbacks based perfectly on your screenshot if headers are missing
+          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0); // Col A
+          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); // Col B
+          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5); // Col F
+          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6); // Col G
+          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9); // Col J
+          const buyIdx    = findCol(["buy", "cost"], -1);
+          const sellIdx   = findCol(["sell", "rate"], -1);
           const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
 
           const normalizedRows = [];
@@ -356,21 +366,27 @@
             const bookingVal = String(r[bookIdx] || "").trim();
             const partyVal = String(r[partyIdx] || "").trim();
 
-            if (!bookingVal && !partyVal) continue;
+            // CRITICAL FIX: Skip the manual "Total" row at the bottom so it never double-counts!
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
+            
+            // Skip completely empty rows
+            if (!bookingVal && !partyVal) continue;
 
-            const vol = parseNum(r[volIdx], 1);
+            const cntrs = parseNum(r[cntrIdx], 0);
+            const teus = parseNum(r[teuIdx], 0);
+            
             let margin = parseNum(r[marginIdx], NaN);
             if (isNaN(margin)) {
               const buy = parseNum(r[buyIdx], NaN);
               const sell = parseNum(r[sellIdx], NaN);
-              margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * vol : 0;
+              margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * teus : 0;
             }
 
             normalizedRows.push({
               vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
               party: (partyVal || "UNKNOWN").toUpperCase(),
-              vol: vol,
+              cntrs: cntrs,
+              teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               margin: margin
             });
@@ -445,12 +461,14 @@
       }
 
       let totalBookings = rows.length;
+      let totalContainers = 0;
       let totalTEUs = 0;
       let totalProfit = 0;
       const aggregatedMap = {};
 
       rows.forEach(item => {
-        totalTEUs += item.vol;
+        totalContainers += item.cntrs;
+        totalTEUs += item.teus;
         totalProfit += item.margin;
 
         let groupKey = item.party;
@@ -458,15 +476,17 @@
         if (groupBy === "vsl") groupKey = item.vsl;
 
         if (!aggregatedMap[groupKey]) {
-          aggregatedMap[groupKey] = { name: groupKey, bookings: 0, teus: 0, profit: 0 };
+          aggregatedMap[groupKey] = { name: groupKey, bookings: 0, cntrs: 0, teus: 0, profit: 0 };
         }
         aggregatedMap[groupKey].bookings += 1;
-        aggregatedMap[groupKey].teus += item.vol;
+        aggregatedMap[groupKey].cntrs += item.cntrs;
+        aggregatedMap[groupKey].teus += item.teus;
         aggregatedMap[groupKey].profit += item.margin;
       });
 
-      // Update KPI Top Cards
+      // Update Top 4 KPI Cards
       document.getElementById("statCount").textContent = totalBookings.toLocaleString();
+      document.getElementById("statContainers").textContent = Math.round(totalContainers).toLocaleString();
       document.getElementById("statVolume").textContent = Math.round(totalTEUs).toLocaleString();
       document.getElementById("statMargin").textContent = "$" + Math.round(totalProfit).toLocaleString();
 
@@ -479,12 +499,13 @@
         <tr>
           <td>${c.name}</td>
           <td style="color: var(--accent);">${c.bookings}</td>
+          <td style="color: var(--text);">${Math.round(c.cntrs)}</td>
           <td style="color: var(--purple);">${Math.round(c.teus)}</td>
           <td style="color: var(--green);">$${Math.round(c.profit).toLocaleString()}</td>
         </tr>
       `).join("");
 
-      document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="4" style="text-align:center; color: var(--subtext);">No data available</td></tr>`;
+      document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="5" style="text-align:center; color: var(--subtext); padding: 20px;">No data available</td></tr>`;
     }
 
     setInterval(fetchMasterSheet, 5 * 60 * 1000);
@@ -495,4 +516,3 @@
   </script>
 </body>
 </html>
-
