@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <!-- Fixed viewport to strictly prevent iOS Auto-Zoom -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
   <!-- iOS Status Bar & Caching -->
@@ -131,7 +132,7 @@
 
     /* Standard Select */
     select.filter-select {
-      color: var(--text-light); padding: 12px 36px 12px 14px; font-size: 0.9rem; font-weight: 600;
+      color: var(--text-light); padding: 12px 36px 12px 14px; font-size: 16px; font-weight: 600;
       outline: none; -webkit-appearance: none; appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 12px center; background-size: 15px; width: 100%;
@@ -143,7 +144,7 @@
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 12px center; background-size: 15px;
-      padding: 12px 36px 12px 14px; color: var(--text-light); font-size: 0.9rem; font-weight: 600;
+      padding: 12px 36px 12px 14px; color: var(--text-light); font-size: 16px; font-weight: 600;
       cursor: pointer; user-select: none;
     }
     .custom-dropdown-menu {
@@ -157,20 +158,23 @@
       padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: #161b26; 
       position: relative; display: flex; align-items: center;
     }
+    /* Fixed iOS Zoom issue by hardcoding 16px font-size */
     .search-input-wrapper input {
       width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px; padding: 10px 32px 10px 14px; color: #fff; font-size: 0.9rem; outline: none;
+      border-radius: 10px; padding: 10px 36px 10px 14px; color: #fff; font-size: 16px; outline: none;
     }
     .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
     
+    /* Fixed Touch Response area for Clear Buttons */
     .clear-search-btn {
-      position: absolute; right: 18px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
-      width: 20px; height: 20px; display: none; align-items: center; justify-content: center;
+      position: absolute; right: 14px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+      width: 24px; height: 24px; display: none; align-items: center; justify-content: center;
       cursor: pointer; color: var(--text-light); transition: background 0.2s, transform 0.1s;
+      z-index: 10;
     }
     .clear-search-btn:hover { background: rgba(255,255,255,0.3); }
     .clear-search-btn:active { transform: scale(0.9); }
-    .clear-search-btn svg { width: 12px; height: 12px; }
+    .clear-search-btn svg { width: 14px; height: 14px; }
     
     .custom-options-list { max-height: 200px; overflow-y: auto; }
     .custom-option {
@@ -192,18 +196,19 @@
     .search-capsule {
       width: 100%; max-width: 500px; display: flex; align-items: center; background: rgba(15, 20, 30, 0.85);
       border-radius: 999px; padding: 10px 16px 10px 20px; border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 16px; position: relative;
     }
     .search-capsule input {
-      flex: 1; background: transparent; border: none; color: #fff; font-size: 1.05rem; outline: none;
+      flex: 1; background: transparent; border: none; color: #fff; font-size: 16px; outline: none;
     }
     .search-capsule input::placeholder { color: rgba(255,255,255,0.4); font-weight: 500; }
     
     .clear-main-search-btn {
       background: rgba(255,255,255,0.15); color: var(--text-light); border: none; 
-      width: 24px; height: 24px; border-radius: 50%;
+      width: 26px; height: 26px; border-radius: 50%;
       display: none; align-items: center; justify-content: center;
       cursor: pointer; transition: background 0.2s, transform 0.1s;
+      z-index: 10;
     }
     .clear-main-search-btn:hover { background: rgba(255,255,255,0.3); }
     .clear-main-search-btn:active { transform: scale(0.9); }
@@ -211,7 +216,7 @@
 
     #globalSearchResults {
       width: 100%; max-width: 500px; max-height: calc(100vh - 120px); overflow-y: auto;
-      border-radius: 20px; display: none; /* Hide empty line */
+      border-radius: 20px; display: none; 
     }
     .search-result-item {
       display: flex; justify-content: space-between; align-items: center;
@@ -271,7 +276,7 @@
     .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .chart-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; color: var(--text-light); }
-    select.mini-select { padding: 8px 30px 8px 12px; font-size: 0.78rem; width: auto; }
+    select.mini-select { padding: 8px 30px 8px 12px; font-size: 16px; width: auto; }
     canvas { width: 100%; max-height: 220px; }
 
     /* Controls Bar & Physical Switch */
@@ -344,10 +349,11 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
+          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="vesselDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="vesselSearch" placeholder="Search Vessel..." oninput="filterCustomOptions('vessel')">
-              <button class="clear-search-btn" id="vesselClearBtn" onclick="clearSearch('vessel')">
+              <button type="button" class="clear-search-btn" id="vesselClearBtn" onclick="clearSearch('vessel', event)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
@@ -366,10 +372,11 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
+          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="podDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="podSearch" placeholder="Search Port..." oninput="filterCustomOptions('pod')">
-              <button class="clear-search-btn" id="podClearBtn" onclick="clearSearch('pod')">
+              <button type="button" class="clear-search-btn" id="podClearBtn" onclick="clearSearch('pod', event)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
@@ -400,7 +407,7 @@
         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
       <input type="text" id="mainSearchInput" placeholder="Search" oninput="performGlobalSearch()">
-      <button class="clear-main-search-btn" id="mainSearchClearBtn" onclick="clearMainSearch()">
+      <button type="button" class="clear-main-search-btn" id="mainSearchClearBtn" onclick="clearMainSearch(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
         </svg>
@@ -593,7 +600,7 @@
     let sortBy = "teu"; 
     let lineChartInstance = null;
 
-    // UI Toggles
+    // Sidebar & Custom Search Dropdown Logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
@@ -615,7 +622,7 @@
         
         const resultsDiv = document.getElementById("globalSearchResults");
         resultsDiv.innerHTML = "";
-        resultsDiv.style.display = "none"; // Hide to clear bottom line
+        resultsDiv.style.display = "none"; 
         
         setTimeout(() => document.getElementById("mainSearchInput").focus(), 100);
       }
@@ -627,7 +634,11 @@
       }
     }
 
-    function clearMainSearch() {
+    function clearMainSearch(event) {
+      if(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       document.getElementById("mainSearchInput").value = "";
       document.getElementById("mainSearchClearBtn").style.display = "none";
       
@@ -682,7 +693,13 @@
       }
     }
 
-    function clearSearch(type) {
+    // Interactive Clear logic inside Sidebar Dropdowns
+    function clearSearch(type, event) {
+      if(event) {
+        event.preventDefault();
+        event.stopPropagation(); // Stops the dropdown from intercepting the click
+      }
+      
       const inputElement = document.getElementById(type + "Search");
       inputElement.value = "";
       filterCustomOptions(type); 
@@ -999,6 +1016,7 @@
       
       overlay.classList.add("active");
     }
+
 
     // Standard Data Processing
     function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
