@@ -13,8 +13,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Live Tracker" />
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
   <style>
     :root {
       --bg: #0b1120;
@@ -273,9 +271,9 @@
 
   <script>
     // =========================================================================
-    // YOUR EXACT MASTER SHEET LINK (ALREADY EMBEDDED)
+    // PASTE YOUR NEW APPS SCRIPT "WEB APP URL" HERE:
     // =========================================================================
-    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDkbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=xlsx";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVpnDoKMhivBzBTsvotyJLlt0O0csejGEvZgVR5IdmI0n4Rdwf0uTx_deXEaxuRAmwlA/exec";
 
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -304,84 +302,70 @@
       statusEl.textContent = "Fetching live data...";
 
       try {
-        const liveUrl = `${MASTER_SHEET_URL.split("?")[0]}?output=xlsx&_nocache=${new Date().getTime()}`;
-        
-        // Robust Multi-Proxy Fallback (Prevents empty pages from ruining the app)
-        const proxies = [
-          "https://api.codetabs.com/v1/proxy/?quest=",
-          "https://api.allorigins.win/raw?url=",
-          "https://corsproxy.io/?"
-        ];
-
-        let arrayBuffer = null;
-
-        for (const proxy of proxies) {
-          try {
-            const resp = await fetch(proxy + encodeURIComponent(liveUrl));
-            if (!resp.ok) continue;
-            
-            const buffer = await resp.arrayBuffer();
-            const view = new Uint8Array(buffer);
-            
-            // SECURITY CHECK: Verify this is a real XLSX file (starts with 'PK' = 0x50 0x4B)
-            if (view[0] === 0x50 && view[1] === 0x4B) {
-              arrayBuffer = buffer;
-              break; 
-            }
-          } catch (e) {
-            console.warn("Proxy failed, trying next...");
-          }
+        if (APPS_SCRIPT_URL.includes("PASTE_")) {
+          statusEl.textContent = "Paste Web App URL in code";
+          return;
         }
 
-        if (!arrayBuffer) {
-          throw new Error("Could not securely download Excel file from Google.");
-        }
+        // Direct fetch from Google - NO PROXY REQUIRED, loads instantly
+        const resp = await fetch(APPS_SCRIPT_URL + "?_cb=" + new Date().getTime());
+        const rawJson = await resp.json();
 
-        const workbook = XLSX.read(arrayBuffer, { type: "array" });
         dataByMonth = {};
 
-        workbook.SheetNames.forEach(sheetName => {
-          const sheet = workbook.Sheets[sheetName];
-          const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        Object.keys(rawJson).forEach(sheetName => {
+          const rawRows = rawJson[sheetName];
           if (rawRows.length < 2) return;
 
-          // Attempt to locate Profit column if it exists in the first few rows
-          let profitIdx = -1;
+          let headerRowIdx = 0;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-            const hdrs = rawRows[r].map(h => String(h).toLowerCase());
-            const idx = hdrs.findIndex(h => h.includes("profit") || h.includes("margin") || h.includes("net"));
-            if (idx !== -1) { profitIdx = idx; break; }
+            const rowText = rawRows[r].join(" ").toLowerCase();
+            if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin") || rowText.includes("party")) {
+              headerRowIdx = r;
+              break;
+            }
           }
-          if (profitIdx === -1) profitIdx = 11; // Fallback to Col L if missing
+
+          const headers = rawRows[headerRowIdx].map(h => String(h).trim().toLowerCase());
+          const findCol = (keywords, fallbackIdx) => {
+            const idx = headers.findIndex(h => keywords.some(k => h.includes(k)));
+            return idx !== -1 ? idx : fallbackIdx;
+          };
+
+          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0);
+          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1);
+          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5);
+          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
+          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
+          const buyIdx    = findCol(["buy", "cost"], -1);
+          const sellIdx   = findCol(["sell", "rate"], -1);
+          const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
 
           const normalizedRows = [];
-          
-          for (let i = 0; i < rawRows.length; i++) {
+          for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
             const r = rawRows[i];
-            
-            // Hardcoded columns strictly based on your Masterfile screenshot
-            const bookingVal = String(r[0] || "").trim(); // Col A
-            const partyVal = String(r[1] || "").trim();   // Col B
+            const bookingVal = String(r[bookIdx] || "").trim();
+            const partyVal = String(r[partyIdx] || "").trim();
 
-            // Ignore totally empty rows, header text rows, and manual total rows
-            if (!bookingVal && !partyVal) continue;
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
-            if (bookingVal.toLowerCase().includes("booking") || bookingVal.toLowerCase().includes("sr no")) continue;
-            if (partyVal.toLowerCase().includes("party") || partyVal.toLowerCase().includes("customer")) continue;
+            if (!bookingVal && !partyVal) continue;
 
-            const cntrs = parseNum(r[5], 0); // Col F
-            const teus = parseNum(r[6], 0);  // Col G
-            const pod = String(r[9] || "UNKNOWN").trim().toUpperCase();  // Col J
-            const vsl = String(r[12] || "UNKNOWN").trim().toUpperCase(); // Col M
+            const cntrs = parseNum(r[cntrIdx], 0);
+            const teus = parseNum(r[teuIdx], 0);
             
-            let margin = parseNum(r[profitIdx], 0);
+            let margin = parseNum(r[marginIdx], NaN);
+            if (isNaN(margin)) {
+              const buy = parseNum(r[buyIdx], NaN);
+              const sell = parseNum(r[sellIdx], NaN);
+              margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * teus : 0;
+            }
 
             normalizedRows.push({
-              vsl: vsl,
-              party: partyVal.toUpperCase(),
+              vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
+              party: (partyVal || "UNKNOWN").toUpperCase(),
               cntrs: cntrs,
               teus: teus,
-              pod: pod,
+              pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               margin: margin
             });
           }
@@ -400,7 +384,7 @@
         statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
       } catch (err) {
         console.error(err);
-        document.getElementById("lastUpdated").textContent = "Error loading master sheet";
+        statusEl.textContent = "Error fetching data";
       }
     }
 
