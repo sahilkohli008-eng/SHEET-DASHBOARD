@@ -78,24 +78,24 @@
 
     /* Header */
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
     
-    .menu-btn, button.refresh-btn {
+    .menu-btn, button.icon-btn {
       background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
       border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-pill);
       color: var(--text-light); cursor: pointer; width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center; transition: transform 0.15s ease;
     }
-    .menu-btn:active, button.refresh-btn:active { transform: scale(0.95); }
+    .menu-btn:active, button.icon-btn:active { transform: scale(0.95); }
     .menu-btn svg { width: 22px; height: 22px; }
-    button.refresh-btn svg { width: 18px; height: 18px; transform-origin: center; }
+    button.icon-btn svg { width: 18px; height: 18px; transform-origin: center; }
     
     h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; margin: 0; }
     
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
 
-    /* Sidebar Drawer */
+    /* Interactive Sidebar Drawer */
     #overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.55);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 998;
@@ -126,9 +126,7 @@
     .close-btn svg { width: 18px; height: 18px; }
     
     .sidebar-content { display: flex; flex-direction: column; gap: 18px; }
-    
     .filter-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
-    
     .filter-label { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 600; letter-spacing: 0.5px; }
 
     /* Standard Select */
@@ -140,7 +138,7 @@
     }
     select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* Custom Searchable Dropdowns */
+    /* Custom Searchable Dropdowns (Sidebar) */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -148,7 +146,6 @@
       padding: 12px 36px 12px 14px; color: var(--text-light); font-size: 0.9rem; font-weight: 600;
       cursor: pointer; user-select: none;
     }
-    
     .custom-dropdown-menu {
       display: none; flex-direction: column; position: absolute; top: calc(100% + 8px); left: 0; width: 100%;
       background: #0f141e; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 18px; 
@@ -166,21 +163,10 @@
     }
     .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
     
-    /* Interactive Clear Button (X) */
     .clear-search-btn {
-      position: absolute;
-      right: 18px;
-      background: rgba(255,255,255,0.15);
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-light);
-      transition: background 0.2s, transform 0.1s;
+      position: absolute; right: 18px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+      width: 20px; height: 20px; display: none; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-light); transition: background 0.2s, transform 0.1s;
     }
     .clear-search-btn:hover { background: rgba(255,255,255,0.3); }
     .clear-search-btn:active { transform: scale(0.9); }
@@ -194,11 +180,59 @@
     .custom-option:last-child { border-bottom: none; }
     .custom-option:hover, .custom-option.selected { background: rgba(255, 255, 255, 0.1); color: var(--accent-blue); font-weight: 700; }
 
+    /* GLOBAL SEARCH & DETAIL PAGE ENGINE */
+    #globalSearchOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2000;
+      opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+      display: flex; flex-direction: column; align-items: center; padding: calc(env(safe-area-inset-top) + 20px) 16px 20px;
+    }
+    #globalSearchOverlay.active { opacity: 1; visibility: visible; }
+
+    .search-capsule {
+      width: 100%; max-width: 500px; display: flex; align-items: center; background: rgba(15, 20, 30, 0.85);
+      border-radius: 999px; padding: 6px 6px 6px 20px; border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 16px;
+    }
+    .search-capsule input {
+      flex: 1; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none;
+    }
+    .search-capsule input::placeholder { color: rgba(255,255,255,0.4); font-weight: 500; }
+    .search-capsule .cancel-btn {
+      background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px 16px;
+      border-radius: 999px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+    }
+
+    #globalSearchResults {
+      width: 100%; max-width: 500px; max-height: calc(100vh - 120px); overflow-y: auto;
+      border-radius: 20px;
+    }
+    .search-result-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer;
+    }
+    .search-result-item:hover { background: rgba(255,255,255,0.05); }
+    .search-result-item .entity-name { font-size: 1rem; font-weight: 700; color: var(--text-light); }
+    .search-result-item .entity-type { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); font-weight: 700;}
+    .entity-type.port { color: var(--orange); }
+    .entity-type.vessel { color: var(--purple); }
+
+    /* DETAIL OVERLAY PAGE */
+    #detailOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #07090e;
+      z-index: 3000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow-y: auto; padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
+    }
+    #detailOverlay.active { transform: translateY(0); }
+    .detail-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .detail-titles h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-light); line-height: 1.1; margin-bottom: 4px;}
+    .detail-titles .badge { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.1); color: var(--subtext-light); text-transform: uppercase; letter-spacing: 1px;}
+    
     /* Bento KPI Cards Layout */
     .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
     .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
-    .stat-card { padding: 16px; }
-    .stat-card.small-card { padding: 14px 12px; }
+    .stat-card { padding: 16px; border-radius: var(--radius-main); }
+    .stat-card.small-card { padding: 14px 12px; border-radius: var(--radius-main); }
     
     .stat-card .label-row { display: flex; justify-content: space-between; align-items: center; }
     .stat-card .label { font-size: 0.68rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
@@ -228,7 +262,7 @@
     .sub-value { font-size: 0.7rem; color: var(--subtext-light); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
 
     /* Chart Summary */
-    .chart-container { padding: 18px; margin-bottom: 20px; display: none; }
+    .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .chart-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; color: var(--text-light); }
     select.mini-select { padding: 8px 30px 8px 12px; font-size: 0.78rem; width: auto; }
@@ -304,6 +338,7 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
+          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="vesselDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="vesselSearch" placeholder="Search Vessel..." oninput="filterCustomOptions('vessel')">
@@ -326,6 +361,7 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
+          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="podDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="podSearch" placeholder="Search Port..." oninput="filterCustomOptions('pod')">
@@ -353,6 +389,73 @@
     </div>
   </div>
 
+  <!-- GLOBAL SEARCH OVERLAY -->
+  <div id="globalSearchOverlay">
+    <div class="search-capsule">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.4)" stroke-width="2" style="width: 20px; height: 20px; margin-right: 12px;">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="mainSearchInput" placeholder="Search Customer, Vessel, Port..." oninput="performGlobalSearch()">
+      <button class="cancel-btn" onclick="toggleGlobalSearch()">Cancel</button>
+    </div>
+    <div id="globalSearchResults" class="liquid-glass">
+      <!-- Search Results populate here dynamically -->
+    </div>
+  </div>
+
+  <!-- DETAIL INFORMATION OVERLAY -->
+  <div id="detailOverlay">
+    <div class="detail-header-bar">
+      <div class="detail-titles">
+        <h2 id="detailNameTitle">Detail Name</h2>
+        <span id="detailTypeBadge" class="badge">Type</span>
+      </div>
+      <button class="close-btn" onclick="closeDetailView()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <div class="card-row-2">
+      <div class="stat-card liquid-glass">
+        <div class="label-row"><div class="label">BOOKINGS</div></div>
+        <div class="value bkg-val" id="detBkgs">--</div>
+      </div>
+      <div class="stat-card liquid-glass">
+        <div class="label-row"><div class="label">CONTAINERS</div></div>
+        <div class="value cntr-val" id="detCntrs">--</div>
+      </div>
+    </div>
+    <div class="card-row-2" style="margin-bottom: 24px;">
+      <div class="stat-card liquid-glass">
+        <div class="label-row"><div class="label">TOTAL TEUs</div></div>
+        <div class="value teu-val" id="detTeus">--</div>
+      </div>
+      <div class="stat-card liquid-glass" style="background: var(--card-highlight);">
+        <div class="label-row"><div class="label">PROFIT</div></div>
+        <div class="value margin-val" id="detProfit">--</div>
+        <div class="sub-value" id="detYield">--</div>
+      </div>
+    </div>
+    
+    <div class="filter-label" style="margin-bottom: 8px;">Activity Breakdown</div>
+    <div class="customer-table-wrap liquid-glass">
+      <table class="cust-table">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Location / Ref</th>
+            <th>TEUs</th>
+            <th>Profit</th>
+          </tr>
+        </thead>
+        <tbody id="detailTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MAIN HEADER -->
   <header>
     <div class="header-left">
       <button class="menu-btn" onclick="toggleSidebar()">
@@ -362,12 +465,19 @@
       </button>
       <h1>Dashboard</h1>
     </div>
-    <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
-      <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="23 4 23 10 17 10"></polyline>
-        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-      </svg>
-    </button>
+    <div class="header-right">
+      <button class="icon-btn" onclick="toggleGlobalSearch()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+      <button class="icon-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
+        <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <!-- KPI Cards -->
@@ -467,6 +577,7 @@
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     let dataByMonth = {};
+    let globalSearchIndex = []; // { name, type }
     let activeMonth = "ALL";
     let activeVessel = "ALL";
     let activePod = "ALL";
@@ -474,7 +585,7 @@
     let sortBy = "teu"; 
     let lineChartInstance = null;
 
-    // Sidebar & Custom Search Dropdown Logic
+    // UI Toggles
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
@@ -486,6 +597,21 @@
       }
     }
 
+    function toggleGlobalSearch() {
+      const searchOverlay = document.getElementById("globalSearchOverlay");
+      searchOverlay.classList.toggle("active");
+      if(searchOverlay.classList.contains("active")) {
+        document.getElementById("mainSearchInput").value = "";
+        document.getElementById("globalSearchResults").innerHTML = "";
+        document.getElementById("mainSearchInput").focus();
+      }
+    }
+
+    function closeDetailView() {
+      document.getElementById("detailOverlay").classList.remove("active");
+    }
+
+    // Sidebar Dropdowns
     function toggleCustomDropdown(dropdownId) {
       document.querySelectorAll(".custom-dropdown-menu").forEach(menu => {
         if(menu.id !== dropdownId) menu.classList.remove("active");
@@ -515,12 +641,8 @@
       const input = inputElement.value.toLowerCase();
       const clearBtn = document.getElementById(type + "ClearBtn");
       
-      // Show/Hide Clear X button dynamically
-      if (input.length > 0) {
-        clearBtn.style.display = "flex";
-      } else {
-        clearBtn.style.display = "none";
-      }
+      if (input.length > 0) clearBtn.style.display = "flex";
+      else clearBtn.style.display = "none";
 
       const options = document.getElementById(type + "OptionsList").getElementsByClassName("custom-option");
       for (let i = 0; i < options.length; i++) {
@@ -532,9 +654,8 @@
     function clearSearch(type) {
       const inputElement = document.getElementById(type + "Search");
       inputElement.value = "";
-      filterCustomOptions(type); // Hide button & reset visual list instantly
+      filterCustomOptions(type); 
       
-      // Default it back to ALL dynamically without closing the dropdown UI
       const defaultLabel = type === 'vessel' ? 'All Vessels' : 'All Ports';
       document.getElementById(type + "Filter").value = "ALL";
       document.getElementById(type + "SelectLabel").textContent = defaultLabel;
@@ -545,8 +666,8 @@
         else opt.classList.remove("selected");
       }
       
-      applyGlobalFilters(); // Trigger live dashboard reset
-      inputElement.focus(); // Keep user seamlessly in the typing flow
+      applyGlobalFilters();
+      inputElement.focus();
     }
 
     document.addEventListener("click", function(event) {
@@ -555,6 +676,7 @@
       }
     });
 
+    // Helper functions
     function normalizeMonthName(rawName) {
       const clean = String(rawName || "").trim().toUpperCase();
       for (const m of MONTH_ORDER) {
@@ -571,6 +693,7 @@
       return isNaN(parsed) ? fallback : parsed;
     }
 
+    // Main Fetch
     async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
       const refreshIcon = document.getElementById("refresh-icon");
@@ -665,7 +788,8 @@
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
               eqpType: deducedEqp,
-              margin: margin
+              margin: margin,
+              month: normalizeMonthName(sheetName)
             });
           }
 
@@ -677,6 +801,7 @@
         });
 
         populateFilterDropdowns();
+        buildGlobalSearchIndex();
         applyGlobalFilters();
 
         const now = new Date();
@@ -689,6 +814,7 @@
       }
     }
 
+    // Population Functions
     function populateFilterDropdowns() {
       const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
       
@@ -701,12 +827,11 @@
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
-      // Month
       const monthSel = document.getElementById("mainMonthSelect");
       monthSel.innerHTML = `<option value="ALL">All Months Overview</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
       monthSel.value = months.includes(activeMonth) ? activeMonth : "ALL";
 
-      // Custom Searchable Vessel List
+      // Populate Searchable Vessel List
       const vslList = document.getElementById("vesselOptionsList");
       let vslHtml = `<div class="custom-option ${activeVessel === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('vessel', 'ALL', 'All Vessels')">All Vessels</div>`;
       vsls.forEach(v => {
@@ -717,7 +842,7 @@
       document.getElementById("vesselFilter").value = vsls.includes(activeVessel) ? activeVessel : "ALL";
       document.getElementById("vesselSelectLabel").textContent = (activeVessel === "ALL" || !vsls.includes(activeVessel)) ? "All Vessels" : activeVessel;
 
-      // Custom Searchable Port List
+      // Populate Searchable Port List
       const podList = document.getElementById("podOptionsList");
       let podHtml = `<div class="custom-option ${activePod === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('pod', 'ALL', 'All Ports')">All Ports</div>`;
       pods.forEach(p => {
@@ -729,6 +854,123 @@
       document.getElementById("podSelectLabel").textContent = (activePod === "ALL" || !pods.includes(activePod)) ? "All Ports" : activePod;
     }
 
+    function buildGlobalSearchIndex() {
+      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
+      const uniqueParties = [...new Set(allRows.map(r => r.party))].filter(Boolean);
+      const uniqueVessels = [...new Set(allRows.map(r => r.vsl))].filter(Boolean);
+      const uniquePorts = [...new Set(allRows.map(r => r.pod))].filter(Boolean);
+
+      globalSearchIndex = [
+        ...uniqueParties.map(n => ({ name: n, type: 'Customer' })),
+        ...uniqueVessels.map(n => ({ name: n, type: 'Vessel' })),
+        ...uniquePorts.map(n => ({ name: n, type: 'Port' }))
+      ];
+    }
+
+    // Global Search Engine
+    function performGlobalSearch() {
+      const query = document.getElementById("mainSearchInput").value.toLowerCase();
+      const resultsDiv = document.getElementById("globalSearchResults");
+      
+      if (query.length < 2) {
+        resultsDiv.innerHTML = "";
+        return;
+      }
+
+      const matches = globalSearchIndex.filter(item => item.name.toLowerCase().includes(query)).slice(0, 15); // limit to 15
+      
+      if (matches.length === 0) {
+        resultsDiv.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--subtext-light);">No results found.</div>`;
+        return;
+      }
+
+      let html = "";
+      matches.forEach(m => {
+        let typeClass = m.type.toLowerCase(); // 'customer', 'vessel', 'port'
+        const safeName = m.name.replace(/'/g, "\\'");
+        html += `
+          <div class="search-result-item" onclick="openDetailView('${safeName}', '${m.type}')">
+            <span class="entity-name">${m.name}</span>
+            <span class="entity-type ${typeClass}">${m.type}</span>
+          </div>
+        `;
+      });
+      resultsDiv.innerHTML = html;
+    }
+
+    // Detail Info View Engine
+    function openDetailView(name, type) {
+      document.getElementById("globalSearchOverlay").classList.remove("active");
+      const overlay = document.getElementById("detailOverlay");
+      
+      document.getElementById("detailNameTitle").textContent = name;
+      document.getElementById("detailTypeBadge").textContent = type;
+      
+      // Assign Badge Color based on type
+      const badge = document.getElementById("detailTypeBadge");
+      badge.style.color = type === 'Vessel' ? 'var(--purple)' : (type === 'Port' ? 'var(--orange)' : 'var(--accent-blue)');
+
+      // Filter all data for this specific entity
+      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
+      const matchedRows = allRows.filter(r => {
+        if(type === 'Customer') return r.party === name;
+        if(type === 'Vessel') return r.vsl === name;
+        if(type === 'Port') return r.pod === name;
+        return false;
+      });
+
+      // Aggregate Totals
+      let tBkgs = matchedRows.length, tCntrs = 0, tTeus = 0, tProfit = 0;
+      
+      // Aggregate for breakdown table (group by month and secondary entity)
+      const breakdownMap = {};
+
+      matchedRows.forEach(r => {
+        tCntrs += r.cntrs; tTeus += r.teus; tProfit += r.margin;
+        
+        let secEntity = "";
+        if(type === 'Customer') secEntity = r.vsl;
+        else if(type === 'Vessel') secEntity = r.party;
+        else if(type === 'Port') secEntity = r.party;
+
+        const bKey = r.month + "_" + secEntity;
+        if(!breakdownMap[bKey]) {
+          breakdownMap[bKey] = { month: r.month, sec: secEntity, teus: 0, profit: 0 };
+        }
+        breakdownMap[bKey].teus += r.teus;
+        breakdownMap[bKey].profit += r.margin;
+      });
+
+      // Update KPI Cards
+      document.getElementById("detBkgs").textContent = tBkgs.toLocaleString();
+      document.getElementById("detCntrs").textContent = Math.round(tCntrs).toLocaleString();
+      document.getElementById("detTeus").textContent = Math.round(tTeus).toLocaleString();
+      document.getElementById("detProfit").textContent = "$" + Math.round(tProfit).toLocaleString();
+      const yieldPerCntr = tCntrs > 0 ? Math.round(tProfit / tCntrs) : 0;
+      document.getElementById("detYield").textContent = `YIELD: $${yieldPerCntr.toLocaleString()} / CNTR`;
+
+      // Update Table
+      const breakdownArray = Object.values(breakdownMap).sort((a,b) => b.teus - a.teus);
+      const tableBody = document.getElementById("detailTableBody");
+      
+      if(breakdownArray.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--subtext-light); padding: 20px;">No activity found</td></tr>`;
+      } else {
+        tableBody.innerHTML = breakdownArray.map(c => `
+          <tr>
+            <td>${c.month}</td>
+            <td style="color: var(--accent-blue);">${c.sec}</td>
+            <td style="color: var(--purple);">${Math.round(c.teus)}</td>
+            <td style="color: var(--green);">$${Math.round(c.profit).toLocaleString()}</td>
+          </tr>
+        `).join("");
+      }
+      
+      overlay.classList.add("active");
+    }
+
+
+    // Standard Data Processing
     function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
       let rows = [];
       if (month === "ALL") {
