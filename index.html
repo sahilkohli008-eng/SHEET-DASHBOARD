@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Tracker</title>
 
+  <!-- Prevent iOS Home Screen Caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- iOS PWA Fullscreen Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Live Tracker" />
@@ -20,7 +26,6 @@
       --accent: #38bdf8;
       --purple: #818cf8;
       --green: #34d399;
-      --amber: #fbbf24;
       --text: #f8fafc;
       --subtext: #94a3b8;
       --border: #243248;
@@ -67,7 +72,7 @@
     }
     button.refresh-btn:active { opacity: 0.6; }
 
-    /* Horizontal Month Pill Tabs (Replaces Dropdown List) */
+    /* Horizontal Month Pill Tabs */
     .month-tabs {
       display: flex;
       gap: 8px;
@@ -203,7 +208,6 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
       overflow: hidden;
     }
     .cust-rank {
@@ -294,12 +298,13 @@
       <h1>Live Tracker</h1>
       <div class="status" id="lastUpdated">Updating...</div>
     </div>
-    <button class="refresh-btn" onclick="fetchAllWorkbooks()">↻ Refresh</button>
+    <!-- Single tap refreshes sheet data; Double tap reloads app layout -->
+    <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">↻ Refresh</button>
   </header>
 
-  <!-- Curated Single Month-Wise Pill Bar -->
+  <!-- Single Month-Wise Pill Bar -->
   <div class="month-tabs" id="monthTabs">
-    <button class="month-tab active" onclick="selectMonth('ALL')">ALL MONTHS</button>
+    <button class="month-tab active" onclick="selectMonth('ALL')">ALL</button>
   </div>
 
   <!-- Top Summary KPIs -->
@@ -366,20 +371,17 @@
 
   <script>
     // =========================================================================
-    // PASTE YOUR TWO PUBLISHED GOOGLE SHEET LINKS BELOW:
-    // Both sheets will automatically merge by Month (e.g., Aug + AUG -> AUG)
+    // PASTE YOUR SINGLE MASTER GOOGLE SHEET PUBLISHED LINK HERE:
+    // Any new month tab you add to this master sheet will appear automatically!
     // =========================================================================
-    const WORKBOOK_URLS = [
-      { url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSA7Ust8ut8lwSDfgzbacQ3biTKRy5YBNWY87cfGJp4JOKEsGx1kEjQcnEn1xuhKxzlZVtBNzfQTFaO/pub?output=csv" },
-      { url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRoSpmbzsEN8-Vxcg1DqZNLcmN-V8Yy3P10YyTGDk2yegMLRfSG2qCgS44_hRm2sAUh3A7aNvOQP9jU/pub?output=xlsx" }
-    ];
+    const MASTER_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRszublKGPZpDKbqmiC2DMOOtQBngZCYGhQ02HSQXkd49PZNRKnywOl-PvHY7teCz8gP8l3iAywhPY7/pub?output=xlsx";
 
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     let dataByMonth = {};
     let activeMonth = "ALL";
-    let chartGroup = "party"; // 'party', 'pod', 'vsl'
-    let sortBy = "teu";       // 'teu', 'profit'
+    let chartGroup = "party";  // 'party', 'pod', 'vsl'
+    let sortBy = "teu";        // 'teu', 'profit'
     let displayMode = "cards"; // 'cards', 'table'
     let chartInstance = null;
 
@@ -389,7 +391,6 @@
       return `${base}?output=xlsx&_cb=${Date.now()}`;
     }
 
-    // Standardizes tab names so "Sheet 1: Aug" and "Sheet 2: AUG" merge into "AUG"
     function normalizeMonthName(rawName) {
       const clean = String(rawName || "").trim().toUpperCase();
       for (const m of MONTH_ORDER) {
@@ -398,7 +399,6 @@
       return clean;
     }
 
-    // Safely parses numbers like "$1,200", "400", "20"
     function parseNum(val, fallback = 0) {
       if (typeof val === "number") return isNaN(val) ? fallback : val;
       if (!val) return fallback;
@@ -407,97 +407,85 @@
       return isNaN(parsed) ? fallback : parsed;
     }
 
-    async function fetchWorkbook(wbConfig) {
-      const liveUrl = toMultiTabUrl(wbConfig.url);
-      if (!liveUrl) return {};
-
-      const resp = await fetch(liveUrl);
-      const arrayBuffer = await resp.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: "array" });
-
-      const tabsData = {};
-      workbook.SheetNames.forEach(sheetName => {
-        const sheet = workbook.Sheets[sheetName];
-        const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-        if (rawRows.length < 2) return;
-
-        // Find header row dynamically (in case row 0 is a title)
-        let headerRowIdx = 0;
-        for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-          const rowText = rawRows[r].join(" ").toLowerCase();
-          if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin")) {
-            headerRowIdx = r;
-            break;
-          }
-        }
-
-        const headers = rawRows[headerRowIdx].map(h => String(h).trim().toLowerCase());
-        const findCol = (keywords, fallbackIdx) => {
-          const idx = headers.findIndex(h => keywords.some(k => h.includes(k)));
-          return idx !== -1 ? idx : fallbackIdx;
-        };
-
-        const bookIdx   = findCol(["booking", "bkg", "bl"], 1);
-        const vslIdx    = findCol(["vsl", "vessel"], 2);
-        const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 4);
-        const volIdx    = findCol(["teu", "vol", "qty", "cntr", "container", "box", "count"], 6);
-        const podIdx    = findCol(["pod", "port", "dest", "discharge"], 8);
-        const buyIdx    = findCol(["buy", "cost"], 9);
-        const sellIdx   = findCol(["sell", "rate"], 10);
-        const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
-
-        const normalizedRows = [];
-        for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
-          const r = rawRows[i];
-          const bookingVal = String(r[bookIdx] || "").trim();
-          const partyVal = String(r[partyIdx] || "").trim();
-
-          // Skip blank rows or total summary rows
-          if (!bookingVal && !partyVal) continue;
-          if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
-
-          const vol = parseNum(r[volIdx], 1);
-
-          // Extract Margin from Column L (or calculate Selling - Buying if Margin cell is empty)
-          let margin = parseNum(r[marginIdx], NaN);
-          if (isNaN(margin)) {
-            const buy = parseNum(r[buyIdx], NaN);
-            const sell = parseNum(r[sellIdx], NaN);
-            margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * vol : 0;
-          }
-
-          normalizedRows.push({
-            vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
-            party: (partyVal || "UNKNOWN CUSTOMER").toUpperCase(),
-            vol: vol,
-            pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
-            margin: margin
-          });
-        }
-
-        if (normalizedRows.length > 0) {
-          const mKey = normalizeMonthName(sheetName);
-          if (!tabsData[mKey]) tabsData[mKey] = [];
-          tabsData[mKey] = tabsData[mKey].concat(normalizedRows);
-        }
-      });
-      return tabsData;
-    }
-
-    async function fetchAllWorkbooks() {
+    async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
       statusEl.textContent = "Refreshing...";
 
       try {
-        const results = await Promise.all(WORKBOOK_URLS.map(wb => fetchWorkbook(wb)));
+        const liveUrl = toMultiTabUrl(MASTER_SHEET_URL);
+        if (!liveUrl) {
+          statusEl.textContent = "Paste Master Sheet URL in code";
+          return;
+        }
+
+        const resp = await fetch(liveUrl);
+        const arrayBuffer = await resp.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+
         dataByMonth = {};
 
-        // Merge same-month rows from Sheet 1 and Sheet 2 into one unified month key
-        results.forEach(wbMap => {
-          Object.entries(wbMap).forEach(([monthKey, rows]) => {
-            if (!dataByMonth[monthKey]) dataByMonth[monthKey] = [];
-            dataByMonth[monthKey] = dataByMonth[monthKey].concat(rows);
-          });
+        workbook.SheetNames.forEach(sheetName => {
+          const sheet = workbook.Sheets[sheetName];
+          const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+          if (rawRows.length < 2) return;
+
+          // Locate header row automatically
+          let headerRowIdx = 0;
+          for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+            const rowText = rawRows[r].join(" ").toLowerCase();
+            if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("pod") || rowText.includes("margin")) {
+              headerRowIdx = r;
+              break;
+            }
+          }
+
+          const headers = rawRows[headerRowIdx].map(h => String(h).trim().toLowerCase());
+          const findCol = (keywords, fallbackIdx) => {
+            const idx = headers.findIndex(h => keywords.some(k => h.includes(k)));
+            return idx !== -1 ? idx : fallbackIdx;
+          };
+
+          const bookIdx   = findCol(["booking", "bkg", "bl"], 1);
+          const vslIdx    = findCol(["vsl", "vessel"], 2);
+          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 4);
+          const volIdx    = findCol(["teu", "vol", "qty", "cntr", "container", "box", "count"], 6);
+          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 8);
+          const buyIdx    = findCol(["buy", "cost"], 9);
+          const sellIdx   = findCol(["sell", "rate"], 10);
+          const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
+
+          const normalizedRows = [];
+          for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
+            const r = rawRows[i];
+            const bookingVal = String(r[bookIdx] || "").trim();
+            const partyVal = String(r[partyIdx] || "").trim();
+
+            if (!bookingVal && !partyVal) continue;
+            if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
+
+            const vol = parseNum(r[volIdx], 1);
+
+            let margin = parseNum(r[marginIdx], NaN);
+            if (isNaN(margin)) {
+              const buy = parseNum(r[buyIdx], NaN);
+              const sell = parseNum(r[sellIdx], NaN);
+              margin = (!isNaN(buy) && !isNaN(sell)) ? (sell - buy) * vol : 0;
+            }
+
+            normalizedRows.push({
+              vsl: String(r[vslIdx] || "UNKNOWN").trim().toUpperCase(),
+              party: (partyVal || "UNKNOWN CUSTOMER").toUpperCase(),
+              vol: vol,
+              pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
+              margin: margin
+            });
+          }
+
+          if (normalizedRows.length > 0) {
+            const mKey = normalizeMonthName(sheetName);
+            if (!dataByMonth[mKey]) dataByMonth[mKey] = [];
+            dataByMonth[mKey] = dataByMonth[mKey].concat(normalizedRows);
+          }
         });
 
         renderMonthTabs();
@@ -507,7 +495,7 @@
         statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
       } catch (err) {
         console.error(err);
-        statusEl.textContent = "Error loading sheets";
+        statusEl.textContent = "Error loading master sheet";
       }
     }
 
@@ -581,13 +569,11 @@
         totalTEUs += item.vol;
         totalProfit += item.margin;
 
-        // Aggregate for Chart
         let cKey = item.party;
         if (chartGroup === "pod") cKey = item.pod;
         if (chartGroup === "vsl") cKey = item.vsl;
         chartMap[cKey] = (chartMap[cKey] || 0) + item.vol;
 
-        // Aggregate per Customer for Curated Cards / Table
         if (!customerStats[item.party]) {
           customerStats[item.party] = { name: item.party, bookings: 0, teus: 0, profit: 0 };
         }
@@ -596,12 +582,10 @@
         customerStats[item.party].profit += item.margin;
       });
 
-      // Update Top Summary Cards
       document.getElementById("statCount").textContent = totalBookings.toLocaleString();
       document.getElementById("statVolume").textContent = Math.round(totalTEUs).toLocaleString();
       document.getElementById("statMargin").textContent = "$" + Math.round(totalProfit).toLocaleString();
 
-      // Update Pie Chart
       const sortedChart = Object.entries(chartMap).sort((a, b) => b[1] - a[1]);
       const top8 = sortedChart.slice(0, 8);
       const others = sortedChart.slice(8);
@@ -618,7 +602,6 @@
       document.getElementById("chartTitle").textContent = `${mLabel} — TEUs by ${gLabel}`;
       updateChart(labels, values);
 
-      // Render Customer Breakdown (Cards & Table)
       const custArray = Object.values(customerStats).sort((a, b) => {
         return sortBy === "profit" ? (b.profit - a.profit) : (b.teus - a.teus);
       });
@@ -691,11 +674,11 @@
       });
     }
 
-    setInterval(fetchAllWorkbooks, 5 * 60 * 1000);
+    setInterval(fetchMasterSheet, 5 * 60 * 1000);
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) fetchAllWorkbooks();
+      if (!document.hidden) fetchMasterSheet();
     });
-    window.addEventListener("DOMContentLoaded", fetchAllWorkbooks);
+    window.addEventListener("DOMContentLoaded", fetchMasterSheet);
   </script>
 </body>
 </html>
