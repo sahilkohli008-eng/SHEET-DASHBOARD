@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Dashboard</title>
 
+  <!-- iOS Status Bar & Caching -->
+  <meta name="theme-color" content="#0a101f" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -18,15 +20,13 @@
 
   <style>
     :root {
-      /* Nexora-Inspired Glassmorphism / Fintech Deep Blue Theme */
-      --bg-gradient: linear-gradient(160deg, #0a101f 0%, #11274a 50%, #1e4b8f 100%);
       --card-bg: rgba(255, 255, 255, 0.08);
       --card-highlight: linear-gradient(135deg, rgba(74, 158, 255, 0.2) 0%, rgba(37, 99, 235, 0.05) 100%);
       --card-alt: rgba(255, 255, 255, 0.12);
       --border-color: rgba(255, 255, 255, 0.15);
       
-      --accent: #5eead4;     /* Mint/Cyan for highlights */
-      --accent-blue: #60a5fa; /* Soft bright blue */
+      --accent: #5eead4;
+      --accent-blue: #60a5fa; 
       --purple: #c084fc;
       --green: #4ade80;
       --orange: #fb923c;
@@ -45,15 +45,24 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     }
     
+    /* Bulletproof Full-Screen Gradient for iOS Safari */
+    html {
+      background-color: #0a101f; /* Matches top of gradient to hide scroll bounce */
+    }
     body {
-      background: var(--bg-gradient);
-      background-attachment: fixed;
       color: var(--text);
       padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
       min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(160deg, #0a101f 0%, #11274a 50%, #1e4b8f 100%);
+      z-index: -1;
     }
 
-    /* Glassmorphism utility */
     .glass {
       background: var(--card-bg);
       backdrop-filter: blur(16px);
@@ -77,7 +86,6 @@
       align-items: center;
       gap: 10px;
     }
-    /* Logo-like dash */
     h1::before {
       content: "";
       display: block;
@@ -110,7 +118,7 @@
     button.refresh-btn:active { opacity: 0.5; }
     button.refresh-btn svg { width: 18px; height: 18px; }
 
-    /* Global Filters */
+    /* Top Global Filters */
     .global-filters { margin-bottom: 20px; }
     
     select.filter-select {
@@ -146,7 +154,6 @@
       gap: 10px; 
     }
     .sub-filters select { width: 100%; }
-    .sub-filters .full-width { grid-column: span 2; }
 
     /* Bento KPI Cards Layout */
     .card-row-2 {
@@ -162,36 +169,16 @@
       margin-bottom: 12px;
     }
     
-    .stat-card {
-      border-radius: 20px;
-      padding: 16px;
-    }
-    .stat-card.small-card {
-      padding: 12px;
-      border-radius: 16px;
-    }
+    .stat-card { border-radius: 20px; padding: 16px; }
+    .stat-card.small-card { padding: 12px; border-radius: 16px; }
     
-    .stat-card .label-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .stat-card .label {
-      font-size: 0.7rem;
-      color: var(--subtext);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
+    .stat-card .label-row { display: flex; justify-content: space-between; align-items: center; }
+    .stat-card .label { font-size: 0.7rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
     .trend-badge {
-      font-size: 0.65rem;
-      padding: 4px 6px;
-      border-radius: 8px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
+      font-size: 0.65rem; padding: 4px 6px; border-radius: 8px;
+      font-weight: 700; display: inline-flex; align-items: center;
       background: var(--card-alt);
     }
     .stat-card.small-card .trend-badge { font-size: 0.55rem; padding: 3px 5px; }
@@ -199,13 +186,7 @@
     .trend-badge.down { color: var(--red); }
     .trend-badge.neutral { color: var(--subtext); }
 
-    .stat-card .value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-top: 8px;
-      color: var(--text);
-      letter-spacing: -0.2px;
-    }
+    .stat-card .value { font-size: 1.5rem; font-weight: 700; margin-top: 8px; color: var(--text); letter-spacing: -0.2px; }
     .stat-card.small-card .value { font-size: 1.2rem; margin-top: 6px; }
     
     .stat-card .value.bkg-val { color: var(--accent-blue); }
@@ -214,107 +195,52 @@
     .stat-card .value.gp-val { color: var(--accent-blue); }
     .stat-card .value.hq-val { color: var(--orange); }
     .stat-card .value.spl-val { color: var(--pink); }
-
-    .sub-value {
-      font-size: 0.75rem;
-      color: var(--subtext);
-      margin-top: 6px;
-      font-weight: 600;
-    }
+    .sub-value { font-size: 0.75rem; color: var(--subtext); margin-top: 6px; font-weight: 600; }
 
     /* Line Chart Summary */
-    .chart-container {
-      border-radius: 24px;
-      padding: 20px;
-      margin-bottom: 20px;
-      display: none;
-    }
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
+    .chart-container { border-radius: 24px; padding: 20px; margin-bottom: 20px; display: none; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .chart-title { font-size: 1rem; font-weight: 700; color: var(--text); }
     select.mini-select {
-      background: var(--card-alt);
-      padding: 6px 30px 6px 12px;
-      font-size: 0.8rem;
-      border-radius: 10px;
-      background-size: 14px;
-      border: 1px solid var(--border-color);
-      color: var(--text);
+      background: var(--card-alt); padding: 6px 30px 6px 12px; font-size: 0.8rem;
+      border-radius: 10px; background-size: 14px; border: 1px solid var(--border-color); color: var(--text);
     }
     canvas { width: 100%; max-height: 220px; }
 
-    /* Controls Bar */
-    .controls-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+    /* Bottom Table Controls */
+    .controls-bar { margin-bottom: 16px; }
+    .controls-top-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px;
     }
-    .controls-bar select { flex: 1; }
+    .controls-top-row select { flex: 1; }
     .mini-pills { 
-      display: flex; 
-      background: var(--card-alt); 
-      border-radius: 12px; 
-      padding: 4px;
-      border: 1px solid var(--border-color);
+      display: flex; background: var(--card-alt); border-radius: 12px; padding: 4px; border: 1px solid var(--border-color);
     }
     .mini-pill {
-      background: transparent; 
-      border: none; 
-      color: var(--subtext);
-      padding: 6px 14px; 
-      font-size: 0.8rem; 
-      font-weight: 600;
-      border-radius: 8px; 
-      cursor: pointer;
-      transition: all 0.2s;
+      background: transparent; border: none; color: var(--subtext); padding: 6px 14px; 
+      font-size: 0.8rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s;
     }
-    .mini-pill.active { 
-      background: rgba(255, 255, 255, 0.15); 
-      color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+    .mini-pill.active { background: rgba(255, 255, 255, 0.15); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    
+    /* Dedicated Eqp Filter Row */
+    select#eqpFilter { width: 100%; }
 
     /* Master Table */
-    .customer-table-wrap {
-      border-radius: 24px;
-      overflow: hidden;
-      padding-bottom: 8px;
-    }
+    .customer-table-wrap { border-radius: 24px; overflow: hidden; padding-bottom: 8px; }
     table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     table.cust-table th {
-      color: var(--subtext); 
-      font-size: 0.65rem; 
-      text-transform: uppercase;
-      padding: 16px 12px 12px 12px; 
-      text-align: right;
-      border-bottom: 1px solid var(--border-color); 
-      letter-spacing: 0.5px; 
-      font-weight: 600;
+      color: var(--subtext); font-size: 0.65rem; text-transform: uppercase;
+      padding: 16px 12px 12px 12px; text-align: right; border-bottom: 1px solid var(--border-color); 
+      letter-spacing: 0.5px; font-weight: 600;
     }
     table.cust-table th:first-child { text-align: left; padding-left: 20px; }
     table.cust-table td {
-      padding: 14px 12px; 
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      text-align: right; 
-      font-weight: 600; 
-      vertical-align: middle;
+      padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; font-weight: 600; vertical-align: middle;
     }
     table.cust-table tr:last-child td { border-bottom: none; }
     table.cust-table td:first-child {
-      text-align: left; 
-      padding-left: 20px; 
-      font-weight: 600;
-      color: var(--text); 
-      max-width: 130px; 
-      white-space: nowrap;
-      overflow: hidden; 
-      text-overflow: ellipsis;
+      text-align: left; padding-left: 20px; font-weight: 600; color: var(--text); max-width: 130px; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .cell-main { display: block; font-size: 0.9rem; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext); margin-top: 4px; font-weight: 600; }
@@ -335,25 +261,22 @@
     </button>
   </header>
 
+  <!-- Top Global Filters (Vessel & Port only) -->
   <div class="global-filters">
-    <select id="mainMonthSelect" class="filter-select" onchange="applyGlobalFilters()">
+    <select id="mainMonthSelect" class="filter-select glass" onchange="applyGlobalFilters()">
       <option value="ALL">All Months Overview</option>
     </select>
     <div class="sub-filters">
-      <select id="vesselFilter" class="filter-select" onchange="applyGlobalFilters()">
+      <select id="vesselFilter" class="filter-select glass" onchange="applyGlobalFilters()">
         <option value="ALL">All Vessels</option>
       </select>
-      <select id="podFilter" class="filter-select" onchange="applyGlobalFilters()">
+      <select id="podFilter" class="filter-select glass" onchange="applyGlobalFilters()">
         <option value="ALL">All Ports</option>
-      </select>
-      <!-- New Container Type Global Filter -->
-      <select id="eqpFilter" class="filter-select full-width" onchange="applyGlobalFilters()">
-        <option value="ALL">All Container Types</option>
       </select>
     </div>
   </div>
 
-  <!-- BENTO KPI LAYOUT -->
+  <!-- KPI Cards -->
   <div class="card-row-2">
     <div class="stat-card glass">
       <div class="label-row"><div class="label">BOOKINGS</div><div id="trendBkgs"></div></div>
@@ -392,6 +315,7 @@
     </div>
   </div>
 
+  <!-- Trends Chart -->
   <div id="summaryChartContainer" class="chart-container glass">
     <div class="chart-header">
       <div class="chart-title">Monthly Trends</div>
@@ -408,19 +332,29 @@
     <canvas id="lineChart"></canvas>
   </div>
 
+  <!-- Bottom Table Controls & Added Container Filter -->
   <div class="controls-bar">
-    <select class="filter-select glass" id="groupBySelect" onchange="renderTableData()">
-      <option value="party">Customer</option>
-      <option value="pod">Port</option>
-      <option value="vsl">Vessel</option>
-      <option value="custType">Customer Type</option>
-    </select>
-    <div class="mini-pills">
-      <button class="mini-pill active" id="sort-teu" onclick="setSortBy('teu')">TEUs</button>
-      <button class="mini-pill" id="sort-profit" onclick="setSortBy('profit')">Profit</button>
+    <div class="controls-top-row">
+      <select class="filter-select glass" id="groupBySelect" onchange="renderTableData()">
+        <option value="party">Customer</option>
+        <option value="pod">Port</option>
+        <option value="vsl">Vessel</option>
+        <option value="custType">Customer Type</option>
+      </select>
+      <div class="mini-pills">
+        <button class="mini-pill active" id="sort-teu" onclick="setSortBy('teu')">TEUs</button>
+        <button class="mini-pill" id="sort-profit" onclick="setSortBy('profit')">Profit</button>
+      </div>
     </div>
+    <select id="eqpFilter" class="filter-select glass" onchange="applyGlobalFilters()">
+      <option value="ALL">All Container Types</option>
+      <option value="20GP">20 General Purpose Container</option>
+      <option value="40HQ">40 High Cube Container</option>
+      <option value="SPL">Special Equipment Container</option>
+    </select>
   </div>
 
+  <!-- Table -->
   <div class="customer-table-wrap glass">
     <table class="cust-table">
       <thead>
@@ -523,7 +457,6 @@
           const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
           const vslIdx      = findCol(["vsl", "vessel"], 12); 
           const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
-          const eqpTypeIdx  = findCol(["equipment", "eqp", "type", "size"], -1); // Fallback if there's a strict column
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -543,13 +476,6 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
-            
-            // Deduce Container Type if explicit column isn't perfectly mapped, otherwise rely on counts
-            let deducedEqp = "MIXED";
-            if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
-            else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
-            else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
-            else if (eqpTypeIdx !== -1 && r[eqpTypeIdx]) deducedEqp = String(r[eqpTypeIdx]).trim().toUpperCase();
 
             normalizedRows.push({
               vsl: vslName,
@@ -561,7 +487,6 @@
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
-              eqpType: deducedEqp,
               margin: margin
             });
           }
@@ -585,11 +510,10 @@
     }
 
     function populateFilterDropdowns() {
-      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
+      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL");
       
       const vsls = [...new Set(allRows.map(r => r.vsl))].filter(v => v && v !== "UNKNOWN").sort();
       const pods = [...new Set(allRows.map(r => r.pod))].filter(p => p && p !== "UNKNOWN").sort();
-      const eqps = [...new Set(allRows.map(r => r.eqpType))].filter(e => e && e !== "UNKNOWN").sort();
 
       const months = Object.keys(dataByMonth).sort((a, b) => {
         const idxA = MONTH_ORDER.indexOf(a);
@@ -608,13 +532,9 @@
       const podSel = document.getElementById("podFilter");
       podSel.innerHTML = `<option value="ALL">All Ports</option>` + pods.map(p => `<option value="${p}">${p}</option>`).join("");
       podSel.value = pods.includes(activePod) ? activePod : "ALL";
-
-      const eqpSel = document.getElementById("eqpFilter");
-      eqpSel.innerHTML = `<option value="ALL">All Container Types</option>` + eqps.map(e => `<option value="${e}">${e}</option>`).join("");
-      eqpSel.value = eqps.includes(activeEqp) ? activeEqp : "ALL";
     }
 
-    function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
+    function getFilteredRows(month, vsl, pod, eqp) {
       let rows = [];
       if (month === "ALL") {
         Object.values(dataByMonth).forEach(mRows => rows = rows.concat(mRows));
@@ -624,7 +544,10 @@
       
       if (vsl !== "ALL") rows = rows.filter(r => r.vsl === vsl);
       if (pod !== "ALL") rows = rows.filter(r => r.pod === pod);
-      if (!bypassEqp && eqp !== "ALL") rows = rows.filter(r => r.eqpType === eqp);
+      
+      if (eqp === "20GP") rows = rows.filter(r => r.gp20 > 0);
+      if (eqp === "40HQ") rows = rows.filter(r => r.hq40 > 0);
+      if (eqp === "SPL") rows = rows.filter(r => r.spl > 0);
       
       return rows;
     }
@@ -790,13 +713,13 @@
       const ctx = document.getElementById("lineChart").getContext("2d");
       if (lineChartInstance) lineChartInstance.destroy();
 
-      let color = "#5eead4"; // default mint accent
-      if (metric === 'profit') color = "#4ade80"; // Green
-      else if (metric === 'teus') color = "#c084fc"; // Purple
-      else if (metric === 'cntrs') color = "#60a5fa"; // Blue
-      else if (metric === 'gp20') color = "#60a5fa"; // Blue
-      else if (metric === 'hq40') color = "#fb923c"; // Orange
-      else if (metric === 'spl') color = "#fb7185";  // Pink
+      let color = "#5eead4"; 
+      if (metric === 'profit') color = "#4ade80"; 
+      else if (metric === 'teus') color = "#c084fc"; 
+      else if (metric === 'cntrs') color = "#60a5fa"; 
+      else if (metric === 'gp20') color = "#60a5fa"; 
+      else if (metric === 'hq40') color = "#fb923c"; 
+      else if (metric === 'spl') color = "#fb7185";  
 
       lineChartInstance = new Chart(ctx, {
         type: 'line',
@@ -813,7 +736,7 @@
             pointBorderColor: '#ffffff',
             pointBorderWidth: 1.5,
             fill: true,
-            tension: 0.4 // Smoother curves for modern look
+            tension: 0.4 
           }]
         },
         options: {
