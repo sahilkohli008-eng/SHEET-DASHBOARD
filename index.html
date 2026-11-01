@@ -6,7 +6,7 @@
   <title>Dashboard</title>
 
   <!-- iOS Status Bar & Caching -->
-  <meta name="theme-color" content="#0b0e14" />
+  <meta name="theme-color" content="#07090e" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -20,16 +20,26 @@
 
   <style>
     :root {
-      --accent: #5eead4;
-      --accent-blue: #60a5fa; 
-      --purple: #c084fc;
+      /* High-Contrast Neon Accents */
+      --accent: #5eead4;      /* Mint/Cyan ($53,771 style) */
+      --accent-blue: #60a5fa; /* Crisp iOS Blue */
+      --purple: #c084fc;      /* High-Contrast Purple (1,042 style) */
       --green: #4ade80;
       --orange: #fb923c;
       --pink: #fb7185;
       --red: #f87171;
       
       --text-light: #ffffff;
-      --subtext-light: rgba(255, 255, 255, 0.6);
+      --subtext-light: rgba(255, 255, 255, 0.62);
+
+      /* Strict iOS Glassmorphism Tokens */
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
+      --glass-border: 0.5px solid rgba(255, 255, 255, 0.15);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
+      --glass-blur: blur(24px) saturate(180%);
+      
+      --radius-main: 22px;
+      --radius-pill: 14px;
     }
     
     * {
@@ -37,70 +47,112 @@
       -webkit-tap-highlight-color: transparent;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
     
-    /* Darker Ambient Background for High Contrast 3D Glass */
+    /* Deep Dark Canvas to Maximize Frosted Glass Contrast */
     html, body {
-      background-color: #0b0e14;
+      background-color: #07090e;
       color: var(--text-light);
     }
     body {
       padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
       min-height: 100vh;
       position: relative;
+      overflow-x: hidden;
     }
-    /* Soft Neon Backlights to refract through the glass */
+    
+    /* Subtle Ambient Backlight for Glass Refraction */
     body::before {
-      content: ""; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%;
+      content: "";
+      position: fixed;
+      top: -15%; left: -15%; width: 130%; height: 130%;
       background: 
-        radial-gradient(circle at 20% 30%, rgba(96, 165, 250, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(192, 132, 252, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(45, 212, 191, 0.08) 0%, transparent 50%);
-      filter: blur(60px); z-index: -2;
+        radial-gradient(circle at 18% 22%, rgba(56, 189, 248, 0.14) 0%, transparent 42%),
+        radial-gradient(circle at 82% 65%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.10) 0%, transparent 45%);
+      filter: blur(50px);
+      z-index: -2;
+      pointer-events: none;
     }
 
-    /* 3D Liquid Glass Engine */
+    /* Core Ultra-Premium iOS Glassmorphism Class */
     .liquid-glass {
-      background: linear-gradient(135deg, rgba(30, 35, 45, 0.6) 0%, rgba(15, 18, 24, 0.8) 100%);
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 24px;
-      /* Razor sharp white top/left edges for glare */
-      border-top: 1px solid rgba(255, 255, 255, 0.4);
-      border-left: 1px solid rgba(255, 255, 255, 0.25);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      box-shadow: 
-        inset 0 4px 6px -2px rgba(255, 255, 255, 0.3),  /* Inner Top Glare */
-        inset 0 -6px 12px -2px rgba(0, 0, 0, 0.8),      /* Inner Bottom Shadow */
-        inset 4px 0 16px -4px rgba(96, 165, 250, 0.2),  /* Inner Left Cyan Bleed */
-        inset -4px 0 16px -4px rgba(192, 132, 252, 0.2),/* Inner Right Purple Bleed */
-        0 12px 24px rgba(0, 0, 0, 0.6),                 /* Outer Drop Shadow */
-        0 4px 12px rgba(0, 0, 0, 0.3);                  /* Outer Contact Shadow */
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-main);
+      color: var(--text-light);
     }
-    .liquid-capsule { border-radius: 999px !important; }
 
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .header-left { display: flex; align-items: center; gap: 12px; }
+    /* Smaller Inner Pills & Input Controls (14px Squircle) */
+    .liquid-pill {
+      border-radius: var(--radius-pill) !important;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
     
     .menu-btn {
-      background: transparent; border: none; color: var(--text-light); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; padding: 4px;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-pill);
+      color: var(--text-light);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease;
     }
-    .menu-btn svg { width: 28px; height: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+    .menu-btn:active { transform: scale(0.95); }
+    .menu-btn svg { width: 22px; height: 22px; }
     
-    h1 { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; text-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-    .status { font-size: 0.75rem; color: var(--subtext-light); margin-top: 2px; margin-left: 44px; font-weight: 600;}
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      margin: 0;
+    }
+    .status {
+      font-size: 0.72rem;
+      color: var(--subtext-light);
+      margin-top: 3px;
+      margin-left: 52px;
+      font-weight: 500;
+    }
     
     button.refresh-btn {
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
-      color: var(--text-light); width: 42px; height: 42px; border-radius: 21px;
-      border-top: 1px solid rgba(255,255,255,0.5);
-      border-left: 1px solid rgba(255,255,255,0.3);
-      display: flex; justify-content: center; align-items: center;
-      cursor: pointer; backdrop-filter: blur(10px); 
-      box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.3);
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-pill);
+      color: var(--text-light);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease;
     }
     button.refresh-btn:active { transform: scale(0.95); }
     button.refresh-btn svg { width: 18px; height: 18px; }
@@ -108,138 +160,262 @@
     /* Interactive Sidebar Drawer */
     #overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      z-index: 998; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
     }
     #overlay.active { opacity: 1; visibility: visible; }
 
     #sidebar {
-      position: fixed; top: 0; left: 0; bottom: 0; width: 75vw; max-width: 320px;
-      background: linear-gradient(135deg, rgba(20, 25, 35, 0.85) 0%, rgba(10, 12, 16, 0.95) 100%); 
-      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-      border-right: 1px solid rgba(255,255,255,0.2); z-index: 999;
-      transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: calc(env(safe-area-inset-top) + 20px) 20px 20px; display: flex; flex-direction: column;
-      box-shadow: 20px 0 50px rgba(0,0,0,0.6);
+      position: fixed; top: 0; left: 0; bottom: 0; width: 78vw; max-width: 320px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-right: 0.5px solid rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 12px 0 32px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: calc(env(safe-area-inset-top) + 20px) 20px 20px;
+      display: flex;
+      flex-direction: column;
     }
     #sidebar.active { transform: translateX(0); }
-    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .sidebar-header h2 { font-size: 1.3rem; font-weight: 800; color: var(--text-light); }
-    .close-btn { background: none; border: none; color: var(--text-light); cursor: pointer; padding: 4px; }
-    .close-btn svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .sidebar-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-light);
+    }
+    .close-btn {
+      background: var(--glass-bg);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-pill);
+      color: var(--text-light);
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-btn svg { width: 18px; height: 18px; }
     
-    .sidebar-content { display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-content { display: flex; flex-direction: column; gap: 18px; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; }
-    .filter-label { font-size: 0.75rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 700; letter-spacing: 0.5px; }
+    .filter-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--subtext-light);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
 
+    /* Input Fields & Dropdowns */
     select.filter-select {
-      color: var(--text-light); padding: 14px 18px; font-size: 0.95rem; font-weight: 600;
-      outline: none; -webkit-appearance: none; appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;
-      width: 100%; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      color: var(--text-light);
+      padding: 12px 36px 12px 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 15px;
+      width: 100%;
+    }
+    select.filter-select option {
+      background-color: #111520;
+      color: #ffffff;
     }
 
     /* Bento KPI Cards Layout */
-    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
-    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
     
-    .stat-card { padding: 18px; }
-    .stat-card.small-card { padding: 14px 12px; border-radius: 20px; }
+    .stat-card {
+      padding: 16px;
+      border-radius: var(--radius-main);
+    }
+    .stat-card.small-card {
+      padding: 14px 12px;
+      border-radius: var(--radius-main);
+    }
     
-    .stat-card .label-row { display: flex; justify-content: space-between; align-items: center; }
-    .stat-card .label { font-size: 0.7rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+    .stat-card .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-card .label {
+      font-size: 0.68rem;
+      color: var(--subtext-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
     .trend-badge {
-      font-size: 0.65rem; padding: 4px 6px; border-radius: 8px; font-weight: 800; display: inline-flex; align-items: center;
-      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      font-size: 0.62rem;
+      padding: 3px 7px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
     }
-    .stat-card.small-card .trend-badge { font-size: 0.55rem; padding: 3px 5px; }
-    .trend-badge.up { color: var(--green); text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
-    .trend-badge.down { color: var(--red); text-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
+    .stat-card.small-card .trend-badge { font-size: 0.54rem; padding: 2px 5px; }
+    .trend-badge.up { color: var(--green); }
+    .trend-badge.down { color: var(--red); }
     .trend-badge.neutral { color: var(--subtext-light); }
 
+    /* High-Contrast KPI Values */
     .stat-card .value { 
-      font-size: 1.6rem; font-weight: 800; margin-top: 10px; letter-spacing: -0.2px; 
-      text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin-top: 8px;
+      letter-spacing: -0.4px;
     }
-    .stat-card.small-card .value { font-size: 1.25rem; margin-top: 8px; }
+    .stat-card.small-card .value { font-size: 1.25rem; margin-top: 6px; }
     
-    .stat-card .value.bkg-val { color: var(--accent-blue); text-shadow: 0 0 16px rgba(96,165,250,0.3); }
-    .stat-card .value.teu-val { color: var(--purple); text-shadow: 0 0 16px rgba(192,132,252,0.3); }
-    .stat-card .value.margin-val { 
-      background: linear-gradient(90deg, #5eead4, #3b82f6); 
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-      font-size: 1.8rem; filter: drop-shadow(0 0 8px rgba(94, 234, 212, 0.3));
-    }
+    .stat-card .value.bkg-val { color: var(--accent-blue); }
+    .stat-card .value.cntr-val { color: var(--text-light); }
+    .stat-card .value.teu-val { color: var(--purple); }
+    .stat-card .value.margin-val { color: var(--accent); font-size: 1.7rem; }
     .stat-card .value.gp-val { color: var(--accent-blue); }
     .stat-card .value.hq-val { color: var(--orange); }
     .stat-card .value.spl-val { color: var(--pink); }
-    .sub-value { font-size: 0.75rem; color: var(--subtext-light); margin-top: 6px; font-weight: 600; }
-
-    /* Line Chart Summary */
-    .chart-container { padding: 20px; margin-bottom: 24px; display: none; }
-    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .chart-title { font-size: 1.05rem; font-weight: 800; color: var(--text-light); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    select.mini-select {
-      background: rgba(0,0,0,0.4); padding: 8px 32px 8px 12px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.2);
-      border-radius: 999px; background-size: 14px; border-left: none; border-right: none; border-bottom: none;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); color: var(--text-light);
+    
+    .sub-value {
+      font-size: 0.7rem;
+      color: var(--subtext-light);
+      margin-top: 5px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
     }
-    canvas { width: 100%; max-height: 220px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
 
-    /* Bottom Controls */
-    .controls-bar { margin-bottom: 16px; }
-    .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    /* Line Chart Summary Panel */
+    .chart-container {
+      padding: 18px;
+      margin-bottom: 20px;
+      border-radius: var(--radius-main);
+      display: none;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: var(--text-light);
+    }
+    select.mini-select {
+      padding: 8px 30px 8px 12px;
+      font-size: 0.78rem;
+      width: auto;
+    }
+    canvas { width: 100%; max-height: 220px; }
+
+    /* Bottom Controls Bar */
+    .controls-bar { margin-bottom: 14px; }
+    .controls-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
     .controls-top-row select { flex: 1; }
     
-    /* 3D Realistic Toggle Switch (Matches the image) */
+    /* Glossy Glass Segmented Switch (14px Squircle) */
     .switch-track {
-      display: flex; 
-      background: rgba(5, 7, 10, 0.7); 
-      border-radius: 999px; 
-      padding: 4px; 
-      border-top: 1px solid rgba(0,0,0,0.8);
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      box-shadow: inset 0 4px 8px rgba(0,0,0,0.8);
-      position: relative;
+      display: flex;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: var(--radius-pill);
+      padding: 3px;
     }
     .switch-btn {
-      background: transparent; color: rgba(255,255,255,0.5); border: none; padding: 10px 18px; 
-      font-size: 0.8rem; font-weight: 800; border-radius: 999px; cursor: pointer; transition: all 0.3s;
-      position: relative; z-index: 2;
+      background: transparent;
+      color: var(--subtext-light);
+      border: 0.5px solid transparent;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
     .switch-btn.active {
-      color: #ffffff;
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      box-shadow: 
-        inset 0 2px 4px rgba(255,255,255,0.5), /* Inner Top Glare */
-        inset 0 -2px 4px rgba(0,0,0,0.3),      /* Inner Bottom Shadow */
-        0 4px 12px rgba(96,165,250,0.5);       /* Outer Glow */
-      border-top: 1px solid rgba(255,255,255,0.6);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      color: var(--text-light);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 100%);
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.25);
     }
     
-    /* Master Table */
-    .customer-table-wrap { overflow: hidden; padding-bottom: 8px; }
-    table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    table.cust-table th {
-      color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase;
-      padding: 18px 12px 14px 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); 
-      letter-spacing: 0.5px; font-weight: 800;
+    /* Master Data Table Panel */
+    .customer-table-wrap {
+      overflow: hidden;
+      padding-bottom: 6px;
+      border-radius: var(--radius-main);
     }
-    table.cust-table th:first-child { text-align: left; padding-left: 20px; }
+    table.cust-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    table.cust-table th {
+      color: var(--subtext-light);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 16px 12px 12px 12px;
+      text-align: right;
+      border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    table.cust-table th:first-child { text-align: left; padding-left: 18px; }
     table.cust-table td {
-      padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; font-weight: 600; vertical-align: middle;
+      padding: 14px 12px;
+      border-bottom: 0.5px solid rgba(255, 255, 255, 0.07);
+      text-align: right;
+      font-weight: 600;
+      vertical-align: middle;
     }
     table.cust-table tr:last-child td { border-bottom: none; }
     table.cust-table td:first-child {
-      text-align: left; padding-left: 20px; font-weight: 700; color: var(--text-light); max-width: 120px; 
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-align: left;
+      padding-left: 18px;
+      font-weight: 600;
+      color: var(--text-light);
+      max-width: 130px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .cell-main { display: block; font-size: 0.95rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 4px; font-weight: 700; }
+    .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
+    .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -250,7 +426,7 @@
     <div class="sidebar-header">
       <h2>Global Filters</h2>
       <button class="close-btn" onclick="toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
@@ -258,25 +434,25 @@
     <div class="sidebar-content">
       <div class="filter-group">
         <label class="filter-label">Month Overview</label>
-        <select id="mainMonthSelect" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
+        <select id="mainMonthSelect" class="filter-select liquid-glass liquid-pill" onchange="applyGlobalFilters()">
           <option value="ALL">All Months Overview</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Vessels</label>
-        <select id="vesselFilter" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
+        <select id="vesselFilter" class="filter-select liquid-glass liquid-pill" onchange="applyGlobalFilters()">
           <option value="ALL">All Vessels</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Ports</label>
-        <select id="podFilter" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
+        <select id="podFilter" class="filter-select liquid-glass liquid-pill" onchange="applyGlobalFilters()">
           <option value="ALL">All Ports</option>
         </select>
       </div>
       <div class="filter-group">
         <label class="filter-label">Container Type</label>
-        <select id="eqpFilter" class="filter-select liquid-glass liquid-capsule" onchange="applyGlobalFilters()">
+        <select id="eqpFilter" class="filter-select liquid-glass liquid-pill" onchange="applyGlobalFilters()">
           <option value="ALL">All Container Types</option>
           <option value="20GP">20 General Purpose</option>
           <option value="40HQ">40 High Cube</option>
@@ -290,7 +466,7 @@
     <div>
       <div class="header-left">
         <button class="menu-btn" onclick="toggleSidebar()">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -299,7 +475,7 @@
       <div class="status" id="lastUpdated">Updating...</div>
     </div>
     <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="23 4 23 10 17 10"></polyline>
         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
       </svg>
@@ -333,7 +509,7 @@
     </div>
   </div>
 
-  <div class="card-row-2" style="margin-bottom: 24px;">
+  <div class="card-row-2" style="margin-bottom: 20px;">
     <div class="stat-card liquid-glass">
       <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
@@ -349,7 +525,7 @@
   <div id="summaryChartContainer" class="chart-container liquid-glass">
     <div class="chart-header">
       <div class="chart-title">Monthly Trends</div>
-      <select id="chartMetricSelect" class="filter-select liquid-capsule mini-select" onchange="renderLineChart()">
+      <select id="chartMetricSelect" class="filter-select liquid-glass liquid-pill mini-select" onchange="renderLineChart()">
         <option value="teus">TEUs</option>
         <option value="profit">Profit</option>
         <option value="cntrs">Containers</option>
@@ -362,10 +538,10 @@
     <canvas id="lineChart"></canvas>
   </div>
 
-  <!-- Bottom Table Controls with 3D Switch -->
+  <!-- Bottom Table Controls -->
   <div class="controls-bar">
     <div class="controls-top-row">
-      <select class="filter-select liquid-glass liquid-capsule" id="groupBySelect" onchange="renderTableData()">
+      <select class="filter-select liquid-glass liquid-pill" id="groupBySelect" onchange="renderTableData()">
         <option value="party">Customer</option>
         <option value="pod">Port</option>
         <option value="vsl">Vessel</option>
@@ -746,7 +922,7 @@
       if (lineChartInstance) lineChartInstance.destroy();
 
       let color = "#5eead4"; 
-      if (metric === 'profit') color = "#4ade80"; 
+      if (metric === 'profit') color = "#5eead4"; 
       else if (metric === 'teus') color = "#c084fc"; 
       else if (metric === 'cntrs') color = "#60a5fa"; 
       else if (metric === 'gp20') color = "#60a5fa"; 
@@ -761,12 +937,12 @@
             label: metric.toUpperCase(),
             data: dataPoints,
             borderColor: color,
-            backgroundColor: color + '33', 
-            borderWidth: 3,
+            backgroundColor: color + '28', 
+            borderWidth: 2.5,
             pointBackgroundColor: color,
-            pointRadius: 5,
+            pointRadius: 4.5,
             pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
+            pointBorderWidth: 1.5,
             fill: true,
             tension: 0.4 
           }]
@@ -777,13 +953,13 @@
           plugins: { legend: { display: false } },
           scales: {
             y: { 
-              grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, 
-              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: '-apple-system' } }, 
+              grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false }, 
+              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: 'system-ui, -apple-system' } }, 
               beginAtZero: true 
             },
             x: { 
               grid: { display: false }, 
-              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: '-apple-system' } } 
+              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: 'system-ui, -apple-system' } } 
             }
           }
         }
