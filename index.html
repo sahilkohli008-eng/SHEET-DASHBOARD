@@ -191,21 +191,27 @@
 
     .search-capsule {
       width: 100%; max-width: 500px; display: flex; align-items: center; background: rgba(15, 20, 30, 0.85);
-      border-radius: 999px; padding: 6px 6px 6px 20px; border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px; padding: 10px 16px 10px 20px; border: 1px solid rgba(255,255,255,0.2);
       box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 16px;
     }
     .search-capsule input {
-      flex: 1; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none;
+      flex: 1; background: transparent; border: none; color: #fff; font-size: 1.05rem; outline: none;
     }
     .search-capsule input::placeholder { color: rgba(255,255,255,0.4); font-weight: 500; }
-    .search-capsule .cancel-btn {
-      background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px 16px;
-      border-radius: 999px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+    
+    .clear-main-search-btn {
+      background: rgba(255,255,255,0.15); color: var(--text-light); border: none; 
+      width: 24px; height: 24px; border-radius: 50%;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
     }
+    .clear-main-search-btn:hover { background: rgba(255,255,255,0.3); }
+    .clear-main-search-btn:active { transform: scale(0.9); }
+    .clear-main-search-btn svg { width: 14px; height: 14px; }
 
     #globalSearchResults {
       width: 100%; max-width: 500px; max-height: calc(100vh - 120px); overflow-y: auto;
-      border-radius: 20px;
+      border-radius: 20px; display: none; /* Hide empty line */
     }
     .search-result-item {
       display: flex; justify-content: space-between; align-items: center;
@@ -338,7 +344,6 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
-          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="vesselDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="vesselSearch" placeholder="Search Vessel..." oninput="filterCustomOptions('vessel')">
@@ -361,7 +366,6 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
-          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="podDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="podSearch" placeholder="Search Port..." oninput="filterCustomOptions('pod')">
@@ -389,14 +393,18 @@
     </div>
   </div>
 
-  <!-- GLOBAL SEARCH OVERLAY -->
-  <div id="globalSearchOverlay">
+  <!-- GLOBAL SEARCH OVERLAY (Interactive Background) -->
+  <div id="globalSearchOverlay" onclick="closeGlobalSearch(event)">
     <div class="search-capsule">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.4)" stroke-width="2" style="width: 20px; height: 20px; margin-right: 12px;">
         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" id="mainSearchInput" placeholder="Search Customer, Vessel, Port..." oninput="performGlobalSearch()">
-      <button class="cancel-btn" onclick="toggleGlobalSearch()">Cancel</button>
+      <input type="text" id="mainSearchInput" placeholder="Search" oninput="performGlobalSearch()">
+      <button class="clear-main-search-btn" id="mainSearchClearBtn" onclick="clearMainSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      </button>
     </div>
     <div id="globalSearchResults" class="liquid-glass">
       <!-- Search Results populate here dynamically -->
@@ -577,7 +585,7 @@
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     let dataByMonth = {};
-    let globalSearchIndex = []; // { name, type }
+    let globalSearchIndex = []; 
     let activeMonth = "ALL";
     let activeVessel = "ALL";
     let activePod = "ALL";
@@ -597,14 +605,37 @@
       }
     }
 
+    // Global Search Interactive Close
     function toggleGlobalSearch() {
       const searchOverlay = document.getElementById("globalSearchOverlay");
       searchOverlay.classList.toggle("active");
       if(searchOverlay.classList.contains("active")) {
         document.getElementById("mainSearchInput").value = "";
-        document.getElementById("globalSearchResults").innerHTML = "";
-        document.getElementById("mainSearchInput").focus();
+        document.getElementById("mainSearchClearBtn").style.display = "none";
+        
+        const resultsDiv = document.getElementById("globalSearchResults");
+        resultsDiv.innerHTML = "";
+        resultsDiv.style.display = "none"; // Hide to clear bottom line
+        
+        setTimeout(() => document.getElementById("mainSearchInput").focus(), 100);
       }
+    }
+
+    function closeGlobalSearch(e) {
+      if (e.target.id === "globalSearchOverlay") {
+        toggleGlobalSearch();
+      }
+    }
+
+    function clearMainSearch() {
+      document.getElementById("mainSearchInput").value = "";
+      document.getElementById("mainSearchClearBtn").style.display = "none";
+      
+      const resultsDiv = document.getElementById("globalSearchResults");
+      resultsDiv.innerHTML = "";
+      resultsDiv.style.display = "none"; 
+      
+      document.getElementById("mainSearchInput").focus();
     }
 
     function closeDetailView() {
@@ -871,14 +902,21 @@
     function performGlobalSearch() {
       const query = document.getElementById("mainSearchInput").value.toLowerCase();
       const resultsDiv = document.getElementById("globalSearchResults");
+      const clearBtn = document.getElementById("mainSearchClearBtn");
+      
+      if (query.length > 0) clearBtn.style.display = "flex";
+      else clearBtn.style.display = "none";
       
       if (query.length < 2) {
         resultsDiv.innerHTML = "";
+        resultsDiv.style.display = "none";
         return;
       }
 
-      const matches = globalSearchIndex.filter(item => item.name.toLowerCase().includes(query)).slice(0, 15); // limit to 15
+      const matches = globalSearchIndex.filter(item => item.name.toLowerCase().includes(query)).slice(0, 15);
       
+      resultsDiv.style.display = "block";
+
       if (matches.length === 0) {
         resultsDiv.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--subtext-light);">No results found.</div>`;
         return;
@@ -886,7 +924,7 @@
 
       let html = "";
       matches.forEach(m => {
-        let typeClass = m.type.toLowerCase(); // 'customer', 'vessel', 'port'
+        let typeClass = m.type.toLowerCase(); 
         const safeName = m.name.replace(/'/g, "\\'");
         html += `
           <div class="search-result-item" onclick="openDetailView('${safeName}', '${m.type}')">
@@ -906,11 +944,9 @@
       document.getElementById("detailNameTitle").textContent = name;
       document.getElementById("detailTypeBadge").textContent = type;
       
-      // Assign Badge Color based on type
       const badge = document.getElementById("detailTypeBadge");
       badge.style.color = type === 'Vessel' ? 'var(--purple)' : (type === 'Port' ? 'var(--orange)' : 'var(--accent-blue)');
 
-      // Filter all data for this specific entity
       const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
       const matchedRows = allRows.filter(r => {
         if(type === 'Customer') return r.party === name;
@@ -919,10 +955,7 @@
         return false;
       });
 
-      // Aggregate Totals
       let tBkgs = matchedRows.length, tCntrs = 0, tTeus = 0, tProfit = 0;
-      
-      // Aggregate for breakdown table (group by month and secondary entity)
       const breakdownMap = {};
 
       matchedRows.forEach(r => {
@@ -941,7 +974,6 @@
         breakdownMap[bKey].profit += r.margin;
       });
 
-      // Update KPI Cards
       document.getElementById("detBkgs").textContent = tBkgs.toLocaleString();
       document.getElementById("detCntrs").textContent = Math.round(tCntrs).toLocaleString();
       document.getElementById("detTeus").textContent = Math.round(tTeus).toLocaleString();
@@ -949,7 +981,6 @@
       const yieldPerCntr = tCntrs > 0 ? Math.round(tProfit / tCntrs) : 0;
       document.getElementById("detYield").textContent = `YIELD: $${yieldPerCntr.toLocaleString()} / CNTR`;
 
-      // Update Table
       const breakdownArray = Object.values(breakdownMap).sort((a,b) => b.teus - a.teus);
       const tableBody = document.getElementById("detailTableBody");
       
@@ -968,7 +999,6 @@
       
       overlay.classList.add("active");
     }
-
 
     // Standard Data Processing
     function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
