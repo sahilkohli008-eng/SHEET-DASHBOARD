@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Summary Dashboard</title>
+
+  <!-- iOS PWA Fullscreen Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Dashboard" />
+
+  <!-- Chart.js & PapaParse (for CSV parsing) CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 20px);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .status {
+      font-size: 0.75rem;
+      color: var(--subtext);
+      margin-top: 2px;
+    }
+    button.refresh-btn {
+      background: var(--card-bg);
+      border: 1px solid #334155;
+      color: var(--accent);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.refresh-btn:active {
+      opacity: 0.7;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #334155;
+    }
+    .stat-card .label {
+      font-size: 0.75rem;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-top: 6px;
+      color: var(--accent);
+    }
+    .chart-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+    canvas {
+      max-width: 100%;
+      max-height: 280px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>Live Tracker</h1>
+      <div class="status" id="lastUpdated">Updating...</div>
+    </div>
+    <button class="refresh-btn" onclick="fetchSheetData()">↻ Refresh</button>
+  </header>
+
+  <!-- Summary Cards -->
+  <div class="card-grid">
+    <div class="stat-card">
+      <div class="label">Total Records</div>
+      <div class="value" id="statCount">--</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Sum / Volume</div>
+      <div class="value" id="statSum">--</div>
+    </div>
+  </div>
+
+  <!-- Pie Chart -->
+  <div class="chart-container">
+    <div class="chart-title">Breakdown by Category</div>
+    <canvas id="pieChart"></canvas>
+  </div>
+
+  <script>
+    // 1. Paste your published CSV URL here:
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSA7Ust8ut8lwSDfgzbacQ3biTKRy5YBNWY87cfGJp4JOKEsGx1kEjQcnEn1xuhKxzlZVtBNzfQTFaO/pub?output=csv";
+
+    let chartInstance = null;
+
+    async function fetchSheetData() {
+      const statusEl = document.getElementById("lastUpdated");
+      statusEl.textContent = "Refreshing...";
+
+      try {
+        // Cache-busting query parameter ensures fresh fetch every time
+        const response = await fetch(`${SHEET_CSV_URL}&_cb=${Date.now()}`);
+        const csvText = await response.text();
+
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            processData(results.data);
+            const now = new Date();
+            statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+          }
+        });
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Error fetching sheet";
+      }
+    }
+
+    function processData(rows) {
+      if (!rows || rows.length === 0) return;
+
+      // Identify key columns (adapt column names as needed)
+      // Example assumes columns: "Category" (or "Port"/"Status") and "Amount" (or "Count"/"Teus")
+      const keys = Object.keys(rows[0]);
+      const catKey = keys[0]; // first column as label
+      const valKey = keys[1]; // second column as number (or count occurrences)
+
+      const categoryMap = {};
+      let totalSum = 0;
+
+      rows.forEach(row => {
+        const cat = row[catKey] || "Other";
+        const val = parseFloat(row[valKey]) || 1; // falls back to counting occurrences
+
+        categoryMap[cat] = (categoryMap[cat] || 0) + val;
+        totalSum += val;
+      });
+
+      // Update Summary Cards
+      document.getElementById("statCount").textContent = rows.length.toLocaleString();
+      document.getElementById("statSum").textContent = totalSum.toLocaleString();
+
+      // Update Pie Chart
+      renderChart(Object.keys(categoryMap), Object.values(categoryMap));
+    }
+
+    function renderChart(labels, values) {
+      const ctx = document.getElementById("pieChart").getContext("2d");
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: "doughnut", // sleek pie variant
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: [
+              "#38bdf8", "#818cf8", "#f472b6", "#fbbf24", "#34d399", "#a78bfa"
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { color: "#94a3b8", font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+
+    // Refresh every 5 minutes (300,000 ms)
+    setInterval(fetchSheetData, 5 * 60 * 1000);
+
+    // Refresh every time app is opened / brought to foreground
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        fetchSheetData();
+      }
+    });
+
+    // Initial load
+    window.addEventListener("DOMContentLoaded", fetchSheetData);
+  </script>
+</body>
+</html>
