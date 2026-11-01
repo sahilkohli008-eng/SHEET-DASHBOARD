@@ -18,21 +18,25 @@
 
   <style>
     :root {
-      /* Native iOS Dark Mode Palette */
-      --bg: #000000;
-      --card-bg: #1c1c1e;
-      --card-alt: #2c2c2e;
-      --accent: #0a84ff;
-      --purple: #bf5af2;
-      --green: #30d158;
-      --orange: #ff9f0a;
-      --cyan: #32ade6;
-      --pink: #ff2d55;
-      --red: #ff453a;
+      /* Nexora-Inspired Glassmorphism / Fintech Deep Blue Theme */
+      --bg-gradient: linear-gradient(160deg, #0a101f 0%, #11274a 50%, #1e4b8f 100%);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-highlight: linear-gradient(135deg, rgba(74, 158, 255, 0.2) 0%, rgba(37, 99, 235, 0.05) 100%);
+      --card-alt: rgba(255, 255, 255, 0.12);
+      --border-color: rgba(255, 255, 255, 0.15);
+      
+      --accent: #5eead4;     /* Mint/Cyan for highlights */
+      --accent-blue: #60a5fa; /* Soft bright blue */
+      --purple: #c084fc;
+      --green: #4ade80;
+      --orange: #fb923c;
+      --pink: #fb7185;
+      --red: #f87171;
+      
       --text: #ffffff;
-      --subtext: #8e8e93;
-      --border: #38383a;
+      --subtext: rgba(255, 255, 255, 0.7);
     }
+    
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -40,74 +44,109 @@
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     }
+    
     body {
-      background: var(--bg);
+      background: var(--bg-gradient);
+      background-attachment: fixed;
       color: var(--text);
-      padding: calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 30px);
+      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
+      min-height: 100vh;
+    }
+
+    /* Glassmorphism utility */
+    .glass {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      padding-top: 4px;
+      margin-bottom: 20px;
     }
+    
     h1 {
-      font-size: 1.75rem;
+      font-size: 1.85rem;
       font-weight: 700;
       letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+    /* Logo-like dash */
+    h1::before {
+      content: "";
+      display: block;
+      width: 24px;
+      height: 18px;
+      background: repeating-linear-gradient(0deg, var(--text), var(--text) 3px, transparent 3px, transparent 7px);
+    }
+
     .status {
       font-size: 0.75rem;
       color: var(--subtext);
-      margin-top: 2px;
+      margin-top: 4px;
+      margin-left: 34px;
     }
     
     button.refresh-btn {
       background: var(--card-alt);
-      color: var(--accent);
-      width: 36px;
-      height: 36px;
-      border-radius: 18px;
-      border: none;
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      backdrop-filter: blur(10px);
       transition: opacity 0.2s;
     }
     button.refresh-btn:active { opacity: 0.5; }
     button.refresh-btn svg { width: 18px; height: 18px; }
 
     /* Global Filters */
-    .global-filters { margin-bottom: 16px; }
+    .global-filters { margin-bottom: 20px; }
+    
     select.filter-select {
-      background: var(--card-bg);
+      background-color: var(--card-alt);
       color: var(--text);
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 0.85rem;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 0.9rem;
       font-weight: 600;
-      border: none;
+      border: 1px solid var(--border-color);
       outline: none;
       -webkit-appearance: none;
       appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
-      background-position: right 12px center;
+      background-position: right 14px center;
       background-size: 16px;
+      backdrop-filter: blur(10px);
     }
+    
     select#mainMonthSelect {
       width: 100%;
-      background-color: var(--card-alt);
-      font-size: 1rem;
-      padding: 12px 16px;
-      border-radius: 14px;
-      margin-bottom: 10px;
+      font-size: 1.05rem;
+      padding: 14px 16px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      background: var(--card-highlight);
     }
-    .sub-filters { display: flex; gap: 10px; }
-    .sub-filters select { flex: 1; }
+    
+    .sub-filters { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+    }
+    .sub-filters select { width: 100%; }
+    .sub-filters .full-width { grid-column: span 2; }
 
     /* Bento KPI Cards Layout */
     .card-row-2 {
@@ -124,12 +163,12 @@
     }
     
     .stat-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px 16px;
+      border-radius: 20px;
+      padding: 16px;
     }
     .stat-card.small-card {
-      padding: 12px 10px;
+      padding: 12px;
+      border-radius: 16px;
     }
     
     .stat-card .label-row {
@@ -138,73 +177,73 @@
       align-items: center;
     }
     .stat-card .label {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: var(--subtext);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
     }
-    .stat-card.small-card .label {
-      font-size: 0.55rem;
-    }
+    .stat-card.small-card .label { font-size: 0.6rem; }
     
     .trend-badge {
       font-size: 0.65rem;
-      padding: 3px 5px;
-      border-radius: 6px;
+      padding: 4px 6px;
+      border-radius: 8px;
       font-weight: 700;
       display: inline-flex;
       align-items: center;
+      background: var(--card-alt);
     }
-    .stat-card.small-card .trend-badge { font-size: 0.55rem; padding: 2px 4px; }
-    .trend-badge.up { background: rgba(48, 209, 88, 0.15); color: var(--green); }
-    .trend-badge.down { background: rgba(255, 69, 58, 0.15); color: var(--red); }
-    .trend-badge.neutral { background: var(--card-alt); color: var(--subtext); }
+    .stat-card.small-card .trend-badge { font-size: 0.55rem; padding: 3px 5px; }
+    .trend-badge.up { color: var(--green); }
+    .trend-badge.down { color: var(--red); }
+    .trend-badge.neutral { color: var(--subtext); }
 
     .stat-card .value {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 700;
-      margin-top: 6px;
+      margin-top: 8px;
       color: var(--text);
       letter-spacing: -0.2px;
     }
-    .stat-card.small-card .value { font-size: 1.15rem; margin-top: 4px; }
+    .stat-card.small-card .value { font-size: 1.2rem; margin-top: 6px; }
     
-    .stat-card .value.bkg-val { color: var(--accent); }
+    .stat-card .value.bkg-val { color: var(--accent-blue); }
     .stat-card .value.teu-val { color: var(--purple); }
-    .stat-card .value.margin-val { color: var(--green); }
-    .stat-card .value.gp-val { color: var(--cyan); }
+    .stat-card .value.margin-val { color: var(--accent); font-size: 1.6rem; }
+    .stat-card .value.gp-val { color: var(--accent-blue); }
     .stat-card .value.hq-val { color: var(--orange); }
     .stat-card .value.spl-val { color: var(--pink); }
 
     .sub-value {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: var(--subtext);
-      margin-top: 4px;
+      margin-top: 6px;
       font-weight: 600;
     }
 
     /* Line Chart Summary */
     .chart-container {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 20px;
       display: none;
     }
     .chart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
-    .chart-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .chart-title { font-size: 1rem; font-weight: 700; color: var(--text); }
     select.mini-select {
       background: var(--card-alt);
-      padding: 6px 30px 6px 10px;
-      font-size: 0.75rem;
-      border-radius: 8px;
-      background-size: 12px;
+      padding: 6px 30px 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 10px;
+      background-size: 14px;
+      border: 1px solid var(--border-color);
+      color: var(--text);
     }
     canvas { width: 100%; max-height: 220px; }
 
@@ -213,44 +252,72 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 16px;
     }
     .controls-bar select { flex: 1; }
-    .mini-pills { display: flex; background: var(--card-bg); border-radius: 10px; padding: 3px; }
-    .mini-pill {
-      background: transparent; border: none; color: var(--text);
-      padding: 6px 12px; font-size: 0.75rem; font-weight: 600;
-      border-radius: 8px; cursor: pointer;
+    .mini-pills { 
+      display: flex; 
+      background: var(--card-alt); 
+      border-radius: 12px; 
+      padding: 4px;
+      border: 1px solid var(--border-color);
     }
-    .mini-pill.active { background: #48484a; }
+    .mini-pill {
+      background: transparent; 
+      border: none; 
+      color: var(--subtext);
+      padding: 6px 14px; 
+      font-size: 0.8rem; 
+      font-weight: 600;
+      border-radius: 8px; 
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mini-pill.active { 
+      background: rgba(255, 255, 255, 0.15); 
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
     /* Master Table */
     .customer-table-wrap {
-      background: var(--card-bg);
-      border-radius: 16px;
+      border-radius: 24px;
       overflow: hidden;
       padding-bottom: 8px;
     }
     table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     table.cust-table th {
-      color: var(--subtext); font-size: 0.65rem; text-transform: uppercase;
-      padding: 14px 10px 10px 10px; text-align: right;
-      border-bottom: 1px solid var(--border); letter-spacing: 0.4px; font-weight: 600;
+      color: var(--subtext); 
+      font-size: 0.65rem; 
+      text-transform: uppercase;
+      padding: 16px 12px 12px 12px; 
+      text-align: right;
+      border-bottom: 1px solid var(--border-color); 
+      letter-spacing: 0.5px; 
+      font-weight: 600;
     }
-    table.cust-table th:first-child { text-align: left; padding-left: 16px; }
+    table.cust-table th:first-child { text-align: left; padding-left: 20px; }
     table.cust-table td {
-      padding: 10px 10px; border-bottom: 1px solid var(--border);
-      text-align: right; font-weight: 600; vertical-align: middle;
+      padding: 14px 12px; 
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: right; 
+      font-weight: 600; 
+      vertical-align: middle;
     }
     table.cust-table tr:last-child td { border-bottom: none; }
     table.cust-table td:first-child {
-      text-align: left; padding-left: 16px; font-weight: 600;
-      color: var(--text); max-width: 130px; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis;
+      text-align: left; 
+      padding-left: 20px; 
+      font-weight: 600;
+      color: var(--text); 
+      max-width: 130px; 
+      white-space: nowrap;
+      overflow: hidden; 
+      text-overflow: ellipsis;
     }
-    .cell-main { display: block; }
-    .cell-sub { font-size: 0.65rem; color: var(--subtext); margin-top: 3px; font-weight: 600; }
+    .cell-main { display: block; font-size: 0.9rem; }
+    .cell-sub { font-size: 0.65rem; color: var(--subtext); margin-top: 4px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -279,49 +346,53 @@
       <select id="podFilter" class="filter-select" onchange="applyGlobalFilters()">
         <option value="ALL">All Ports</option>
       </select>
+      <!-- New Container Type Global Filter -->
+      <select id="eqpFilter" class="filter-select full-width" onchange="applyGlobalFilters()">
+        <option value="ALL">All Container Types</option>
+      </select>
     </div>
   </div>
 
   <!-- BENTO KPI LAYOUT -->
   <div class="card-row-2">
-    <div class="stat-card">
+    <div class="stat-card glass">
       <div class="label-row"><div class="label">BOOKINGS</div><div id="trendBkgs"></div></div>
       <div class="value bkg-val" id="statCount">--</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card glass">
       <div class="label-row"><div class="label">CONTAINERS</div><div id="trendCntrs"></div></div>
       <div class="value cntr-val" id="statContainers">--</div>
     </div>
   </div>
 
   <div class="card-row-3">
-    <div class="stat-card small-card">
+    <div class="stat-card small-card glass">
       <div class="label-row"><div class="label">20GP</div><div id="trend20"></div></div>
       <div class="value gp-val" id="stat20">--</div>
     </div>
-    <div class="stat-card small-card">
+    <div class="stat-card small-card glass">
       <div class="label-row"><div class="label">40HQ</div><div id="trend40"></div></div>
       <div class="value hq-val" id="stat40">--</div>
     </div>
-    <div class="stat-card small-card">
+    <div class="stat-card small-card glass">
       <div class="label-row"><div class="label">SPL EQP</div><div id="trendSpl"></div></div>
       <div class="value spl-val" id="statSpl">--</div>
     </div>
   </div>
 
-  <div class="card-row-2" style="margin-bottom: 20px;">
-    <div class="stat-card">
+  <div class="card-row-2" style="margin-bottom: 24px;">
+    <div class="stat-card glass">
       <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card glass" style="background: var(--card-highlight);">
       <div class="label-row"><div class="label">EARNING PROFIT</div><div id="trendProfit"></div></div>
       <div class="value margin-val" id="statMargin">--</div>
       <div class="sub-value" id="statYield">--</div>
     </div>
   </div>
 
-  <div id="summaryChartContainer" class="chart-container">
+  <div id="summaryChartContainer" class="chart-container glass">
     <div class="chart-header">
       <div class="chart-title">Monthly Trends</div>
       <select id="chartMetricSelect" class="filter-select mini-select" onchange="renderLineChart()">
@@ -338,7 +409,7 @@
   </div>
 
   <div class="controls-bar">
-    <select class="filter-select" id="groupBySelect" onchange="renderTableData()">
+    <select class="filter-select glass" id="groupBySelect" onchange="renderTableData()">
       <option value="party">Customer</option>
       <option value="pod">Port</option>
       <option value="vsl">Vessel</option>
@@ -350,7 +421,7 @@
     </div>
   </div>
 
-  <div class="customer-table-wrap">
+  <div class="customer-table-wrap glass">
     <table class="cust-table">
       <thead>
         <tr>
@@ -377,6 +448,7 @@
     let activeMonth = "ALL";
     let activeVessel = "ALL";
     let activePod = "ALL";
+    let activeEqp = "ALL";
     let sortBy = "teu"; 
     let lineChartInstance = null;
 
@@ -440,18 +512,18 @@
             return idx !== -1 ? idx : fallbackIdx;
           };
 
-          // Strict column mappings referencing the Masterfile screenshot
-          const bookIdx     = findCol(["booking", "bkg", "bl", "sr"], 0); // Col A
-          const partyIdx    = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); // Col B
-          const gp20Idx     = findCol(["20gp", "20'", "20st", "20 dv"], 2); // Col C
-          const hq40Idx     = findCol(["40hq", "40hc", "40'", "40 hc"], 3); // Col D
-          const splIdx      = findCol(["spl", "special", "45", "flat", "open"], 4); // Col E
-          const cntrIdx     = findCol(["cntr", "container", "box", "total units", "units"], 5); // Col F
-          const teuIdx      = findCol(["teu", "vol", "qty", "volume"], 6); // Col G
-          const podIdx      = findCol(["pod", "port", "dest", "discharge"], 9); // Col J
-          const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); // Col L
-          const vslIdx      = findCol(["vsl", "vessel"], 12); // Col M
-          const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); // Col P
+          const bookIdx     = findCol(["booking", "bkg", "bl", "sr"], 0); 
+          const partyIdx    = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); 
+          const gp20Idx     = findCol(["20gp", "20'", "20st", "20 dv"], 2); 
+          const hq40Idx     = findCol(["40hq", "40hc", "40'", "40 hc"], 3); 
+          const splIdx      = findCol(["spl", "special", "45", "flat", "open"], 4); 
+          const cntrIdx     = findCol(["cntr", "container", "box", "total units", "units"], 5); 
+          const teuIdx      = findCol(["teu", "vol", "qty", "volume"], 6); 
+          const podIdx      = findCol(["pod", "port", "dest", "discharge"], 9); 
+          const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
+          const vslIdx      = findCol(["vsl", "vessel"], 12); 
+          const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
+          const eqpTypeIdx  = findCol(["equipment", "eqp", "type", "size"], -1); // Fallback if there's a strict column
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -471,6 +543,13 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            
+            // Deduce Container Type if explicit column isn't perfectly mapped, otherwise rely on counts
+            let deducedEqp = "MIXED";
+            if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
+            else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
+            else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
+            else if (eqpTypeIdx !== -1 && r[eqpTypeIdx]) deducedEqp = String(r[eqpTypeIdx]).trim().toUpperCase();
 
             normalizedRows.push({
               vsl: vslName,
@@ -482,6 +561,7 @@
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
+              eqpType: deducedEqp,
               margin: margin
             });
           }
@@ -505,10 +585,11 @@
     }
 
     function populateFilterDropdowns() {
-      const allRows = getFilteredRows("ALL", "ALL", "ALL");
+      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
       
       const vsls = [...new Set(allRows.map(r => r.vsl))].filter(v => v && v !== "UNKNOWN").sort();
       const pods = [...new Set(allRows.map(r => r.pod))].filter(p => p && p !== "UNKNOWN").sort();
+      const eqps = [...new Set(allRows.map(r => r.eqpType))].filter(e => e && e !== "UNKNOWN").sort();
 
       const months = Object.keys(dataByMonth).sort((a, b) => {
         const idxA = MONTH_ORDER.indexOf(a);
@@ -527,9 +608,13 @@
       const podSel = document.getElementById("podFilter");
       podSel.innerHTML = `<option value="ALL">All Ports</option>` + pods.map(p => `<option value="${p}">${p}</option>`).join("");
       podSel.value = pods.includes(activePod) ? activePod : "ALL";
+
+      const eqpSel = document.getElementById("eqpFilter");
+      eqpSel.innerHTML = `<option value="ALL">All Container Types</option>` + eqps.map(e => `<option value="${e}">${e}</option>`).join("");
+      eqpSel.value = eqps.includes(activeEqp) ? activeEqp : "ALL";
     }
 
-    function getFilteredRows(month, vsl, pod) {
+    function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
       let rows = [];
       if (month === "ALL") {
         Object.values(dataByMonth).forEach(mRows => rows = rows.concat(mRows));
@@ -539,6 +624,7 @@
       
       if (vsl !== "ALL") rows = rows.filter(r => r.vsl === vsl);
       if (pod !== "ALL") rows = rows.filter(r => r.pod === pod);
+      if (!bypassEqp && eqp !== "ALL") rows = rows.filter(r => r.eqpType === eqp);
       
       return rows;
     }
@@ -547,6 +633,7 @@
       activeMonth = document.getElementById("mainMonthSelect").value;
       activeVessel = document.getElementById("vesselFilter").value;
       activePod = document.getElementById("podFilter").value;
+      activeEqp = document.getElementById("eqpFilter").value;
 
       updateKPIsAndTrends();
       renderTableData();
@@ -571,7 +658,7 @@
     }
 
     function updateKPIsAndTrends() {
-      const currentRows = getFilteredRows(activeMonth, activeVessel, activePod);
+      const currentRows = getFilteredRows(activeMonth, activeVessel, activePod, activeEqp);
       
       let curBkgs = currentRows.length;
       let curCntrs = 0, curTeus = 0, curMargin = 0, cur20 = 0, cur40 = 0, curSpl = 0;
@@ -589,7 +676,7 @@
         const currIdx = availableMonths.indexOf(activeMonth);
         if (currIdx > 0) {
           const prevMonth = availableMonths[currIdx - 1];
-          const prevRows = getFilteredRows(prevMonth, activeVessel, activePod);
+          const prevRows = getFilteredRows(prevMonth, activeVessel, activePod, activeEqp);
           prevBkgs = prevRows.length;
           prevRows.forEach(r => { 
             prevCntrs += r.cntrs; prevTeus += r.teus; prevMargin += r.margin;
@@ -599,7 +686,6 @@
         }
       }
 
-      // Populate KPI values
       document.getElementById("statCount").textContent = curBkgs.toLocaleString();
       document.getElementById("statContainers").textContent = Math.round(curCntrs).toLocaleString();
       document.getElementById("stat20").textContent = Math.round(cur20).toLocaleString();
@@ -608,7 +694,6 @@
       document.getElementById("statVolume").textContent = Math.round(curTeus).toLocaleString();
       document.getElementById("statMargin").textContent = "$" + Math.round(curMargin).toLocaleString();
 
-      // Populate Trends
       document.getElementById("trendBkgs").innerHTML = getTrendHTML(curBkgs, prevBkgs, showTrend);
       document.getElementById("trendCntrs").innerHTML = getTrendHTML(curCntrs, prevCntrs, showTrend);
       document.getElementById("trend20").innerHTML = getTrendHTML(cur20, prev20, showTrend);
@@ -638,7 +723,7 @@
       else if (groupBy === "vsl") headerNameEl.textContent = "Vessel";
       else if (groupBy === "custType") headerNameEl.textContent = "Customer Type";
 
-      const rows = getFilteredRows(activeMonth, activeVessel, activePod);
+      const rows = getFilteredRows(activeMonth, activeVessel, activePod, activeEqp);
       const aggregatedMap = {};
 
       rows.forEach(item => {
@@ -665,17 +750,17 @@
         return `
         <tr>
           <td>${c.name}</td>
-          <td style="color: var(--accent);">${c.bookings}</td>
+          <td style="color: var(--accent-blue);">${c.bookings}</td>
           <td style="color: var(--text);">${Math.round(c.cntrs)}</td>
           <td style="color: var(--purple);">${Math.round(c.teus)}</td>
           <td>
-            <span class="cell-main" style="color: var(--green);">$${Math.round(c.profit).toLocaleString()}</span>
+            <span class="cell-main" style="color: var(--accent);">$${Math.round(c.profit).toLocaleString()}</span>
             <span class="cell-sub">$${yieldVal.toLocaleString()}/c</span>
           </td>
         </tr>`;
       }).join("");
 
-      document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="5" style="text-align:center; color: var(--subtext); padding: 20px;">No data available</td></tr>`;
+      document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="5" style="text-align:center; color: var(--subtext); padding: 30px;">No data available for this filter combination</td></tr>`;
     }
 
     function renderLineChart() {
@@ -689,7 +774,7 @@
       availableMonths.forEach(m => {
         labels.push(m);
         let sum = 0;
-        const mRows = getFilteredRows(m, activeVessel, activePod);
+        const mRows = getFilteredRows(m, activeVessel, activePod, activeEqp);
         mRows.forEach(row => {
           if (metric === 'teus') sum += row.teus;
           else if (metric === 'profit') sum += row.margin;
@@ -705,13 +790,13 @@
       const ctx = document.getElementById("lineChart").getContext("2d");
       if (lineChartInstance) lineChartInstance.destroy();
 
-      let color = "#0a84ff"; 
-      if (metric === 'profit') color = "#30d158"; 
-      else if (metric === 'teus') color = "#bf5af2"; 
-      else if (metric === 'cntrs') color = "#ff9f0a";
-      else if (metric === 'gp20') color = "#32ade6"; // Cyan
-      else if (metric === 'hq40') color = "#ff9f0a"; // Orange
-      else if (metric === 'spl') color = "#ff2d55";  // Pink
+      let color = "#5eead4"; // default mint accent
+      if (metric === 'profit') color = "#4ade80"; // Green
+      else if (metric === 'teus') color = "#c084fc"; // Purple
+      else if (metric === 'cntrs') color = "#60a5fa"; // Blue
+      else if (metric === 'gp20') color = "#60a5fa"; // Blue
+      else if (metric === 'hq40') color = "#fb923c"; // Orange
+      else if (metric === 'spl') color = "#fb7185";  // Pink
 
       lineChartInstance = new Chart(ctx, {
         type: 'line',
@@ -724,9 +809,11 @@
             backgroundColor: color + '26', 
             borderWidth: 3,
             pointBackgroundColor: color,
-            pointRadius: 4,
+            pointRadius: 5,
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 1.5,
             fill: true,
-            tension: 0.3 
+            tension: 0.4 // Smoother curves for modern look
           }]
         },
         options: {
@@ -734,8 +821,15 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#38383a' }, ticks: { color: '#8e8e93', font: { size: 10 } }, beginAtZero: true },
-            x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 } } }
+            y: { 
+              grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, 
+              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: '-apple-system' } }, 
+              beginAtZero: true 
+            },
+            x: { 
+              grid: { display: false }, 
+              ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10, family: '-apple-system' } } 
+            }
           }
         }
       });
