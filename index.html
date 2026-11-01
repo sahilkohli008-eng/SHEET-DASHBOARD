@@ -13,6 +13,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Dashboard" />
 
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root {
       /* Native iOS Dark Mode Palette */
@@ -22,6 +25,7 @@
       --accent: #0a84ff;   /* iOS System Blue */
       --purple: #bf5af2;   /* iOS System Purple */
       --green: #30d158;    /* iOS System Green */
+      --orange: #ff9f0a;   /* iOS System Orange */
       --text: #ffffff;
       --subtext: #8e8e93;  /* iOS System Gray */
       --border: #38383a;
@@ -43,7 +47,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       padding-top: 4px;
     }
     h1 {
@@ -77,32 +81,32 @@
       height: 18px;
     }
 
-    /* Horizontal Month Pill Tabs */
-    .month-tabs {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-    .month-tabs::-webkit-scrollbar { display: none; }
-    .month-tab {
-      flex: 0 0 auto;
+    /* Dropdowns */
+    select.filter-select {
       background: var(--card-bg);
       color: var(--text);
-      padding: 8px 20px;
-      border-radius: 20px;
+      padding: 10px 14px;
+      border-radius: 12px;
       font-size: 0.85rem;
       font-weight: 600;
       border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
     }
-    .month-tab.active {
-      background: var(--accent);
-      color: #ffffff;
+    .main-dropdown-container {
+      margin-bottom: 16px;
+    }
+    select#mainMonthSelect {
+      width: 100%;
+      background-color: var(--card-alt);
+      font-size: 1rem;
+      padding: 12px 16px;
+      border-radius: 14px;
     }
 
     /* 4 KPI Summary Cards */
@@ -110,7 +114,7 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .stat-card {
       background: var(--card-bg);
@@ -135,6 +139,37 @@
     .stat-card .value.teu-val { color: var(--purple); }
     .stat-card .value.margin-val { color: var(--green); }
 
+    /* Line Chart Summary View */
+    .chart-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: none; /* Hidden by default until ALL is selected */
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    select.mini-select {
+      background: var(--card-alt);
+      padding: 6px 30px 6px 10px;
+      font-size: 0.75rem;
+      border-radius: 8px;
+      background-size: 12px;
+    }
+    canvas {
+      width: 100%;
+      max-height: 220px;
+    }
+
     /* Controls Bar */
     .controls-bar {
       display: flex;
@@ -143,22 +178,8 @@
       gap: 10px;
       margin-bottom: 16px;
     }
-    select.filter-select {
-      background: var(--card-bg);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border: none;
-      outline: none;
+    .controls-bar select {
       flex: 1;
-      -webkit-appearance: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
     }
     .mini-pills {
       display: flex;
@@ -177,7 +198,7 @@
       cursor: pointer;
     }
     .mini-pill.active {
-      background: #48484a; /* iOS segmented control active state */
+      background: #48484a;
     }
 
     /* Master Table View */
@@ -237,8 +258,11 @@
     </button>
   </header>
 
-  <div class="month-tabs" id="monthTabs">
-    <button class="month-tab active" onclick="selectMonth('ALL')">ALL</button>
+  <!-- Full-Width Month Dropdown -->
+  <div class="main-dropdown-container">
+    <select id="mainMonthSelect" class="filter-select" onchange="selectMonth(this.value)">
+      <option value="ALL">All Months Overview</option>
+    </select>
   </div>
 
   <div class="card-grid">
@@ -258,6 +282,20 @@
       <div class="label">EARNING PROFIT</div>
       <div class="value margin-val" id="statMargin">--</div>
     </div>
+  </div>
+
+  <!-- Summarized Demographics Line Chart (Visible only when 'ALL' is selected) -->
+  <div id="summaryChartContainer" class="chart-container">
+    <div class="chart-header">
+      <div class="chart-title">Monthly Trends</div>
+      <select id="chartMetricSelect" class="filter-select mini-select" onchange="renderLineChart()">
+        <option value="teus">TEUs</option>
+        <option value="profit">Profit</option>
+        <option value="cntrs">Containers</option>
+        <option value="bookings">Bookings</option>
+      </select>
+    </div>
+    <canvas id="lineChart"></canvas>
   </div>
 
   <div class="controls-bar">
@@ -298,6 +336,7 @@
     let dataByMonth = {};
     let activeMonth = "ALL";
     let sortBy = "teu"; 
+    let lineChartInstance = null;
 
     function normalizeMonthName(rawName) {
       const clean = String(rawName || "").trim().toUpperCase();
@@ -339,16 +378,12 @@
           throw new Error("Invalid format returned by Google");
         }
 
-        if (rawJson.error) {
-          throw new Error("Error: " + rawJson.error);
-        }
+        if (rawJson.error) throw new Error("Error: " + rawJson.error);
 
         dataByMonth = {};
         const sheetNames = Object.keys(rawJson);
         
-        if (sheetNames.length === 0) {
-           throw new Error("Spreadsheet is empty");
-        }
+        if (sheetNames.length === 0) throw new Error("Spreadsheet is empty");
 
         sheetNames.forEach(sheetName => {
           const rawRows = rawJson[sheetName];
@@ -415,19 +450,20 @@
           }
         });
 
-        renderMonthTabs();
+        renderMonthDropdown();
         renderTableData();
+        renderLineChart(); // Initializes chart if ALL is selected
 
         const now = new Date();
-        statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+        statusEl.textContent = `Updated: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
       } catch (err) {
         console.error(err);
         statusEl.textContent = err.message || "Error fetching data";
       }
     }
 
-    function renderMonthTabs() {
-      const container = document.getElementById("monthTabs");
+    function renderMonthDropdown() {
+      const select = document.getElementById("mainMonthSelect");
       const months = Object.keys(dataByMonth).sort((a, b) => {
         const idxA = MONTH_ORDER.indexOf(a);
         const idxB = MONTH_ORDER.indexOf(b);
@@ -439,18 +475,25 @@
         activeMonth = "ALL";
       }
 
-      let html = `<button class="month-tab ${activeMonth === 'ALL' ? 'active' : ''}" onclick="selectMonth('ALL')">ALL</button>`;
+      let html = `<option value="ALL">All Months Overview</option>`;
       months.forEach(m => {
-        const isActive = activeMonth === m ? "active" : "";
-        html += `<button class="month-tab ${isActive}" onclick="selectMonth('${m}')">${m}</button>`;
+        html += `<option value="${m}" ${activeMonth === m ? 'selected' : ''}>${m}</option>`;
       });
-      container.innerHTML = html;
+      select.innerHTML = html;
     }
 
     function selectMonth(m) {
       activeMonth = m;
-      renderMonthTabs();
       renderTableData();
+      
+      // Toggle the integrated Line Chart Summary Page visibility
+      const chartContainer = document.getElementById("summaryChartContainer");
+      if (activeMonth === "ALL") {
+        chartContainer.style.display = "block";
+        renderLineChart();
+      } else {
+        chartContainer.style.display = "none";
+      }
     }
 
     function setSortBy(s) {
@@ -521,6 +564,76 @@
 
       document.getElementById("customerTableBody").innerHTML = tableHtml || `<tr><td colspan="5" style="text-align:center; color: var(--subtext); padding: 20px;">No data available</td></tr>`;
     }
+
+    // Integrated Line Chart for the "ALL" view Summary
+    function renderLineChart() {
+      if (activeMonth !== "ALL") return;
+
+      const metric = document.getElementById("chartMetricSelect").value;
+      const labels = [];
+      const dataPoints = [];
+
+      // Filter to only include months that exist in the data, in calendar order
+      const availableMonths = MONTH_ORDER.filter(m => dataByMonth[m]);
+
+      availableMonths.forEach(m => {
+        labels.push(m);
+        let sum = 0;
+        dataByMonth[m].forEach(row => {
+          if (metric === 'teus') sum += row.teus;
+          else if (metric === 'profit') sum += row.margin;
+          else if (metric === 'cntrs') sum += row.cntrs;
+          else if (metric === 'bookings') sum += 1;
+        });
+        dataPoints.push(Math.round(sum));
+      });
+
+      const ctx = document.getElementById("lineChart").getContext("2d");
+      if (lineChartInstance) lineChartInstance.destroy();
+
+      // Dynamic native iOS colors based on selected metric
+      let color = "#0a84ff"; // iOS Blue (Default)
+      if (metric === 'profit') color = "#30d158"; // iOS Green
+      else if (metric === 'teus') color = "#bf5af2"; // iOS Purple
+      else if (metric === 'cntrs') color = "#ff9f0a"; // iOS Orange
+
+      lineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: metric.toUpperCase(),
+            data: dataPoints,
+            borderColor: color,
+            backgroundColor: color + '26', // 15% opacity fill
+            borderWidth: 3,
+            pointBackgroundColor: color,
+            pointRadius: 4,
+            fill: true,
+            tension: 0.3 // Smooth curves
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { 
+              grid: { color: '#38383a' }, 
+              ticks: { color: '#8e8e93', font: { size: 10 } },
+              beginAtZero: true
+            },
+            x: { 
+              grid: { display: false }, 
+              ticks: { color: '#8e8e93', font: { size: 10 } } 
+            }
+          }
+        }
+      });
+    }
+
+    // Set chart container to block on initial load
+    document.getElementById("summaryChartContainer").style.display = "block";
 
     setInterval(fetchMasterSheet, 5 * 60 * 1000);
     document.addEventListener("visibilitychange", () => {
