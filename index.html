@@ -45,10 +45,8 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
     }
     
-    /* Bulletproof Full-Screen Gradient for iOS Safari */
-    html {
-      background-color: #0a101f; /* Matches top of gradient to hide scroll bounce */
-    }
+    /* Full-Screen Gradient for iOS Safari */
+    html { background-color: #0a101f; }
     body {
       color: var(--text);
       padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
@@ -60,7 +58,7 @@
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(160deg, #0a101f 0%, #11274a 50%, #1e4b8f 100%);
-      z-index: -1;
+      z-index: -2;
     }
 
     .glass {
@@ -78,27 +76,31 @@
       margin-bottom: 20px;
     }
     
-    h1 {
-      font-size: 1.85rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
-    h1::before {
-      content: "";
-      display: block;
-      width: 24px;
-      height: 18px;
-      background: repeating-linear-gradient(0deg, var(--text), var(--text) 3px, transparent 3px, transparent 7px);
+    
+    .menu-btn {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
     }
+    .menu-btn svg { width: 28px; height: 28px; }
+
+    h1 { font-size: 1.85rem; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
 
     .status {
       font-size: 0.75rem;
       color: var(--subtext);
-      margin-top: 4px;
-      margin-left: 34px;
+      margin-top: 2px;
+      margin-left: 44px; /* Align under Dashboard text */
     }
     
     button.refresh-btn {
@@ -118,15 +120,60 @@
     button.refresh-btn:active { opacity: 0.5; }
     button.refresh-btn svg { width: 18px; height: 18px; }
 
-    /* Top Global Filters */
-    .global-filters { margin-bottom: 20px; }
+    /* Interactive Sidebar Elements */
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+    #overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 75vw;
+      max-width: 320px;
+      background: rgba(13, 25, 50, 0.75);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-right: 1px solid var(--border-color);
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: calc(env(safe-area-inset-top) + 20px) 20px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    #sidebar.active {
+      transform: translateX(0);
+    }
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .sidebar-header h2 { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+    .close-btn { background: none; border: none; color: var(--subtext); cursor: pointer; padding: 4px; }
+    .close-btn svg { width: 24px; height: 24px; }
     
+    .sidebar-content { display: flex; flex-direction: column; gap: 20px; }
+    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+    .filter-label { font-size: 0.75rem; text-transform: uppercase; color: var(--subtext); font-weight: 600; letter-spacing: 0.5px; }
+
     select.filter-select {
       background-color: var(--card-alt);
       color: var(--text);
-      padding: 12px 16px;
+      padding: 14px 16px;
       border-radius: 16px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 600;
       border: 1px solid var(--border-color);
       outline: none;
@@ -137,37 +184,13 @@
       background-position: right 14px center;
       background-size: 16px;
       backdrop-filter: blur(10px);
-    }
-    
-    select#mainMonthSelect {
       width: 100%;
-      font-size: 1.05rem;
-      padding: 14px 16px;
-      border-radius: 18px;
-      margin-bottom: 12px;
-      background: var(--card-highlight);
     }
-    
-    .sub-filters { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 10px; 
-    }
-    .sub-filters select { width: 100%; }
+    select.filter-select:focus { border-color: var(--accent-blue); }
 
     /* Bento KPI Cards Layout */
-    .card-row-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .card-row-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
-    }
+    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
     
     .stat-card { border-radius: 20px; padding: 16px; }
     .stat-card.small-card { padding: 12px; border-radius: 16px; }
@@ -210,7 +233,7 @@
     /* Bottom Table Controls */
     .controls-bar { margin-bottom: 16px; }
     .controls-top-row {
-      display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
     }
     .controls-top-row select { flex: 1; }
     .mini-pills { 
@@ -222,9 +245,6 @@
     }
     .mini-pill.active { background: rgba(255, 255, 255, 0.15); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     
-    /* Dedicated Eqp Filter Row */
-    select#eqpFilter { width: 100%; }
-
     /* Master Table */
     .customer-table-wrap { border-radius: 24px; overflow: hidden; padding-bottom: 8px; }
     table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -248,9 +268,58 @@
 </head>
 <body>
 
+  <!-- Overlay & Sidebar Drawer -->
+  <div id="overlay" onclick="toggleSidebar()"></div>
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <h2>Global Filters</h2>
+      <button class="close-btn" onclick="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="sidebar-content">
+      <div class="filter-group">
+        <label class="filter-label">Month Overview</label>
+        <select id="mainMonthSelect" class="filter-select" onchange="applyGlobalFilters()">
+          <option value="ALL">All Months Overview</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Vessels</label>
+        <select id="vesselFilter" class="filter-select" onchange="applyGlobalFilters()">
+          <option value="ALL">All Vessels</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Ports</label>
+        <select id="podFilter" class="filter-select" onchange="applyGlobalFilters()">
+          <option value="ALL">All Ports</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Container Type</label>
+        <select id="eqpFilter" class="filter-select" onchange="applyGlobalFilters()">
+          <option value="ALL">All Container Types</option>
+          <option value="20GP">20 General Purpose</option>
+          <option value="40HQ">40 High Cube</option>
+          <option value="SPL">Special Equipment</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <header>
     <div>
-      <h1>Dashboard</h1>
+      <div class="header-left">
+        <button class="menu-btn" onclick="toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <h1>Dashboard</h1>
+      </div>
       <div class="status" id="lastUpdated">Updating...</div>
     </div>
     <button class="refresh-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
@@ -260,21 +329,6 @@
       </svg>
     </button>
   </header>
-
-  <!-- Top Global Filters (Vessel & Port only) -->
-  <div class="global-filters">
-    <select id="mainMonthSelect" class="filter-select glass" onchange="applyGlobalFilters()">
-      <option value="ALL">All Months Overview</option>
-    </select>
-    <div class="sub-filters">
-      <select id="vesselFilter" class="filter-select glass" onchange="applyGlobalFilters()">
-        <option value="ALL">All Vessels</option>
-      </select>
-      <select id="podFilter" class="filter-select glass" onchange="applyGlobalFilters()">
-        <option value="ALL">All Ports</option>
-      </select>
-    </div>
-  </div>
 
   <!-- KPI Cards -->
   <div class="card-row-2">
@@ -332,7 +386,7 @@
     <canvas id="lineChart"></canvas>
   </div>
 
-  <!-- Bottom Table Controls & Added Container Filter -->
+  <!-- Bottom Table Controls -->
   <div class="controls-bar">
     <div class="controls-top-row">
       <select class="filter-select glass" id="groupBySelect" onchange="renderTableData()">
@@ -346,12 +400,6 @@
         <button class="mini-pill" id="sort-profit" onclick="setSortBy('profit')">Profit</button>
       </div>
     </div>
-    <select id="eqpFilter" class="filter-select glass" onchange="applyGlobalFilters()">
-      <option value="ALL">All Container Types</option>
-      <option value="20GP">20 General Purpose Container</option>
-      <option value="40HQ">40 High Cube Container</option>
-      <option value="SPL">Special Equipment Container</option>
-    </select>
   </div>
 
   <!-- Table -->
@@ -385,6 +433,14 @@
     let activeEqp = "ALL";
     let sortBy = "teu"; 
     let lineChartInstance = null;
+
+    // Sidebar Logic
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      sidebar.classList.toggle("active");
+      overlay.classList.toggle("active");
+    }
 
     function normalizeMonthName(rawName) {
       const clean = String(rawName || "").trim().toUpperCase();
@@ -457,6 +513,7 @@
           const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
           const vslIdx      = findCol(["vsl", "vessel"], 12); 
           const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
+          const eqpTypeIdx  = findCol(["equipment", "eqp", "type", "size"], -1); 
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -476,6 +533,12 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            
+            let deducedEqp = "MIXED";
+            if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
+            else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
+            else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
+            else if (eqpTypeIdx !== -1 && r[eqpTypeIdx]) deducedEqp = String(r[eqpTypeIdx]).trim().toUpperCase();
 
             normalizedRows.push({
               vsl: vslName,
@@ -487,6 +550,7 @@
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
               custType: custTypeStr,
+              eqpType: deducedEqp,
               margin: margin
             });
           }
@@ -510,7 +574,7 @@
     }
 
     function populateFilterDropdowns() {
-      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL");
+      const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
       
       const vsls = [...new Set(allRows.map(r => r.vsl))].filter(v => v && v !== "UNKNOWN").sort();
       const pods = [...new Set(allRows.map(r => r.pod))].filter(p => p && p !== "UNKNOWN").sort();
@@ -534,7 +598,7 @@
       podSel.value = pods.includes(activePod) ? activePod : "ALL";
     }
 
-    function getFilteredRows(month, vsl, pod, eqp) {
+    function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
       let rows = [];
       if (month === "ALL") {
         Object.values(dataByMonth).forEach(mRows => rows = rows.concat(mRows));
@@ -545,9 +609,11 @@
       if (vsl !== "ALL") rows = rows.filter(r => r.vsl === vsl);
       if (pod !== "ALL") rows = rows.filter(r => r.pod === pod);
       
-      if (eqp === "20GP") rows = rows.filter(r => r.gp20 > 0);
-      if (eqp === "40HQ") rows = rows.filter(r => r.hq40 > 0);
-      if (eqp === "SPL") rows = rows.filter(r => r.spl > 0);
+      if (!bypassEqp && eqp !== "ALL") {
+        if (eqp === "20GP") rows = rows.filter(r => r.gp20 > 0);
+        if (eqp === "40HQ") rows = rows.filter(r => r.hq40 > 0);
+        if (eqp === "SPL") rows = rows.filter(r => r.spl > 0);
+      }
       
       return rows;
     }
