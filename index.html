@@ -26,6 +26,8 @@
       --purple: #bf5af2;
       --green: #30d158;
       --orange: #ff9f0a;
+      --cyan: #32ade6;
+      --pink: #ff2d55;
       --red: #ff453a;
       --text: #ffffff;
       --subtext: #8e8e93;
@@ -107,18 +109,29 @@
     .sub-filters { display: flex; gap: 10px; }
     .sub-filters select { flex: 1; }
 
-    /* KPI Cards */
-    .card-grid {
+    /* Bento KPI Cards Layout */
+    .card-row-2 {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
+    .card-row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
     .stat-card {
       background: var(--card-bg);
       border-radius: 16px;
       padding: 14px 16px;
     }
+    .stat-card.small-card {
+      padding: 12px 10px;
+    }
+    
     .stat-card .label-row {
       display: flex;
       justify-content: space-between;
@@ -131,14 +144,19 @@
       letter-spacing: 0.5px;
       font-weight: 600;
     }
+    .stat-card.small-card .label {
+      font-size: 0.55rem;
+    }
+    
     .trend-badge {
       font-size: 0.65rem;
-      padding: 3px 6px;
+      padding: 3px 5px;
       border-radius: 6px;
       font-weight: 700;
       display: inline-flex;
       align-items: center;
     }
+    .stat-card.small-card .trend-badge { font-size: 0.55rem; padding: 2px 4px; }
     .trend-badge.up { background: rgba(48, 209, 88, 0.15); color: var(--green); }
     .trend-badge.down { background: rgba(255, 69, 58, 0.15); color: var(--red); }
     .trend-badge.neutral { background: var(--card-alt); color: var(--subtext); }
@@ -147,12 +165,18 @@
       font-size: 1.4rem;
       font-weight: 700;
       margin-top: 6px;
-      color: var(--accent);
+      color: var(--text);
       letter-spacing: -0.2px;
     }
-    .stat-card .value.cntr-val { color: var(--text); }
+    .stat-card.small-card .value { font-size: 1.15rem; margin-top: 4px; }
+    
+    .stat-card .value.bkg-val { color: var(--accent); }
     .stat-card .value.teu-val { color: var(--purple); }
     .stat-card .value.margin-val { color: var(--green); }
+    .stat-card .value.gp-val { color: var(--cyan); }
+    .stat-card .value.hq-val { color: var(--orange); }
+    .stat-card .value.spl-val { color: var(--pink); }
+
     .sub-value {
       font-size: 0.7rem;
       color: var(--subtext);
@@ -258,33 +282,40 @@
     </div>
   </div>
 
-  <div class="card-grid">
+  <!-- BENTO KPI LAYOUT -->
+  <div class="card-row-2">
     <div class="stat-card">
-      <div class="label-row">
-        <div class="label">BOOKINGS</div>
-        <div id="trendBkgs"></div>
-      </div>
-      <div class="value" id="statCount">--</div>
+      <div class="label-row"><div class="label">BOOKINGS</div><div id="trendBkgs"></div></div>
+      <div class="value bkg-val" id="statCount">--</div>
     </div>
     <div class="stat-card">
-      <div class="label-row">
-        <div class="label">CONTAINERS</div>
-        <div id="trendCntrs"></div>
-      </div>
+      <div class="label-row"><div class="label">CONTAINERS</div><div id="trendCntrs"></div></div>
       <div class="value cntr-val" id="statContainers">--</div>
     </div>
+  </div>
+
+  <div class="card-row-3">
+    <div class="stat-card small-card">
+      <div class="label-row"><div class="label">20GP</div><div id="trend20"></div></div>
+      <div class="value gp-val" id="stat20">--</div>
+    </div>
+    <div class="stat-card small-card">
+      <div class="label-row"><div class="label">40HQ</div><div id="trend40"></div></div>
+      <div class="value hq-val" id="stat40">--</div>
+    </div>
+    <div class="stat-card small-card">
+      <div class="label-row"><div class="label">SPL EQP</div><div id="trendSpl"></div></div>
+      <div class="value spl-val" id="statSpl">--</div>
+    </div>
+  </div>
+
+  <div class="card-row-2" style="margin-bottom: 20px;">
     <div class="stat-card">
-      <div class="label-row">
-        <div class="label">TOTAL TEUs</div>
-        <div id="trendTeus"></div>
-      </div>
+      <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     <div class="stat-card">
-      <div class="label-row">
-        <div class="label">EARNING PROFIT</div>
-        <div id="trendProfit"></div>
-      </div>
+      <div class="label-row"><div class="label">EARNING PROFIT</div><div id="trendProfit"></div></div>
       <div class="value margin-val" id="statMargin">--</div>
       <div class="sub-value" id="statYield">--</div>
     </div>
@@ -298,6 +329,9 @@
         <option value="profit">Profit</option>
         <option value="cntrs">Containers</option>
         <option value="bookings">Bookings</option>
+        <option value="gp20">20GP Units</option>
+        <option value="hq40">40HQ Units</option>
+        <option value="spl">SPL Equipment</option>
       </select>
     </div>
     <canvas id="lineChart"></canvas>
@@ -306,10 +340,9 @@
   <div class="controls-bar">
     <select class="filter-select" id="groupBySelect" onchange="renderTableData()">
       <option value="party">Group By: Customer</option>
-      <option value="pod">Group By: POD (Port)</option>
+      <option value="pod">Group By: Port</option>
       <option value="vsl">Group By: Vessel</option>
-      <option value="srv">Group By: Service</option>
-      <option value="type">Group By: Cntr Type</option>
+      <option value="custType">Group By: Customer Type</option>
     </select>
     <div class="mini-pills">
       <button class="mini-pill active" id="sort-teu" onclick="setSortBy('teu')">TEUs</button>
@@ -407,15 +440,18 @@
             return idx !== -1 ? idx : fallbackIdx;
           };
 
-          const bookIdx   = findCol(["booking", "bkg", "bl", "sr"], 0);
-          const partyIdx  = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1);
-          const cntrIdx   = findCol(["cntr", "container", "box", "total units", "units"], 5);
-          const teuIdx    = findCol(["teu", "vol", "qty", "volume"], 6);
-          const podIdx    = findCol(["pod", "port", "dest", "discharge"], 9);
-          const vslIdx    = findCol(["vsl", "vessel"], 12);
-          const srvIdx    = findCol(["service", "srv", "loop", "line"], -1);
-          const typeIdx   = findCol(["type", "size", "eqp", "equipment"], -1);
-          const marginIdx = findCol(["margin", "profit", "earning", "net"], 11);
+          // Strict column mappings referencing the Masterfile screenshot
+          const bookIdx     = findCol(["booking", "bkg", "bl", "sr"], 0); // Col A
+          const partyIdx    = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); // Col B
+          const gp20Idx     = findCol(["20gp", "20'", "20st", "20 dv"], 2); // Col C
+          const hq40Idx     = findCol(["40hq", "40hc", "40'", "40 hc"], 3); // Col D
+          const splIdx      = findCol(["spl", "special", "45", "flat", "open"], 4); // Col E
+          const cntrIdx     = findCol(["cntr", "container", "box", "total units", "units"], 5); // Col F
+          const teuIdx      = findCol(["teu", "vol", "qty", "volume"], 6); // Col G
+          const podIdx      = findCol(["pod", "port", "dest", "discharge"], 9); // Col J
+          const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); // Col L
+          const vslIdx      = findCol(["vsl", "vessel"], 12); // Col M
+          const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); // Col P
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -426,22 +462,26 @@
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
             if (!bookingVal && !partyVal) continue;
 
+            const gp20 = parseNum(r[gp20Idx], 0);
+            const hq40 = parseNum(r[hq40Idx], 0);
+            const spl = parseNum(r[splIdx], 0);
             const cntrs = parseNum(r[cntrIdx], 0);
             const teus = parseNum(r[teuIdx], 0);
             const margin = parseNum(r[marginIdx], 0);
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
-            const srvName = srvIdx !== -1 ? String(r[srvIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
-            const cType = typeIdx !== -1 ? String(r[typeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
 
             normalizedRows.push({
               vsl: vslName,
               party: partyVal.toUpperCase(),
+              gp20: gp20,
+              hq40: hq40,
+              spl: spl,
               cntrs: cntrs,
               teus: teus,
               pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
-              srv: srvName,
-              type: cType,
+              custType: custTypeStr,
               margin: margin
             });
           }
@@ -467,7 +507,6 @@
     function populateFilterDropdowns() {
       const allRows = getFilteredRows("ALL", "ALL", "ALL");
       
-      // Changed from Services to Vessels
       const vsls = [...new Set(allRows.map(r => r.vsl))].filter(v => v && v !== "UNKNOWN").sort();
       const pods = [...new Set(allRows.map(r => r.pod))].filter(p => p && p !== "UNKNOWN").sort();
 
@@ -481,7 +520,6 @@
       monthSel.innerHTML = `<option value="ALL">All Months Overview</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
       monthSel.value = months.includes(activeMonth) ? activeMonth : "ALL";
 
-      // Updated dropdown to Vessel
       const vslSel = document.getElementById("vesselFilter");
       vslSel.innerHTML = `<option value="ALL">All Vessels</option>` + vsls.map(v => `<option value="${v}">${v}</option>`).join("");
       vslSel.value = vsls.includes(activeVessel) ? activeVessel : "ALL";
@@ -499,7 +537,6 @@
         rows = dataByMonth[month] || [];
       }
       
-      // Filter logically applies vessel instead of service now
       if (vsl !== "ALL") rows = rows.filter(r => r.vsl === vsl);
       if (pod !== "ALL") rows = rows.filter(r => r.pod === pod);
       
@@ -535,10 +572,16 @@
 
     function updateKPIsAndTrends() {
       const currentRows = getFilteredRows(activeMonth, activeVessel, activePod);
-      let curBkgs = currentRows.length, curCntrs = 0, curTeus = 0, curMargin = 0;
-      currentRows.forEach(r => { curCntrs += r.cntrs; curTeus += r.teus; curMargin += r.margin; });
+      
+      let curBkgs = currentRows.length;
+      let curCntrs = 0, curTeus = 0, curMargin = 0, cur20 = 0, cur40 = 0, curSpl = 0;
+      
+      currentRows.forEach(r => { 
+        curCntrs += r.cntrs; curTeus += r.teus; curMargin += r.margin;
+        cur20 += r.gp20; cur40 += r.hq40; curSpl += r.spl;
+      });
 
-      let prevBkgs = 0, prevCntrs = 0, prevTeus = 0, prevMargin = 0;
+      let prevBkgs = 0, prevCntrs = 0, prevTeus = 0, prevMargin = 0, prev20 = 0, prev40 = 0, prevSpl = 0;
       let showTrend = false;
 
       if (activeMonth !== "ALL") {
@@ -548,18 +591,29 @@
           const prevMonth = availableMonths[currIdx - 1];
           const prevRows = getFilteredRows(prevMonth, activeVessel, activePod);
           prevBkgs = prevRows.length;
-          prevRows.forEach(r => { prevCntrs += r.cntrs; prevTeus += r.teus; prevMargin += r.margin; });
+          prevRows.forEach(r => { 
+            prevCntrs += r.cntrs; prevTeus += r.teus; prevMargin += r.margin;
+            prev20 += r.gp20; prev40 += r.hq40; prevSpl += r.spl;
+          });
           showTrend = true;
         }
       }
 
+      // Populate KPI values
       document.getElementById("statCount").textContent = curBkgs.toLocaleString();
       document.getElementById("statContainers").textContent = Math.round(curCntrs).toLocaleString();
+      document.getElementById("stat20").textContent = Math.round(cur20).toLocaleString();
+      document.getElementById("stat40").textContent = Math.round(cur40).toLocaleString();
+      document.getElementById("statSpl").textContent = Math.round(curSpl).toLocaleString();
       document.getElementById("statVolume").textContent = Math.round(curTeus).toLocaleString();
       document.getElementById("statMargin").textContent = "$" + Math.round(curMargin).toLocaleString();
 
+      // Populate Trends
       document.getElementById("trendBkgs").innerHTML = getTrendHTML(curBkgs, prevBkgs, showTrend);
       document.getElementById("trendCntrs").innerHTML = getTrendHTML(curCntrs, prevCntrs, showTrend);
+      document.getElementById("trend20").innerHTML = getTrendHTML(cur20, prev20, showTrend);
+      document.getElementById("trend40").innerHTML = getTrendHTML(cur40, prev40, showTrend);
+      document.getElementById("trendSpl").innerHTML = getTrendHTML(curSpl, prevSpl, showTrend);
       document.getElementById("trendTeus").innerHTML = getTrendHTML(curTeus, prevTeus, showTrend);
       document.getElementById("trendProfit").innerHTML = getTrendHTML(curMargin, prevMargin, showTrend);
 
@@ -582,8 +636,7 @@
       if (groupBy === "party") headerNameEl.textContent = "Customer Name";
       else if (groupBy === "pod") headerNameEl.textContent = "POD (Port)";
       else if (groupBy === "vsl") headerNameEl.textContent = "Vessel Name";
-      else if (groupBy === "srv") headerNameEl.textContent = "Service";
-      else if (groupBy === "type") headerNameEl.textContent = "Container Type";
+      else if (groupBy === "custType") headerNameEl.textContent = "Customer Type";
 
       const rows = getFilteredRows(activeMonth, activeVessel, activePod);
       const aggregatedMap = {};
@@ -592,8 +645,7 @@
         let groupKey = item.party;
         if (groupBy === "pod") groupKey = item.pod;
         if (groupBy === "vsl") groupKey = item.vsl;
-        if (groupBy === "srv") groupKey = item.srv;
-        if (groupBy === "type") groupKey = item.type;
+        if (groupBy === "custType") groupKey = item.custType;
 
         if (!aggregatedMap[groupKey]) {
           aggregatedMap[groupKey] = { name: groupKey, bookings: 0, cntrs: 0, teus: 0, profit: 0 };
@@ -643,6 +695,9 @@
           else if (metric === 'profit') sum += row.margin;
           else if (metric === 'cntrs') sum += row.cntrs;
           else if (metric === 'bookings') sum += 1;
+          else if (metric === 'gp20') sum += row.gp20;
+          else if (metric === 'hq40') sum += row.hq40;
+          else if (metric === 'spl') sum += row.spl;
         });
         dataPoints.push(Math.round(sum));
       });
@@ -653,7 +708,10 @@
       let color = "#0a84ff"; 
       if (metric === 'profit') color = "#30d158"; 
       else if (metric === 'teus') color = "#bf5af2"; 
-      else if (metric === 'cntrs') color = "#ff9f0a"; 
+      else if (metric === 'cntrs') color = "#ff9f0a";
+      else if (metric === 'gp20') color = "#32ade6"; // Cyan
+      else if (metric === 'hq40') color = "#ff9f0a"; // Orange
+      else if (metric === 'spl') color = "#ff2d55";  // Pink
 
       lineChartInstance = new Chart(ctx, {
         type: 'line',
