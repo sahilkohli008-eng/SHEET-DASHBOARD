@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Fixed viewport to strictly prevent iOS Auto-Zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
@@ -302,7 +301,7 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* PERFECT SCROLLING NATIVE DATA TABLES - NO OVERLAP */
+    /* PERFECT SCROLLING NATIVE DATA TABLES */
     .table-scroll-container, .customer-table-wrap {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
       -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
@@ -328,7 +327,6 @@
     
     table.data-table tr:last-child td, table.cust-table tr:last-child td { border-bottom: none; }
     
-    /* Removed sticky positioning completely */
     table.data-table th:first-child, table.data-table td:first-child,
     table.cust-table th:first-child, table.cust-table td:first-child {
       text-align: left; padding-left: 18px; color: var(--text-light); width: 180px;
@@ -683,8 +681,47 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec";
+    // CORE SCRIPT LOGIC
+    // -------------------------------------------------------------
+    function normalizeMonthName(rawName) {
+      const clean = String(rawName || "").trim().toUpperCase();
+      for (const m of MONTH_ORDER) {
+        if (clean.startsWith(m) || clean.includes(m)) return m;
+      }
+      return clean;
+    }
 
+    function parseNum(val, fallback = 0) {
+      if (val === undefined || val === null || val === "") return fallback;
+      if (typeof val === "number") return isNaN(val) ? fallback : val;
+      const cleaned = String(val).replace(/[^0-9.-]+/g, "");
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? fallback : parsed;
+    }
+
+    // Explicit Exact Match Finder for Status Columns
+    function findExactCol(rawRows, exactNames) {
+      for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+        if (!rawRows[r]) continue; 
+        const rowArr = rawRows[r].map(h => String(h || "").trim().toLowerCase());
+        for (let name of exactNames) {
+          const idx = rowArr.indexOf(name);
+          if (idx !== -1) return idx;
+        }
+      }
+      return -1;
+    }
+
+    function isTruthy(val) {
+      if (val === true || val === 1 || val === "1") return true;
+      if (val === false || val === 0 || val === "0" || val === null || val === undefined || val === "") return false;
+      const str = String(val).trim().toUpperCase();
+      if (!str || str === "FALSE" || str === "NO" || str === "N" || str === "-" || str === "PENDING" || str === "NOT PICKED" || str === "UNPICKED" || str === "☐" || str === "✗" || str === "✘") return false;
+      if (str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE" || str === "PICKED" || str === "ALLOTTED" || str === "ALLOTED" || str === "OK" || str === "✓" || str === "✔" || str === "☑" || str === "X") return true;
+      return false;
+    }
+
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec";
     const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     let dataByMonth = {};
@@ -740,29 +777,6 @@
         liveUsdToInrRate = fetchedRate;
         triggerRateAnimation();
       }
-    }
-
-    // NORMALIZES ALL WHITESPACE/NEWLINES TO FIND COLUMNS SAFELY
-    function findExactCol(rawRows, exactNames) {
-      for (let r = 0; r < Math.min(6, rawRows.length); r++) {
-        if (!rawRows[r]) continue; 
-        const rowArr = rawRows[r].map(h => String(h || "").replace(/\n/g, " ").replace(/\s+/g, " ").trim().toLowerCase());
-        
-        for (let name of exactNames) {
-          const idx = rowArr.indexOf(name);
-          if (idx !== -1) return idx;
-        }
-      }
-      return -1;
-    }
-
-    function isTruthy(val) {
-      if (val === true || val === 1 || val === "1") return true;
-      if (val === false || val === 0 || val === "0" || val === null || val === undefined || val === "") return false;
-      const str = String(val).trim().toUpperCase();
-      if (!str || str === "FALSE" || str === "NO" || str === "N" || str === "-" || str === "PENDING" || str === "NOT PICKED" || str === "UNPICKED" || str === "☐" || str === "✗" || str === "✘") return false;
-      if (str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE" || str === "PICKED" || str === "ALLOTTED" || str === "ALLOTED" || str === "OK" || str === "✓" || str === "✔" || str === "☑" || str === "X") return true;
-      return false;
     }
 
     // SMART BACKGROUND POLLING ENGINE (Waits 3s after previous fetch ends to avoid 429 Google Quota errors)
@@ -836,14 +850,20 @@
           const vslIdx      = findColInFirst5Rows(["vsl", "vessel"], 12); 
           const custTypeIdx = findColInFirst5Rows(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
           
-          // EXACT TARGETING of the new headers to avoid the blank text columns
-          const allotIdx = findExactCol(rawRows, ["allotment status"]);
-          const pickIdx = findExactCol(rawRows, ["pickup status"]);
+          // EXACT TARGETING of the new headers, forcefully replacing all whitespace and line breaks to prevent mismatch
+          let allotIdx = -1;
+          let pickIdx = -1;
+          for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+             if (!rawRows[r]) continue;
+             const rowArr = rawRows[r].map(h => String(h || "").replace(/\n/g, " ").replace(/\s+/g, " ").trim().toLowerCase());
+             if (allotIdx === -1) allotIdx = rowArr.indexOf("allotment status");
+             if (pickIdx === -1) pickIdx = rowArr.indexOf("pickup status");
+          }
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
             const r = rawRows[i];
-            if (!r) continue; // Skip totally empty rows to prevent crashing
+            if (!r) continue; 
             
             const bookingVal = bookIdx !== -1 ? String(r[bookIdx] || "").trim() : "";
             const partyVal = partyIdx !== -1 ? String(r[partyIdx] || "").trim() : "";
@@ -861,7 +881,6 @@
             const vslName = vslIdx !== -1 ? String(r[vslIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
-            // Evaluates booleans or text versions of TRUE/FALSE/CHECKED directly from the exact status columns
             let pickupStatus = "PICKED"; 
             if (allotIdx !== -1 && pickIdx !== -1) { 
                 const isAllotted = isTruthy(r[allotIdx]);
@@ -924,14 +943,13 @@
       } finally {
         if (!isAuto && refreshIcon) refreshIcon.classList.remove("spinning");
         isFetching = false;
-        // Schedule next safe silent refresh
+        // Schedule next safe silent refresh 3 seconds after this one finishes
         fetchTimeout = setTimeout(() => {
           if (!document.hidden) fetchMasterSheet(true);
-        }, 5000); // 5 seconds is the maximum safe threshold for continuous Google sheet polling
+        }, 3000); 
       }
     }
 
-    // 0.1s (100ms) Real-Time UI Render Loop for INR Cards
     function updateInrUI() {
       let arrowHtml = '';
       let colorClass = 'rate-neutral';
@@ -1317,7 +1335,6 @@
       const unpickedList = document.getElementById("unpickedListBody");
       const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
       
-      // Filter out ONLY the explicitly "PICKED" ones.
       let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
 
       if (unpickedRows.length === 0) {
@@ -1555,9 +1572,11 @@
 
     document.getElementById("summaryChartContainer").style.display = "block";
     
-    // Kick off smart background polling safely
-    fetchMasterSheet();
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchMasterSheet(); });
+    // Kick off smart background polling safely AFTER all JS is loaded
+    window.addEventListener("DOMContentLoaded", () => {
+        fetchMasterSheet();
+        document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchMasterSheet(); });
+    });
   </script>
 </body>
 </html>
