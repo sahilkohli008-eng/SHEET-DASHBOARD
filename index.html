@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Fixed viewport to strictly prevent iOS Auto-Zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
@@ -78,7 +77,7 @@
     .liquid-pill { border-radius: var(--radius-pill) !important; }
 
     /* Header */
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 100;}
     .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
     
     .menu-btn, button.icon-btn {
@@ -91,8 +90,38 @@
     .menu-btn svg { width: 22px; height: 22px; }
     button.icon-btn svg { width: 18px; height: 18px; transform-origin: center; }
     
+    /* Header Title Dropdown */
+    .title-dropdown-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
     h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; margin: 0; }
-    
+    .title-chevron {
+      width: 16px; height: 16px; color: var(--subtext-light);
+      margin-top: 4px; transition: transform 0.2s;
+    }
+    .title-dropdown-wrapper.active .title-chevron { transform: rotate(180deg); }
+
+    .title-menu {
+      position: absolute; top: calc(100% + 12px); left: 0;
+      background: #0f141e; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+      width: 200px; max-height: 300px; overflow-y: auto;
+      opacity: 0; visibility: hidden; transform: translateY(-10px);
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 1000;
+    }
+    .title-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
+    .title-option {
+      padding: 14px 16px; font-size: 0.9rem; font-weight: 600; color: var(--text-light);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer;
+    }
+    .title-option:last-child { border-bottom: none; }
+    .title-option.selected { color: var(--accent-blue); background: rgba(255,255,255,0.05); }
+
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
 
@@ -158,21 +187,17 @@
       padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: #161b26; 
       position: relative; display: flex; align-items: center;
     }
-    /* Fixed iOS Zoom issue by hardcoding 16px font-size */
     .search-input-wrapper input {
       width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 10px; padding: 10px 36px 10px 14px; color: #fff; font-size: 16px; outline: none;
     }
     .search-input-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
     
-    /* Fixed Touch Response area for Clear Buttons */
     .clear-search-btn {
       position: absolute; right: 14px; background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
       width: 24px; height: 24px; display: none; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-light); transition: background 0.2s, transform 0.1s;
-      z-index: 10;
+      cursor: pointer; color: var(--text-light); transition: background 0.2s, transform 0.1s; z-index: 10;
     }
-    .clear-search-btn:hover { background: rgba(255,255,255,0.3); }
     .clear-search-btn:active { transform: scale(0.9); }
     .clear-search-btn svg { width: 14px; height: 14px; }
     
@@ -184,7 +209,7 @@
     .custom-option:last-child { border-bottom: none; }
     .custom-option:hover, .custom-option.selected { background: rgba(255, 255, 255, 0.1); color: var(--accent-blue); font-weight: 700; }
 
-    /* GLOBAL SEARCH & DETAIL PAGE ENGINE */
+    /* GLOBAL SEARCH ENGINE OVERLAY */
     #globalSearchOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2000;
@@ -207,10 +232,8 @@
       background: rgba(255,255,255,0.15); color: var(--text-light); border: none; 
       width: 26px; height: 26px; border-radius: 50%;
       display: none; align-items: center; justify-content: center;
-      cursor: pointer; transition: background 0.2s, transform 0.1s;
-      z-index: 10;
+      cursor: pointer; transition: transform 0.1s; z-index: 10;
     }
-    .clear-main-search-btn:hover { background: rgba(255,255,255,0.3); }
     .clear-main-search-btn:active { transform: scale(0.9); }
     .clear-main-search-btn svg { width: 14px; height: 14px; }
 
@@ -222,7 +245,6 @@
       display: flex; justify-content: space-between; align-items: center;
       padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer;
     }
-    .search-result-item:hover { background: rgba(255,255,255,0.05); }
     .search-result-item .entity-name { font-size: 1rem; font-weight: 700; color: var(--text-light); }
     .search-result-item .entity-type { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); font-weight: 700;}
     .entity-type.port { color: var(--orange); }
@@ -251,8 +273,7 @@
     
     .trend-badge {
       font-size: 0.62rem; padding: 3px 7px; border-radius: var(--radius-pill); font-weight: 700; display: inline-flex; align-items: center;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
-      border: 0.5px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%); border: 0.5px solid rgba(255, 255, 255, 0.15);
     }
     .stat-card.small-card .trend-badge { font-size: 0.54rem; padding: 2px 5px; }
     .trend-badge.up { color: var(--green); }
@@ -269,7 +290,6 @@
     .stat-card .value.gp-val { color: var(--accent-blue); }
     .stat-card .value.hq-val { color: var(--orange); }
     .stat-card .value.spl-val { color: var(--pink); }
-    
     .sub-value { font-size: 0.7rem; color: var(--subtext-light); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
 
     /* Chart Summary */
@@ -279,7 +299,7 @@
     select.mini-select { padding: 8px 30px 8px 12px; font-size: 16px; width: auto; }
     canvas { width: 100%; max-height: 220px; }
 
-    /* Controls Bar & Physical Switch */
+    /* Controls Bar & Switch */
     .controls-bar { margin-bottom: 14px; }
     .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .controls-top-row select { flex: 1; }
@@ -335,12 +355,6 @@
     </div>
     
     <div class="sidebar-content">
-      <div class="filter-group">
-        <label class="filter-label">Month Overview</label>
-        <select id="mainMonthSelect" class="filter-select liquid-glass liquid-pill" onchange="applyGlobalFilters()">
-          <option value="ALL">All Months Overview</option>
-        </select>
-      </div>
       
       <!-- CUSTOM SEARCHABLE VESSEL DROPDOWN -->
       <div class="filter-group" style="z-index: 100;">
@@ -349,7 +363,6 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('vesselDropdown')">
             <span id="vesselSelectLabel">All Vessels</span>
           </div>
-          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="vesselDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="vesselSearch" placeholder="Search Vessel..." oninput="filterCustomOptions('vessel')">
@@ -372,7 +385,6 @@
           <div class="custom-select-trigger liquid-glass liquid-pill" onclick="toggleCustomDropdown('podDropdown')">
             <span id="podSelectLabel">All Ports</span>
           </div>
-          <!-- OPAQUE DROPDOWN MENU -->
           <div class="custom-dropdown-menu" id="podDropdown">
             <div class="search-input-wrapper">
               <input type="text" id="podSearch" placeholder="Search Port..." oninput="filterCustomOptions('pod')">
@@ -478,8 +490,19 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <h1>Dashboard</h1>
+      
+      <div class="title-dropdown-wrapper" onclick="toggleTitleMenu()">
+        <h1>Dashboard</h1>
+        <svg class="title-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        <div class="title-menu liquid-glass" id="titleDropdownMenu">
+          <div class="title-option selected" onclick="selectTitleMonth('ALL', 'Dashboard', event)">All Months Overview</div>
+          <!-- Months populate dynamically here -->
+        </div>
+      </div>
     </div>
+    
     <div class="header-right">
       <button class="icon-btn" onclick="toggleGlobalSearch()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -600,6 +623,39 @@
     let sortBy = "teu"; 
     let lineChartInstance = null;
 
+    // Header Title Menu Logic
+    function toggleTitleMenu() {
+      const wrapper = document.querySelector(".title-dropdown-wrapper");
+      const menu = document.getElementById("titleDropdownMenu");
+      wrapper.classList.toggle("active");
+      menu.classList.toggle("active");
+    }
+
+    function selectTitleMonth(monthValue, monthLabel, event) {
+      if(event) {
+        event.stopPropagation();
+      }
+      
+      const wrapper = document.querySelector(".title-dropdown-wrapper");
+      const menu = document.getElementById("titleDropdownMenu");
+      
+      // Update UI Header
+      wrapper.querySelector("h1").textContent = monthLabel;
+      
+      // Close Menu
+      wrapper.classList.remove("active");
+      menu.classList.remove("active");
+      
+      // Sync Selection UI
+      const options = menu.querySelectorAll(".title-option");
+      options.forEach(opt => opt.classList.remove("selected"));
+      event.target.classList.add("selected");
+      
+      // Apply Filter Logic
+      activeMonth = monthValue;
+      applyGlobalFilters(true);
+    }
+
     // Sidebar & Custom Search Dropdown Logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
@@ -693,11 +749,10 @@
       }
     }
 
-    // Interactive Clear logic inside Sidebar Dropdowns
     function clearSearch(type, event) {
       if(event) {
         event.preventDefault();
-        event.stopPropagation(); // Stops the dropdown from intercepting the click
+        event.stopPropagation(); 
       }
       
       const inputElement = document.getElementById(type + "Search");
@@ -722,9 +777,12 @@
       if (!event.target.closest(".custom-select-wrapper")) {
         document.querySelectorAll(".custom-dropdown-menu").forEach(menu => menu.classList.remove("active"));
       }
+      if (!event.target.closest(".title-dropdown-wrapper")) {
+        document.getElementById("titleDropdownMenu").classList.remove("active");
+        document.querySelector(".title-dropdown-wrapper").classList.remove("active");
+      }
     });
 
-    // Helper functions
     function normalizeMonthName(rawName) {
       const clean = String(rawName || "").trim().toUpperCase();
       for (const m of MONTH_ORDER) {
@@ -741,7 +799,6 @@
       return isNaN(parsed) ? fallback : parsed;
     }
 
-    // Main Fetch
     async function fetchMasterSheet() {
       const statusEl = document.getElementById("lastUpdated");
       const refreshIcon = document.getElementById("refresh-icon");
@@ -862,7 +919,6 @@
       }
     }
 
-    // Population Functions
     function populateFilterDropdowns() {
       const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
       
@@ -875,9 +931,13 @@
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
-      const monthSel = document.getElementById("mainMonthSelect");
-      monthSel.innerHTML = `<option value="ALL">All Months Overview</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
-      monthSel.value = months.includes(activeMonth) ? activeMonth : "ALL";
+      // Update Header Title Menu
+      const titleMenu = document.getElementById("titleDropdownMenu");
+      let titleHtml = `<div class="title-option ${activeMonth === 'ALL' ? 'selected' : ''}" onclick="selectTitleMonth('ALL', 'Dashboard', event)">All Months Overview</div>`;
+      months.forEach(m => {
+        titleHtml += `<div class="title-option ${activeMonth === m ? 'selected' : ''}" onclick="selectTitleMonth('${m}', '${m}', event)">${m}</div>`;
+      });
+      titleMenu.innerHTML = titleHtml;
 
       // Populate Searchable Vessel List
       const vslList = document.getElementById("vesselOptionsList");
@@ -915,7 +975,6 @@
       ];
     }
 
-    // Global Search Engine
     function performGlobalSearch() {
       const query = document.getElementById("mainSearchInput").value.toLowerCase();
       const resultsDiv = document.getElementById("globalSearchResults");
@@ -953,7 +1012,6 @@
       resultsDiv.innerHTML = html;
     }
 
-    // Detail Info View Engine
     function openDetailView(name, type) {
       document.getElementById("globalSearchOverlay").classList.remove("active");
       const overlay = document.getElementById("detailOverlay");
@@ -1017,8 +1075,6 @@
       overlay.classList.add("active");
     }
 
-
-    // Standard Data Processing
     function getFilteredRows(month, vsl, pod, eqp, bypassEqp = false) {
       let rows = [];
       if (month === "ALL") {
@@ -1039,11 +1095,12 @@
       return rows;
     }
 
-    function applyGlobalFilters() {
-      activeMonth = document.getElementById("mainMonthSelect").value;
-      activeVessel = document.getElementById("vesselFilter").value; 
-      activePod = document.getElementById("podFilter").value;       
-      activeEqp = document.getElementById("eqpFilter").value;
+    function applyGlobalFilters(skipSidebarDataUpdate = false) {
+      if(!skipSidebarDataUpdate) {
+        activeVessel = document.getElementById("vesselFilter").value; 
+        activePod = document.getElementById("podFilter").value;       
+        activeEqp = document.getElementById("eqpFilter").value;
+      }
 
       updateKPIsAndTrends();
       renderTableData();
