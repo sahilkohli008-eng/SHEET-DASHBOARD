@@ -303,7 +303,7 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* PERFECT SCROLLING NATIVE DATA TABLES */
+    /* PERFECT SCROLLING NATIVE DATA TABLES - NO OVERLAP */
     .table-scroll-container, .customer-table-wrap {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
       -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
@@ -342,26 +342,6 @@
     table.unpicked-table th:nth-child(5), table.unpicked-table td:nth-child(5) { width: 60px; text-align: center; } 
     table.unpicked-table th:nth-child(6), table.unpicked-table td:nth-child(6) { width: 60px; text-align: center; } 
     table.unpicked-table th:nth-child(7), table.unpicked-table td:nth-child(7) { width: 70px; text-align: center; } 
-
-    /* STYLING FOR COSCO TRACKING LINK */
-    .booking-link {
-      color: var(--accent-blue);
-      text-decoration: none;
-      position: relative;
-      display: inline-block;
-      transition: opacity 0.2s;
-    }
-    .booking-link::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 1px;
-      bottom: -2px;
-      left: 0;
-      background-color: var(--accent-blue);
-      opacity: 0.5;
-    }
-    .booking-link:active { opacity: 0.6; }
 
     .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
@@ -1390,14 +1370,10 @@
         <tr>
           <td style="color: var(--text-light); font-weight: 700;">${b.party}</td>
           
-          <!-- SMART COSCO LINK GENERATED HERE -->
-          <td style="font-weight: 700;">
-            <a href="https://elines.coscoshipping.com/ebusiness/cargoTracking?trackingType=BILLOFLADING&number=${b.bkg}" target="_blank" class="booking-link">
-              ${b.bkg}
-            </a>
-          </td>
+          <!-- REMOVED LINK, RETURNED TO CLEAN TEXT -->
+          <td style="color: var(--accent-blue); font-weight: 700;">${b.bkg}</td>
           
-          <td style="${colorClass} font-size: 0.7rem; font-weight: 700;">${b.status}</td>
+          <td style="${colorClass} font-size: 0.7rem;">${b.status}</td>
           <td style="color: var(--subtext-light);">${b.gp20 || '-'}</td>
           <td style="color: var(--orange);">${b.hq40 || '-'}</td>
           <td style="color: var(--pink);">${b.spl || '-'}</td>
