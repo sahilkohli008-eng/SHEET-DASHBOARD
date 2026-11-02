@@ -135,7 +135,7 @@
     
     .close-btn {
       background: var(--glass-bg); border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-pill);
-      color: var(--text-light); cursor: pointer; width: 34px; height: 34px; display: flex; align-items: center; justify-content: margin-top: -2px;
+      color: var(--text-light); cursor: pointer; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-top: -2px;
     }
     .close-btn svg { width: 18px; height: 18px; }
     
@@ -230,6 +230,7 @@
     .entity-type.port { color: var(--orange); }
     .entity-type.vessel { color: var(--purple); }
 
+    /* DETAIL OVERLAY PAGE */
     #detailOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #07090e;
       z-index: 3000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -249,6 +250,7 @@
     .stat-card .label { font-size: 0.68rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
+    /* Live Rate Elements & Pulse Animation */
     .live-rate-text {
       font-size: 0.75rem; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px;
       font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end;
@@ -287,6 +289,7 @@
     .stat-card .value.spl-val { color: var(--pink); }
     .sub-value { font-size: 0.7rem; color: var(--subtext-light); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
 
+    /* SWIPEABLE CARD CSS */
     .swipe-container { overflow: hidden; position: relative; padding: 0 !important; }
     .swipe-wrapper {
       display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; 
@@ -339,12 +342,14 @@
     .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
 
+    /* Chart Summary */
     .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .chart-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; color: var(--text-light); }
     select.mini-select { padding: 8px 30px 8px 12px; font-size: 16px; width: auto; }
     canvas { width: 100%; max-height: 220px; }
 
+    /* Controls Bar & Switch */
     .controls-bar { margin-bottom: 14px; }
     .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .controls-top-row select { flex: 1; }
@@ -739,10 +744,11 @@
       }
     }
 
-    // Explicit Exact Match Finder for Status Columns
+    // Exact String Matcher to safely scan raw arrays without crashing on null rows
     function findExactCol(rawRows, exactNames) {
       for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-        const rowArr = rawRows[r].map(h => String(h).trim().toLowerCase());
+        if (!rawRows[r]) continue;
+        const rowArr = rawRows[r].map(h => String(h || "").trim().toLowerCase());
         for (let name of exactNames) {
           const idx = rowArr.indexOf(name);
           if (idx !== -1) return idx;
@@ -799,6 +805,7 @@
 
           let headerRowIdx = 0;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+            if (!rawRows[r]) continue;
             const rowText = rawRows[r].join(" ").toLowerCase();
             if (rowText.includes("booking") || rowText.includes("vsl") || rowText.includes("party")) {
               headerRowIdx = r;
@@ -808,7 +815,8 @@
           
           const findColInFirst5Rows = (keywords, fallbackIdx) => {
             for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-              const rowArr = rawRows[r].map(h => String(h).trim().toLowerCase());
+              if (!rawRows[r]) continue;
+              const rowArr = rawRows[r].map(h => String(h || "").trim().toLowerCase());
               const idx = rowArr.findIndex(h => keywords.some(k => h.includes(k)));
               if (idx !== -1) return idx;
             }
@@ -827,33 +835,16 @@
           const vslIdx      = findColInFirst5Rows(["vsl", "vessel"], 12); 
           const custTypeIdx = findColInFirst5Rows(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
           
-          // STRICT EXACT MATCH for STATUS to bypass the empty "PICKUP" text column
           const allotIdx = findExactCol(rawRows, ["allotment status", "allotment", "allot"]);
           const pickIdx = findExactCol(rawRows, ["pickup status"]);
-
-          // Fallback if "pickup status" isn't named exactly that yet
-          let finalPickIdx = pickIdx;
-          if (finalPickIdx === -1) {
-             let allPickups = [];
-             for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-                 const rowArr = rawRows[r].map(h => String(h).trim().toLowerCase());
-                 rowArr.forEach((h, i) => {
-                     if (h === "pickup" || h === "pick up" || h === "pick") allPickups.push(i);
-                 });
-                 if (allPickups.length > 0) break;
-             }
-             if (allotIdx !== -1 && allPickups.includes(allotIdx + 1)) {
-                 finalPickIdx = allotIdx + 1;
-             } else if (allPickups.length > 0) {
-                 finalPickIdx = allPickups[allPickups.length - 1];
-             }
-          }
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
             const r = rawRows[i];
-            const bookingVal = String(r[bookIdx] || "").trim();
-            const partyVal = String(r[partyIdx] || "").trim();
+            if (!r) continue;
+            
+            const bookingVal = bookIdx !== -1 ? String(r[bookIdx] || "").trim() : "";
+            const partyVal = partyIdx !== -1 ? String(r[partyIdx] || "").trim() : "";
 
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
             if (!bookingVal && !partyVal) continue;
@@ -868,11 +859,10 @@
             const vslName = vslIdx !== -1 ? String(r[vslIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
-            // Apply exact Picked/Unpicked Rules
             let pickupStatus = "PICKED"; 
-            if (allotIdx !== -1 || finalPickIdx !== -1) {
+            if (allotIdx !== -1 || pickIdx !== -1) {
                 const isAllotted = allotIdx !== -1 ? isTruthy(r[allotIdx]) : false;
-                const isPicked = finalPickIdx !== -1 ? isTruthy(r[finalPickIdx]) : false;
+                const isPicked = pickIdx !== -1 ? isTruthy(r[pickIdx]) : false;
                 
                 if (isAllotted && isPicked) {
                     pickupStatus = "PICKED";
@@ -926,6 +916,7 @@
       } catch (err) {
         console.error(err);
         if(!isAuto) statusEl.textContent = err.message || "Error fetching data";
+        document.getElementById("unpickedListBody").innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--red); padding: 20px;">Data Error. Please refresh.</td></tr>`;
       } finally {
         if (!isAuto && refreshIcon) refreshIcon.classList.remove("spinning");
         isFetching = false;
@@ -1301,7 +1292,6 @@
       const unpickedList = document.getElementById("unpickedListBody");
       const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
       
-      // Filter out ONLY the explicitly "PICKED" ones.
       let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
 
       if (unpickedRows.length === 0) {
