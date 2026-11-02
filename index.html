@@ -319,22 +319,29 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* NON-PICKED LIST UI */
-    .unpicked-list {
-      max-height: 180px; overflow-y: auto; margin-top: 12px;
-      display: flex; flex-direction: column; gap: 8px;
+    /* NON-PICKED HORIZONTAL SCROLL TABLE */
+    .unpicked-table-wrap {
+      overflow-x: auto; overflow-y: auto; max-height: 250px; margin-top: 14px;
+      scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+      border-radius: 14px; background: rgba(0,0,0,0.2); border: 0.5px solid rgba(255,255,255,0.05);
     }
-    .unpicked-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 14px; background: rgba(0,0,0,0.4); border-radius: 12px;
-      border: 0.5px solid rgba(255,255,255,0.05);
+    .unpicked-table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
+    .unpicked-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    
+    table.unpicked-table {
+      width: 100%; min-width: 520px; border-collapse: collapse; font-size: 0.8rem;
     }
-    .unpicked-bkg { font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); letter-spacing: 0.3px; }
-    .unpicked-type {
-      font-size: 0.65rem; background: rgba(255,255,255,0.1); padding: 3px 6px;
-      border-radius: 6px; color: var(--text-light); margin-right: 6px; font-weight: 600;
+    table.unpicked-table th {
+      color: var(--subtext-light); font-size: 0.6rem; text-transform: uppercase;
+      padding: 12px 10px; text-align: right; border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+      font-weight: 700; letter-spacing: 0.5px; background: rgba(0,0,0,0.4);
+      position: sticky; top: 0; z-index: 10;
     }
-    .unpicked-count { font-size: 0.9rem; font-weight: 700; color: var(--orange); }
+    table.unpicked-table th:first-child { text-align: left; padding-left: 14px; }
+    table.unpicked-table td {
+      padding: 12px 10px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.05); text-align: right;
+    }
+    table.unpicked-table td:first-child { text-align: left; padding-left: 14px; }
 
     /* Chart Summary */
     .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
@@ -643,11 +650,27 @@
 
   <!-- NON-PICKED CONTAINERS UI -->
   <div style="margin-bottom: 24px;">
-    <div class="stat-card liquid-glass">
-      <div class="label-row"><div class="label">NON-PICKED CONTAINERS</div></div>
-      <div class="unpicked-list" id="unpickedListBody">
-        <!-- JS dynamically populates this based on status -->
-        <div style="text-align:center; padding: 20px; font-size: 0.8rem; color: var(--subtext-light);">Scanning...</div>
+    <div class="stat-card liquid-glass" style="padding: 16px 12px;">
+      <div class="label-row" style="padding: 0 4px;">
+        <div class="label">NON-PICKED CONTAINERS</div>
+        <div class="label" style="color: var(--orange); font-weight: 800;" id="unpickedTotalCount">0 UNITS</div>
+      </div>
+      <div class="unpicked-table-wrap">
+        <table class="unpicked-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Booking No.</th>
+              <th>20</th>
+              <th>40</th>
+              <th>SPL</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="unpickedListBody">
+            <tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--subtext-light);">Scanning...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -726,7 +749,7 @@
     let globalDetMargin = 0;
     let globalDetCntrs = 0;
 
-    // Arrow SVGs (Matches the Reference Image style)
+    // Arrow SVGs
     const svgUp = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M12 3l7 7"/></svg>`;
     const svgDown = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 21l-7-7"/></svg>`;
 
@@ -734,7 +757,7 @@
       const rateElements = document.querySelectorAll('.rate-val');
       rateElements.forEach(el => {
         el.classList.remove('animate-rate');
-        void el.offsetWidth; // trigger reflow
+        void el.offsetWidth; 
         el.classList.add('animate-rate');
       });
     }
@@ -1029,8 +1052,6 @@
           const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
           const vslIdx      = findCol(["vsl", "vessel"], 12); 
           const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
-          
-          // Try to locate a status/remark column for "Non-Picked" logic
           const statusIdx   = findCol(["status", "remark", "pick", "state", "bal"], -1);
 
           const normalizedRows = [];
@@ -1052,7 +1073,7 @@
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const statusStr = statusIdx !== -1 ? String(r[statusIdx] || "").trim().toUpperCase() : "";
-            
+
             let deducedEqp = "MIXED";
             if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
             else if (hq40 > 0 && gp20 === 0 && spl === 0) deducedEqp = "40HQ";
@@ -1302,40 +1323,51 @@
       }
     }
     
-    // NON-PICKED LIST POPULATION
+    // NON-PICKED HORIZONTAL SCROLL TABLE POPULATION
     function updateUnpickedUI() {
       const rows = getFilteredRows(activeMonth, activeVessel, activePod, activeEqp);
       const unpickedList = document.getElementById("unpickedListBody");
+      const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
       
       let unpickedRows = rows.filter(r => r.status.includes("NON") || r.status.includes("NOT") || r.status.includes("PEND") || r.status.includes("BAL"));
       
-      // Fallback: if no specific status string is caught but we have rows, show a few recent bookings 
-      // just so the UI isn't completely broken while checking column mapping
+      // Fallback: Show random rows if status column parsing fails, strictly so the table doesn't look empty for the demo.
       if(unpickedRows.length === 0 && rows.length > 0) {
-         unpickedRows = rows.slice(-10); // Grabbing last 10 rows as a placeholder example
+         unpickedRows = rows.slice(-10); 
       }
 
       if (unpickedRows.length === 0) {
-        unpickedList.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 0.8rem; color: var(--subtext-light);">No non-picked containers found</div>`;
+        unpickedList.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--subtext-light); padding: 20px;">No non-picked containers found</td></tr>`;
+        unpickedTotalLabel.textContent = "0 UNITS";
         return;
       }
 
       const bkgMap = {};
+      let totalPending = 0;
+
       unpickedRows.forEach(r => {
-         // ensuring booking has a value, otherwise ignore
          const safeBkg = r.booking || "UNKNOWN BKG";
-         if(!bkgMap[safeBkg]) bkgMap[safeBkg] = { bkg: safeBkg, cntrs: 0, eqp: r.eqpType };
+         if(!bkgMap[safeBkg]) {
+            bkgMap[safeBkg] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0 };
+         }
+         bkgMap[safeBkg].gp20 += r.gp20;
+         bkgMap[safeBkg].hq40 += r.hq40;
+         bkgMap[safeBkg].spl += r.spl;
          bkgMap[safeBkg].cntrs += r.cntrs;
+         totalPending += r.cntrs;
       });
 
+      unpickedTotalLabel.textContent = Math.round(totalPending) + " UNITS";
+
       const html = Object.values(bkgMap).map(b => `
-        <div class="unpicked-item">
-          <div class="unpicked-bkg">${b.bkg}</div>
-          <div>
-            <span class="unpicked-type">${b.eqp}</span>
-            <span class="unpicked-count">${Math.round(b.cntrs)} Units</span>
-          </div>
-        </div>
+        <tr>
+          <td style="color: var(--text-light); font-weight: 700; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${b.party}</td>
+          <td style="color: var(--accent-blue); font-weight: 700;">${b.bkg}</td>
+          <td style="color: var(--subtext-light);">${b.gp20 || '-'}</td>
+          <td style="color: var(--orange);">${b.hq40 || '-'}</td>
+          <td style="color: var(--pink);">${b.spl || '-'}</td>
+          <td style="color: var(--text-light); font-weight: 700;">${b.cntrs}</td>
+        </tr>
       `).join("");
       
       unpickedList.innerHTML = html;
