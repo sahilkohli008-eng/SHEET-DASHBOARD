@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Fixed viewport to strictly prevent iOS Auto-Zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
@@ -302,7 +303,7 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* PERFECT SCROLLING NATIVE DATA TABLES */
+    /* PERFECT SCROLLING NATIVE DATA TABLES - NO OVERLAP */
     .table-scroll-container, .customer-table-wrap {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
       -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
@@ -328,6 +329,7 @@
     
     table.data-table tr:last-child td, table.cust-table tr:last-child td { border-bottom: none; }
     
+    /* Global First Column Overrides */
     table.data-table th:first-child, table.data-table td:first-child,
     table.cust-table th:first-child, table.cust-table td:first-child {
       text-align: left; padding-left: 18px; color: var(--text-light); width: 180px;
@@ -335,6 +337,13 @@
     
     table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 130px; }
     
+    /* NON-PICKED TABLE - STRICT CENTER ALIGNMENT FOR COLUMNS 3 THROUGH 7 */
+    table.unpicked-table th:nth-child(3), table.unpicked-table td:nth-child(3) { width: 170px; text-align: center; } /* Status */
+    table.unpicked-table th:nth-child(4), table.unpicked-table td:nth-child(4) { width: 60px; text-align: center; } /* 20 */
+    table.unpicked-table th:nth-child(5), table.unpicked-table td:nth-child(5) { width: 60px; text-align: center; } /* 40 */
+    table.unpicked-table th:nth-child(6), table.unpicked-table td:nth-child(6) { width: 60px; text-align: center; } /* SPL */
+    table.unpicked-table th:nth-child(7), table.unpicked-table td:nth-child(7) { width: 70px; text-align: center; } /* Total */
+
     .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
 
@@ -614,8 +623,9 @@
         <div class="label" style="color: var(--orange); font-weight: 800;" id="unpickedTotalCount">0 UNITS</div>
       </div>
       
+      <!-- ADDED 'unpicked-table' CSS CLASS HERE -->
       <div class="table-scroll-container">
-        <table class="data-table">
+        <table class="data-table unpicked-table">
           <thead>
             <tr>
               <th>Customer Name</th>
@@ -690,7 +700,6 @@
     // =========================================================
     // 2. PROTECTED GLOBAL NAMESPACE (DO NOT MODIFY)
     // =========================================================
-    // Attaching helpers to 'window' makes them immune to HTML UI changes
     window.MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     
     window.parseNum = function(val, fallback = 0) {
