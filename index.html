@@ -229,6 +229,7 @@
     .entity-type.port { color: var(--orange); }
     .entity-type.vessel { color: var(--purple); }
 
+    /* DETAIL OVERLAY PAGE */
     #detailOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #07090e;
       z-index: 3000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -301,45 +302,38 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* PERFECT SCROLLING NATIVE DATA TABLES (No Clipping/Jitter) */
+    /* PERFECT SCROLLING NATIVE DATA TABLES */
     .table-scroll-container, .customer-table-wrap {
-      width: 100%; 
-      overflow-x: auto; 
-      overflow-y: hidden; 
-      -webkit-overflow-scrolling: touch; 
-      border-radius: var(--radius-main); 
-      margin-top: 14px;
-      padding-bottom: 8px;
-      transform: translate3d(0,0,0); /* Hardware Acceleration to prevent Safari void bug */
+      width: 100%; overflow-x: auto; overflow-y: hidden; 
+      -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
+      padding-bottom: 8px; transform: translate3d(0,0,0);
     }
     .table-scroll-container::-webkit-scrollbar, .customer-table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
     .table-scroll-container::-webkit-scrollbar-thumb, .customer-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     
     table.data-table, table.cust-table {
-      min-width: 100%; 
-      border-collapse: collapse; 
-      font-size: 0.85rem; 
-      transform: translate3d(0,0,0);
+      width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed;
     }
     
     table.data-table th, table.cust-table th {
       color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase;
       padding: 16px 14px; text-align: right; border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
       font-weight: 700; letter-spacing: 0.5px; background: rgba(0,0,0,0.2);
-      white-space: nowrap; /* Forces layout to breathe horizontally */
     }
     
     table.data-table td, table.cust-table td {
       padding: 14px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.05); text-align: right; font-weight: 600; vertical-align: middle;
-      white-space: nowrap; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     
     table.data-table tr:last-child td, table.cust-table tr:last-child td { border-bottom: none; }
     
     table.data-table th:first-child, table.data-table td:first-child,
     table.cust-table th:first-child, table.cust-table td:first-child {
-      text-align: left; padding-left: 18px; color: var(--text-light); 
+      text-align: left; padding-left: 18px; color: var(--text-light); width: 180px;
     }
+    
+    table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 130px; }
     
     .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
@@ -688,9 +682,53 @@
   </div>
 
   <script>
+    // =========================================================
+    // 1. USER CONFIGURATION - PASTE URL HERE
+    // =========================================================
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec";
 
-    const MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    // =========================================================
+    // 2. PROTECTED GLOBAL NAMESPACE (DO NOT MODIFY)
+    // =========================================================
+    // Attaching helpers to 'window' makes them immune to HTML UI changes
+    window.MONTH_ORDER = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    
+    window.parseNum = function(val, fallback = 0) {
+      if (val === undefined || val === null || val === "") return fallback;
+      if (typeof val === "number") return isNaN(val) ? fallback : val;
+      const cleaned = String(val).replace(/[^0-9.-]+/g, "");
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? fallback : parsed;
+    };
+
+    window.normalizeMonthName = function(rawName) {
+      const clean = String(rawName || "").trim().toUpperCase();
+      for (const m of window.MONTH_ORDER) {
+        if (clean.startsWith(m) || clean.includes(m)) return m;
+      }
+      return clean;
+    };
+
+    window.isTruthy = function(val) {
+      if (val === true || val === 1 || val === "1") return true;
+      if (val === false || val === 0 || val === "0" || val === null || val === undefined || val === "") return false;
+      const str = String(val).trim().toUpperCase();
+      if (!str || str === "FALSE" || str === "NO" || str === "N" || str === "-" || str === "PENDING" || str === "NOT PICKED" || str === "UNPICKED" || str === "☐" || str === "✗" || str === "✘") return false;
+      if (str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE" || str === "PICKED" || str === "ALLOTTED" || str === "ALLOTED" || str === "OK" || str === "✓" || str === "✔" || str === "☑" || str === "X") return true;
+      return false;
+    };
+
+    window.findExactCol = function(rawRows, exactNames) {
+      for (let r = 0; r < Math.min(6, rawRows.length); r++) {
+        if (!rawRows[r]) continue; 
+        const rowArr = rawRows[r].map(h => String(h || "").replace(/\n/g, " ").replace(/\s+/g, " ").trim().toLowerCase());
+        for (let name of exactNames) {
+          const idx = rowArr.indexOf(name);
+          if (idx !== -1) return idx;
+        }
+      }
+      return -1;
+    };
 
     let dataByMonth = {};
     let globalSearchIndex = []; 
@@ -708,7 +746,6 @@
     let globalDetMargin = 0;
     let globalDetCntrs = 0;
     
-    // Engine State for Safe Background Polling
     let isFetching = false;
     let fetchTimeout; 
 
@@ -747,30 +784,6 @@
       }
     }
 
-    // NORMALIZES ALL WHITESPACE/NEWLINES TO FIND COLUMNS SAFELY
-    function findExactCol(rawRows, exactNames) {
-      for (let r = 0; r < Math.min(6, rawRows.length); r++) {
-        if (!rawRows[r]) continue; 
-        const rowArr = rawRows[r].map(h => String(h || "").replace(/\n/g, " ").replace(/\s+/g, " ").trim().toLowerCase());
-        
-        for (let name of exactNames) {
-          const idx = rowArr.indexOf(name);
-          if (idx !== -1) return idx;
-        }
-      }
-      return -1;
-    }
-
-    function isTruthy(val) {
-      if (val === true || val === 1 || val === "1") return true;
-      if (val === false || val === 0 || val === "0" || val === null || val === undefined || val === "") return false;
-      const str = String(val).trim().toUpperCase();
-      if (!str || str === "FALSE" || str === "NO" || str === "N" || str === "-" || str === "PENDING" || str === "NOT PICKED" || str === "UNPICKED" || str === "☐" || str === "✗" || str === "✘") return false;
-      if (str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE" || str === "PICKED" || str === "ALLOTTED" || str === "ALLOTED" || str === "OK" || str === "✓" || str === "✔" || str === "☑" || str === "X") return true;
-      return false;
-    }
-
-    // SMART BACKGROUND POLLING ENGINE (Waits 3s after previous fetch ends to avoid 429 Google Quota errors)
     async function fetchMasterSheet(isAuto = false) {
       if (isFetching) return; 
       isFetching = true;
@@ -796,7 +809,7 @@
         try {
           rawJson = JSON.parse(text);
         } catch (parseError) {
-          throw new Error("Invalid format returned by Google (Check sharing permissions or wait a few seconds).");
+          throw new Error("Invalid format returned by Google.");
         }
 
         if (rawJson.error) throw new Error("Error: " + rawJson.error);
@@ -841,9 +854,8 @@
           const vslIdx      = findColInFirst5Rows(["vsl", "vessel"], 12); 
           const custTypeIdx = findColInFirst5Rows(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
           
-          // EXACT TARGETING of the new headers
-          const allotIdx = findExactCol(rawRows, ["allotment status"]);
-          const pickIdx = findExactCol(rawRows, ["pickup status"]);
+          const allotIdx = window.findExactCol(rawRows, ["allotment status"]);
+          const pickIdx = window.findExactCol(rawRows, ["pickup status"]);
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -856,20 +868,20 @@
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
             if (!bookingVal && !partyVal) continue;
 
-            const gp20 = parseNum(r[gp20Idx], 0);
-            const hq40 = parseNum(r[hq40Idx], 0);
-            const spl = parseNum(r[splIdx], 0);
-            const cntrs = parseNum(r[cntrIdx], 0);
-            const teus = parseNum(r[teuIdx], 0);
-            const margin = parseNum(r[marginIdx], 0);
+            const gp20 = window.parseNum(r[gp20Idx], 0);
+            const hq40 = window.parseNum(r[hq40Idx], 0);
+            const spl = window.parseNum(r[splIdx], 0);
+            const cntrs = window.parseNum(r[cntrIdx], 0);
+            const teus = window.parseNum(r[teuIdx], 0);
+            const margin = window.parseNum(r[marginIdx], 0);
             
             const vslName = vslIdx !== -1 ? String(r[vslIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
             let pickupStatus = "PICKED"; 
             if (allotIdx !== -1 && pickIdx !== -1) { 
-                const isAllotted = isTruthy(r[allotIdx]);
-                const isPicked = isTruthy(r[pickIdx]);
+                const isAllotted = window.isTruthy(r[allotIdx]);
+                const isPicked = window.isTruthy(r[pickIdx]);
                 
                 if (isAllotted && isPicked) {
                     pickupStatus = "PICKED";
@@ -901,12 +913,12 @@
               eqpType: deducedEqp,
               margin: margin,
               pickupStatus: pickupStatus,
-              month: normalizeMonthName(sheetName)
+              month: window.normalizeMonthName(sheetName)
             });
           }
 
           if (normalizedRows.length > 0) {
-            const mKey = normalizeMonthName(sheetName);
+            const mKey = window.normalizeMonthName(sheetName);
             if (!newDataByMonth[mKey]) newDataByMonth[mKey] = [];
             newDataByMonth[mKey] = newDataByMonth[mKey].concat(normalizedRows);
           }
@@ -928,7 +940,6 @@
       } finally {
         if (!isAuto && refreshIcon) refreshIcon.classList.remove("spinning");
         isFetching = false;
-        // Schedule next safe silent refresh 3 seconds after this one finishes
         fetchTimeout = setTimeout(() => {
           if (!document.hidden) fetchMasterSheet(true);
         }, 3000); 
@@ -1123,8 +1134,8 @@
       const pods = [...new Set(allRows.map(r => r.pod))].filter(p => p && p !== "UNKNOWN").sort();
 
       const months = Object.keys(dataByMonth).sort((a, b) => {
-        const idxA = MONTH_ORDER.indexOf(a);
-        const idxB = MONTH_ORDER.indexOf(b);
+        const idxA = window.MONTH_ORDER.indexOf(a);
+        const idxB = window.MONTH_ORDER.indexOf(b);
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
@@ -1388,7 +1399,7 @@
       let showTrend = false;
 
       if (activeMonth !== "ALL") {
-        const availableMonths = MONTH_ORDER.filter(m => dataByMonth[m]);
+        const availableMonths = window.MONTH_ORDER.filter(m => dataByMonth[m]);
         const currIdx = availableMonths.indexOf(activeMonth);
         if (currIdx > 0) {
           const prevMonth = availableMonths[currIdx - 1];
@@ -1489,7 +1500,7 @@
       const metric = document.getElementById("chartMetricSelect").value;
       const labels = [];
       const dataPoints = [];
-      const availableMonths = MONTH_ORDER.filter(m => dataByMonth[m]);
+      const availableMonths = window.MONTH_ORDER.filter(m => dataByMonth[m]);
 
       availableMonths.forEach(m => {
         labels.push(m);
@@ -1557,7 +1568,7 @@
 
     document.getElementById("summaryChartContainer").style.display = "block";
     
-    // Kick off smart background polling safely AFTER all JS is loaded
+    // START ENGINE SAFELY ONLY AFTER BROWSER IS FULLY READY
     window.addEventListener("DOMContentLoaded", () => {
         fetchMasterSheet();
         document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchMasterSheet(); });
