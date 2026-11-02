@@ -249,7 +249,7 @@
     .stat-card .label { font-size: 0.68rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
-    /* Live Rate Elements */
+    /* Live Rate Elements & Pulse Animation */
     .live-rate-text {
       font-size: 0.75rem; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px;
       font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end;
@@ -304,52 +304,38 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* PERFECT SCROLLING NATIVE DATA TABLES */
-    .table-scroll-container {
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch; 
-      border-radius: var(--radius-main);
-      margin-top: 14px;
-      display: block; /* Required for native horizontal scroll without sticky tearing */
-      white-space: nowrap;
+    /* PERFECT SCROLLING NATIVE DATA TABLES - 100% Free of Sticky Glitches */
+    .table-scroll-container, .customer-table-wrap {
+      width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; 
+      border-radius: var(--radius-main); margin-top: 14px;
     }
+    .table-scroll-container::-webkit-scrollbar, .customer-table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
+    .table-scroll-container::-webkit-scrollbar-thumb, .customer-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     
-    .table-scroll-container::-webkit-scrollbar { height: 6px; }
-    .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-    
-    table.data-table {
-      width: max-content; /* Forces table to stretch naturally without compressing */
-      min-width: 100%;
-      border-collapse: collapse;
+    table.data-table, table.cust-table {
+      width: max-content; /* This ensures the table naturally flows without squeezing text */
+      min-width: 100%; 
+      border-collapse: collapse; 
       font-size: 0.85rem;
     }
+    table.data-table th, table.cust-table th {
+      color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase;
+      padding: 16px 14px; text-align: right; border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
+      font-weight: 700; letter-spacing: 0.5px;
+    }
+    table.data-table td, table.cust-table td {
+      padding: 14px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.05); text-align: right; font-weight: 600; vertical-align: middle;
+      white-space: nowrap; /* Forces content onto a single line for smooth swiping */
+    }
+    table.data-table tr:last-child td, table.cust-table tr:last-child td { border-bottom: none; }
     
-    table.data-table th, table.data-table td {
-      padding: 16px 14px;
-      text-align: right;
-      border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
+    table.data-table th:first-child, table.data-table td:first-child,
+    table.cust-table th:first-child, table.cust-table td:first-child {
+      text-align: left; padding-left: 18px; color: var(--text-light);
     }
     
-    table.data-table th {
-      color: var(--subtext-light);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      background: rgba(0,0,0,0.2);
-    }
-    
-    table.data-table th:first-child, 
-    table.data-table td:first-child {
-      text-align: left;
-      padding-left: 18px;
-    }
-    
-    table.data-table td:first-child {
-      color: var(--text-light);
-      font-weight: 700;
-    }
+    .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
+    .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
 
     /* Chart Summary */
     .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
@@ -740,9 +726,9 @@
     let globalCurCntrs = 0;
     let globalDetMargin = 0;
     let globalDetCntrs = 0;
-    let isFetching = false;
+    let isFetching = false; 
 
-    // Custom Minimal SVGs matching user reference
+    // Arrow SVGs
     const svgUp = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M12 3l7 7"/></svg>`;
     const svgDown = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 21l-7-7"/></svg>`;
 
@@ -852,6 +838,7 @@
       }
     }
 
+    // Global Search Interactive Close
     function toggleGlobalSearch() {
       const searchOverlay = document.getElementById("globalSearchOverlay");
       searchOverlay.classList.toggle("active");
@@ -978,6 +965,24 @@
       const parsed = parseFloat(cleaned);
       return isNaN(parsed) ? fallback : parsed;
     }
+    
+    // Deep Search for columns across first 5 rows
+    function findColInFirst5Rows(rawRows, keywords) {
+        for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+            const rowArr = rawRows[r].map(h => String(h).trim().toLowerCase());
+            const idx = rowArr.findIndex(h => keywords.some(k => h.includes(k)));
+            if (idx !== -1) return idx;
+        }
+        return -1;
+    }
+    
+    // Google Sheets Checkbox Truthy Validator
+    function isTruthy(val) {
+        if (val === true || val === 1 || val === "1") return true;
+        if (!val) return false;
+        const str = String(val).trim().toUpperCase();
+        return str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE";
+    }
 
     // Main Fetch Engine with 0.1s Polling Support
     async function fetchMasterSheet(isAuto = false) {
@@ -1018,6 +1023,7 @@
           const rawRows = rawJson[sheetName];
           if (!Array.isArray(rawRows) || rawRows.length < 2) return;
 
+          // Locate actual header row index (where Bookings start)
           let headerRowIdx = 0;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
             const rowText = rawRows[r].join(" ").toLowerCase();
@@ -1027,33 +1033,28 @@
             }
           }
           
-          const headers = rawRows[headerRowIdx].map(h => String(h).trim().toLowerCase());
-          const findCol = (keywords, fallbackIdx) => {
-            const idx = headers.findIndex(h => keywords.some(k => h.includes(k)));
-            return idx !== -1 ? idx : fallbackIdx;
-          };
-
-          const bookIdx     = findCol(["booking", "bkg", "bl", "sr"], 0); 
-          const partyIdx    = findCol(["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); 
-          const gp20Idx     = findCol(["20gp", "20'", "20st", "20 dv"], 2); 
-          const hq40Idx     = findCol(["40hq", "40hc", "40'", "40 hc"], 3); 
-          const splIdx      = findCol(["spl", "special", "45", "flat", "open"], 4); 
-          const cntrIdx     = findCol(["cntr", "container", "box", "total units", "units"], 5); 
-          const teuIdx      = findCol(["teu", "vol", "qty", "volume"], 6); 
-          const podIdx      = findCol(["pod", "port", "dest", "discharge"], 9); 
-          const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
-          const vslIdx      = findCol(["vsl", "vessel"], 12); 
-          const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
+          // Deep-scan for exact columns regardless of merged headers
+          const bookIdx     = findColInFirst5Rows(rawRows, ["booking", "bkg", "bl", "sr"]); 
+          const partyIdx    = findColInFirst5Rows(rawRows, ["party", "customer", "shipper", "forwarder", "client", "company", "name"]); 
+          const gp20Idx     = findColInFirst5Rows(rawRows, ["20gp", "20'", "20st", "20 dv"]); 
+          const hq40Idx     = findColInFirst5Rows(rawRows, ["40hq", "40hc", "40'", "40 hc"]); 
+          const splIdx      = findColInFirst5Rows(rawRows, ["spl", "special", "45", "flat", "open"]); 
+          const cntrIdx     = findColInFirst5Rows(rawRows, ["cntr", "container", "box", "total units", "units"]); 
+          const teuIdx      = findColInFirst5Rows(rawRows, ["teu", "vol", "qty", "volume"]); 
+          const podIdx      = findColInFirst5Rows(rawRows, ["pod", "port", "dest", "discharge"]); 
+          const marginIdx   = findColInFirst5Rows(rawRows, ["margin", "profit", "earning", "net"]); 
+          const vslIdx      = findColInFirst5Rows(rawRows, ["vsl", "vessel"]); 
+          const custTypeIdx = findColInFirst5Rows(rawRows, ["forwarder", "shipper", "cust type", "type", "customer type"]); 
           
-          // Ultra-Robust Allotment & Pickup Column Finders
-          const allotIdx    = headers.findIndex(h => h === "allotment" || h === "allot" || h.includes("allot"));
-          const pickIdx     = headers.findIndex(h => h === "pickup" || h === "pick up" || h === "pick" || h.includes("pick"));
+          // Robust Checkbox Extractors
+          const allotIdx    = findColInFirst5Rows(rawRows, ["allot", "allotment"]);
+          const pickIdx     = findColInFirst5Rows(rawRows, ["pick", "pickup", "pick up", "pkup"]);
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
             const r = rawRows[i];
-            const bookingVal = String(r[bookIdx] || "").trim();
-            const partyVal = String(r[partyIdx] || "").trim();
+            const bookingVal = bookIdx !== -1 ? String(r[bookIdx] || "").trim() : "";
+            const partyVal = partyIdx !== -1 ? String(r[partyIdx] || "").trim() : "";
 
             if (partyVal.toLowerCase().includes("total") || bookingVal.toLowerCase().includes("total")) continue;
             if (!bookingVal && !partyVal) continue;
@@ -1065,23 +1066,27 @@
             const teus = parseNum(r[teuIdx], 0);
             const margin = parseNum(r[marginIdx], 0);
             
-            const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
+            const vslName = vslIdx !== -1 ? String(r[vslIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
-            // Bulletproof Checkbox Logic (Handles both literal booleans and strings)
-            const allotRaw = allotIdx !== -1 ? r[allotIdx] : false;
-            const pickRaw = pickIdx !== -1 ? r[pickIdx] : false;
-            
-            const isAllotted = (allotRaw === true || allotRaw === "TRUE" || allotRaw === "TRUE " || allotRaw === 1 || String(allotRaw).trim().toUpperCase() === "TRUE");
-            const isPicked = (pickRaw === true || pickRaw === "TRUE" || pickRaw === "TRUE " || pickRaw === 1 || String(pickRaw).trim().toUpperCase() === "TRUE");
-            
-            let pickupStatus = "NOT PICKED";
-            if (isPicked) {
-                pickupStatus = "PICKED";
-            } else if (isAllotted && !isPicked) {
-                pickupStatus = "ALLOTTED BUT NOT PICKED";
-            } else {
-                pickupStatus = "NOT PICKED";
+            // Core Checkbox Logic
+            let pickupStatus = "PICKED"; // Default hidden if columns completely missing
+            if (allotIdx !== -1 || pickIdx !== -1) {
+                const allotRaw = allotIdx !== -1 ? r[allotIdx] : false;
+                const pickRaw = pickIdx !== -1 ? r[pickIdx] : false;
+                
+                const isAllotted = isTruthy(allotRaw);
+                const isPicked = isTruthy(pickRaw);
+                
+                if (isAllotted && isPicked) {
+                    pickupStatus = "PICKED";
+                } else if (isAllotted && !isPicked) {
+                    pickupStatus = "ALLOTTED BUT NOT PICKED";
+                } else if (!isAllotted && !isPicked) {
+                    pickupStatus = "NOT PICKED";
+                } else if (!isAllotted && isPicked) {
+                    pickupStatus = "PICKED";
+                }
             }
 
             let deducedEqp = "MIXED";
