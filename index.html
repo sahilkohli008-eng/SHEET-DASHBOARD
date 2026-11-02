@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Fixed viewport to strictly prevent iOS Auto-Zoom -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
@@ -21,7 +20,6 @@
 
   <style>
     :root {
-      /* High-Contrast Neon Accents */
       --accent: #5eead4;      
       --accent-blue: #60a5fa; 
       --purple: #c084fc;      
@@ -33,7 +31,6 @@
       --text-light: #ffffff;
       --subtext-light: rgba(255, 255, 255, 0.62);
 
-      /* Strict iOS Glassmorphism Tokens */
       --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
       --glass-border: 0.5px solid rgba(255, 255, 255, 0.15);
       --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -52,14 +49,12 @@
       -webkit-font-smoothing: antialiased;
     }
     
-    /* Deep Dark Canvas */
     html, body { background-color: #07090e; color: var(--text-light); }
     body {
       padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
       min-height: 100vh; position: relative; overflow-x: hidden;
     }
     
-    /* Ambient Backlight */
     body::before {
       content: ""; position: fixed; top: -15%; left: -15%; width: 130%; height: 130%;
       background: 
@@ -69,7 +64,6 @@
       filter: blur(50px); z-index: -2; pointer-events: none;
     }
 
-    /* Base Glassmorphism */
     .liquid-glass {
       background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
       border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-main);
@@ -77,7 +71,6 @@
     }
     .liquid-pill { border-radius: var(--radius-pill) !important; }
 
-    /* Header */
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 100;}
     .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
     
@@ -91,10 +84,7 @@
     .menu-btn svg { width: 22px; height: 22px; }
     button.icon-btn svg { width: 18px; height: 18px; transform-origin: center; }
     
-    /* Header Title Dropdown */
-    .title-dropdown-wrapper {
-      position: relative; display: flex; align-items: center; gap: 6px; cursor: pointer;
-    }
+    .title-dropdown-wrapper { position: relative; display: flex; align-items: center; gap: 6px; cursor: pointer; }
     h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; margin: 0; }
     .title-chevron { width: 16px; height: 16px; color: var(--subtext-light); margin-top: 4px; transition: transform 0.2s; }
     .title-dropdown-wrapper.active .title-chevron { transform: rotate(180deg); }
@@ -119,7 +109,6 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
 
-    /* Interactive Sidebar Drawer */
     #overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.55);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 998;
@@ -153,7 +142,6 @@
     .filter-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
     .filter-label { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext-light); font-weight: 600; letter-spacing: 0.5px; }
 
-    /* Standard Select */
     select.filter-select {
       color: var(--text-light); padding: 12px 36px 12px 14px; font-size: 16px; font-weight: 600;
       outline: none; -webkit-appearance: none; appearance: none;
@@ -162,7 +150,6 @@
     }
     select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* Custom Searchable Dropdowns (Sidebar) */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -203,7 +190,6 @@
     .custom-option:last-child { border-bottom: none; }
     .custom-option:hover, .custom-option.selected { background: rgba(255, 255, 255, 0.1); color: var(--accent-blue); font-weight: 700; }
 
-    /* GLOBAL SEARCH ENGINE OVERLAY */
     #globalSearchOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2000;
@@ -254,7 +240,6 @@
     .detail-titles h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-light); line-height: 1.1; margin-bottom: 4px;}
     .detail-titles .badge { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.1); color: var(--subtext-light); text-transform: uppercase; letter-spacing: 1px;}
 
-    /* Bento KPI Cards Layout */
     .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
     .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
     .stat-card { padding: 16px; border-radius: var(--radius-main); }
@@ -271,7 +256,6 @@
     }
     .rate-val { display: flex; align-items: center; gap: 3px; transition: color 0.3s ease; }
     
-    /* Arrow Animation */
     @keyframes ratePulse {
       0% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.15); opacity: 0.8; }
@@ -320,76 +304,29 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
-    /* HORIZONTAL SCROLL TABLES (Non-Picked & Master Table) */
+    /* HORIZONTAL SCROLL TABLES */
     .table-scroll-container {
-      width: 100%;
-      overflow-x: auto;
-      overflow-y: auto;
-      max-height: 250px;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 12px;
-      margin-top: 14px;
-      transform: translateZ(0); /* Hardware Acceleration */
+      width: 100%; overflow-x: auto; overflow-y: auto; max-height: 250px;
+      -webkit-overflow-scrolling: touch; border-radius: 12px; margin-top: 14px;
+      transform: translateZ(0); 
     }
-    
     .table-scroll-container::-webkit-scrollbar { height: 6px; width: 6px; }
     .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     
-    table.data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-      min-width: 500px;
-    }
-    
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 600px; }
     table.data-table th, table.data-table td {
-      padding: 12px 10px;
-      text-align: right;
-      border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
-      white-space: nowrap;
+      padding: 12px 10px; text-align: right; border-bottom: 0.5px solid rgba(255, 255, 255, 0.05); white-space: nowrap;
     }
     table.data-table th {
-      color: var(--subtext-light);
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      position: sticky;
-      top: 0;
-      background: #0f141e;
-      z-index: 10;
-      border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
+      color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase; font-weight: 700;
+      letter-spacing: 0.5px; background: rgba(0,0,0,0.4);
     }
-    
-    /* Sticky First Column for Horizontal Scrolling */
-    table.data-table th:first-child,
-    table.data-table td:first-child {
-      text-align: left;
-      padding-left: 14px;
-      position: sticky;
-      left: 0;
-      background: #0f141e; /* Must match container background */
-      z-index: 15;
-    }
-    /* Shadow for sticky column */
-    table.data-table th:first-child::after,
-    table.data-table td:first-child::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: -5px;
-      width: 5px;
-      height: 100%;
-      background: linear-gradient(90deg, rgba(0,0,0,0.4), transparent);
-    }
-
     table.data-table td { font-weight: 600; vertical-align: middle; }
     table.data-table tr:last-child td { border-bottom: none; }
-    table.data-table td:first-child {
-      color: var(--text-light);
-      max-width: 140px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    
+    /* Removed sticky positioning from headers to fix iOS Safari clipping overlap issues entirely */
+    table.data-table th:first-child, table.data-table td:first-child {
+      text-align: left; padding-left: 14px; color: var(--text-light);
     }
     .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
     .cell-sub { font-size: 0.65rem; color: var(--subtext-light); margin-top: 3px; font-weight: 500; }
@@ -612,7 +549,7 @@
           <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
       </button>
-      <button class="icon-btn" onclick="fetchMasterSheet()" ondblclick="window.location.reload(true)">
+      <button class="icon-btn" onclick="fetchMasterSheet(false)" ondblclick="window.location.reload(true)">
         <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="23 4 23 10 17 10"></polyline>
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
@@ -688,13 +625,13 @@
         <div class="label" style="color: var(--orange); font-weight: 800;" id="unpickedTotalCount">0 UNITS</div>
       </div>
       
-      <!-- New Smoooth Scrolling Table -->
       <div class="table-scroll-container">
         <table class="data-table">
           <thead>
             <tr>
               <th>Customer</th>
               <th>Booking No.</th>
+              <th>Status</th>
               <th>20</th>
               <th>40</th>
               <th>SPL</th>
@@ -702,7 +639,7 @@
             </tr>
           </thead>
           <tbody id="unpickedListBody">
-            <tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--subtext-light);">Scanning...</td></tr>
+            <tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--subtext-light);">Scanning...</td></tr>
           </tbody>
         </table>
       </div>
@@ -782,6 +719,7 @@
     let globalCurCntrs = 0;
     let globalDetMargin = 0;
     let globalDetCntrs = 0;
+    let isFetching = false; // Lock to prevent 0.1s API spam collisions
 
     // Arrow SVGs
     const svgUp = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M12 3l7 7"/></svg>`;
@@ -796,7 +734,6 @@
       });
     }
 
-    // Background High-Frequency Exchange Rate Fetcher
     async function fetchLiveExchangeRate() {
       let fetchedRate = null;
       try {
@@ -822,7 +759,6 @@
 
     setInterval(fetchLiveExchangeRate, 10000);
 
-    // 0.1s (100ms) Real-Time UI Render Loop for INR Cards
     function updateInrUI() {
       let arrowHtml = '';
       let colorClass = 'rate-neutral';
@@ -856,7 +792,6 @@
     }
     setInterval(updateInrUI, 100);
 
-    // Header Title Menu Logic
     function toggleTitleMenu() {
       const wrapper = document.querySelector(".title-dropdown-wrapper");
       const menu = document.getElementById("titleDropdownMenu");
@@ -866,66 +801,50 @@
 
     function selectTitleMonth(monthValue, monthLabel, event) {
       if(event) { event.stopPropagation(); }
-      
       const wrapper = document.querySelector(".title-dropdown-wrapper");
       const menu = document.getElementById("titleDropdownMenu");
-      
       wrapper.querySelector("h1").textContent = monthLabel;
-      
       wrapper.classList.remove("active");
       menu.classList.remove("active");
-      
       const options = menu.querySelectorAll(".title-option");
       options.forEach(opt => opt.classList.remove("selected"));
       event.target.classList.add("selected");
-      
       activeMonth = monthValue;
       applyGlobalFilters(true);
     }
 
-    // Sidebar & Custom Search Dropdown Logic
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
       sidebar.classList.toggle("active");
       overlay.classList.toggle("active");
-      
       if(!sidebar.classList.contains("active")) {
         document.querySelectorAll(".custom-dropdown-menu").forEach(menu => menu.classList.remove("active"));
       }
     }
 
-    // Global Search Interactive Close
     function toggleGlobalSearch() {
       const searchOverlay = document.getElementById("globalSearchOverlay");
       searchOverlay.classList.toggle("active");
       if(searchOverlay.classList.contains("active")) {
         document.getElementById("mainSearchInput").value = "";
         document.getElementById("mainSearchClearBtn").style.display = "none";
-        
-        const resultsDiv = document.getElementById("globalSearchResults");
-        resultsDiv.innerHTML = "";
-        resultsDiv.style.display = "none"; 
-        
+        document.getElementById("globalSearchResults").innerHTML = "";
+        document.getElementById("globalSearchResults").style.display = "none"; 
         setTimeout(() => document.getElementById("mainSearchInput").focus(), 100);
       }
     }
 
     function closeGlobalSearch(e) {
-      if (e.target.id === "globalSearchOverlay") {
-        toggleGlobalSearch();
-      }
+      if (e.target.id === "globalSearchOverlay") toggleGlobalSearch();
     }
 
     function clearMainSearch(event) {
       if(event) { event.preventDefault(); event.stopPropagation(); }
       document.getElementById("mainSearchInput").value = "";
       document.getElementById("mainSearchClearBtn").style.display = "none";
-      
-      const resultsDiv = document.getElementById("globalSearchResults");
-      resultsDiv.innerHTML = "";
-      resultsDiv.style.display = "none"; 
-      
+      document.getElementById("globalSearchResults").innerHTML = "";
+      document.getElementById("globalSearchResults").style.display = "none"; 
       document.getElementById("mainSearchInput").focus();
     }
 
@@ -933,7 +852,6 @@
       document.getElementById("detailOverlay").classList.remove("active");
     }
 
-    // Sidebar Dropdowns
     function toggleCustomDropdown(dropdownId) {
       document.querySelectorAll(".custom-dropdown-menu").forEach(menu => {
         if(menu.id !== dropdownId) menu.classList.remove("active");
@@ -949,7 +867,6 @@
       document.getElementById(type + "Filter").value = value;
       document.getElementById(type + "SelectLabel").textContent = label;
       document.getElementById(type + "Dropdown").classList.remove("active");
-      
       const options = document.getElementById(type + "OptionsList").children;
       for(let opt of options) {
         if(opt.textContent === label) opt.classList.add("selected");
@@ -975,21 +892,17 @@
 
     function clearSearch(type, event) {
       if(event) { event.preventDefault(); event.stopPropagation(); }
-      
       const inputElement = document.getElementById(type + "Search");
       inputElement.value = "";
       filterCustomOptions(type); 
-      
       const defaultLabel = type === 'vessel' ? 'All Vessels' : 'All Ports';
       document.getElementById(type + "Filter").value = "ALL";
       document.getElementById(type + "SelectLabel").textContent = defaultLabel;
-      
       const options = document.getElementById(type + "OptionsList").children;
       for(let opt of options) {
         if(opt.textContent === defaultLabel) opt.classList.add("selected");
         else opt.classList.remove("selected");
       }
-      
       applyGlobalFilters();
       inputElement.focus();
     }
@@ -1024,16 +937,19 @@
       return isNaN(parsed) ? fallback : parsed;
     }
 
-    // Main Fetch
-    async function fetchMasterSheet() {
+    // Main Fetch Engine
+    async function fetchMasterSheet(isAuto = false) {
+      if (isFetching) return; // Prevent overlapping API limits
+      isFetching = true;
+
       const statusEl = document.getElementById("lastUpdated");
       const refreshIcon = document.getElementById("refresh-icon");
       
-      statusEl.textContent = "Fetching data...";
-      if (refreshIcon) refreshIcon.classList.add("spinning");
-
-      // Fire off rate fetch immediately when doing a master pull
-      fetchLiveExchangeRate();
+      if(!isAuto) {
+        statusEl.textContent = "Fetching data...";
+        if (refreshIcon) refreshIcon.classList.add("spinning");
+        fetchLiveExchangeRate(); // Manual refresh hits the currency API instantly
+      }
 
       try {
         if (APPS_SCRIPT_URL.includes("PASTE_")) throw new Error("Missing Script URL");
@@ -1087,7 +1003,9 @@
           const vslIdx      = findCol(["vsl", "vessel"], 12); 
           const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
           
-          const statusIdx   = findCol(["status", "remark", "pick", "state", "bal"], -1);
+          // Specific Checkbox Columns for Allocation/Pickup Status
+          const allotIdx    = findCol(["allot", "allotment"], -1);
+          const pickIdx     = findCol(["pick", "pickup"], -1);
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -1107,7 +1025,17 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
-            const statusStr = statusIdx !== -1 ? String(r[statusIdx] || "").trim().toUpperCase() : "";
+            
+            const allotVal = allotIdx !== -1 ? String(r[allotIdx]).trim().toUpperCase() : "FALSE";
+            const pickVal = pickIdx !== -1 ? String(r[pickIdx]).trim().toUpperCase() : "FALSE";
+            
+            const isAllotted = (allotVal === "TRUE" || allotVal === "YES" || allotVal === "1" || allotVal === "Y");
+            const isPicked = (pickVal === "TRUE" || pickVal === "YES" || pickVal === "1" || pickVal === "Y");
+            
+            let pickupStatus = "PICKED";
+            if (!isPicked) {
+                pickupStatus = isAllotted ? "ALLOTTED BUT NOT PICKED" : "NOT PICKED";
+            }
 
             let deducedEqp = "MIXED";
             if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
@@ -1127,7 +1055,7 @@
               custType: custTypeStr,
               eqpType: deducedEqp,
               margin: margin,
-              status: statusStr,
+              pickupStatus: pickupStatus,
               month: normalizeMonthName(sheetName)
             });
           }
@@ -1150,8 +1078,12 @@
         statusEl.textContent = err.message || "Error fetching data";
       } finally {
         if (refreshIcon) refreshIcon.classList.remove("spinning");
+        isFetching = false;
       }
     }
+
+    // Aggressive Auto-Refresh: 100ms
+    setInterval(() => fetchMasterSheet(true), 100);
 
     function populateFilterDropdowns() {
       const allRows = getFilteredRows("ALL", "ALL", "ALL", "ALL", true);
@@ -1165,7 +1097,6 @@
         return (idxA !== -1 && idxB !== -1) ? idxA - idxB : a.localeCompare(b);
       });
 
-      // Update Header Title Menu
       const titleMenu = document.getElementById("titleDropdownMenu");
       let titleHtml = `<div class="title-option ${activeMonth === 'ALL' ? 'selected' : ''}" onclick="selectTitleMonth('ALL', 'Dashboard', event)">All Months Overview</div>`;
       months.forEach(m => {
@@ -1173,7 +1104,6 @@
       });
       titleMenu.innerHTML = titleHtml;
 
-      // Populate Searchable Vessel List
       const vslList = document.getElementById("vesselOptionsList");
       let vslHtml = `<div class="custom-option ${activeVessel === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('vessel', 'ALL', 'All Vessels')">All Vessels</div>`;
       vsls.forEach(v => {
@@ -1184,7 +1114,6 @@
       document.getElementById("vesselFilter").value = vsls.includes(activeVessel) ? activeVessel : "ALL";
       document.getElementById("vesselSelectLabel").textContent = (activeVessel === "ALL" || !vsls.includes(activeVessel)) ? "All Vessels" : activeVessel;
 
-      // Populate Searchable Port List
       const podList = document.getElementById("podOptionsList");
       let podHtml = `<div class="custom-option ${activePod === 'ALL' ? 'selected' : ''}" onclick="selectCustomOption('pod', 'ALL', 'All Ports')">All Ports</div>`;
       pods.forEach(p => {
@@ -1283,7 +1212,6 @@
         breakdownMap[bKey].profit += r.margin;
       });
 
-      // Pass aggregated metrics to global vars for the 0.1s INR loop
       globalDetMargin = tProfit;
       globalDetCntrs = tCntrs;
 
@@ -1291,12 +1219,10 @@
       document.getElementById("detCntrs").textContent = Math.round(tCntrs).toLocaleString();
       document.getElementById("detTeus").textContent = Math.round(tTeus).toLocaleString();
       
-      // USD Instantly
       document.getElementById("detProfit").textContent = "$" + Math.round(tProfit).toLocaleString();
       const yieldPerCntr = tCntrs > 0 ? Math.round(tProfit / tCntrs) : 0;
       document.getElementById("detYield").textContent = `YIELD: $${yieldPerCntr.toLocaleString()} / CNTR`;
       
-      // Initial INR Load
       updateInrUI();
 
       const breakdownArray = Object.values(breakdownMap).sort((a,b) => b.teus - a.teus);
@@ -1358,20 +1284,16 @@
       }
     }
     
-    // NON-PICKED LIST POPULATION
+    // NON-PICKED HORIZONTAL SCROLL TABLE POPULATION
     function updateUnpickedUI() {
       const rows = getFilteredRows(activeMonth, activeVessel, activePod, activeEqp);
       const unpickedList = document.getElementById("unpickedListBody");
       const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
       
-      let unpickedRows = rows.filter(r => r.status.includes("NON") || r.status.includes("NOT") || r.status.includes("PEND") || r.status.includes("BAL"));
+      let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
       
-      if(unpickedRows.length === 0 && rows.length > 0) {
-         unpickedRows = rows.slice(-10); 
-      }
-
       if (unpickedRows.length === 0) {
-        unpickedList.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--subtext-light); padding: 20px;">No non-picked containers found</td></tr>`;
+        unpickedList.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--subtext-light); padding: 20px;">No non-picked containers found</td></tr>`;
         unpickedTotalLabel.textContent = "0 UNITS";
         return;
       }
@@ -1382,7 +1304,7 @@
       unpickedRows.forEach(r => {
          const safeBkg = r.booking || "UNKNOWN BKG";
          if(!bkgMap[safeBkg]) {
-            bkgMap[safeBkg] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0 };
+            bkgMap[safeBkg] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0, status: r.pickupStatus };
          }
          bkgMap[safeBkg].gp20 += r.gp20;
          bkgMap[safeBkg].hq40 += r.hq40;
@@ -1393,16 +1315,19 @@
 
       unpickedTotalLabel.textContent = Math.round(totalPending) + " UNITS";
 
-      const html = Object.values(bkgMap).map(b => `
+      const html = Object.values(bkgMap).map(b => {
+        const colorClass = b.status === "NOT PICKED" ? "color: var(--red);" : "color: var(--orange);";
+        return `
         <tr>
-          <td style="color: var(--text-light); font-weight: 700; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${b.party}</td>
+          <td>${b.party}</td>
           <td style="color: var(--accent-blue); font-weight: 700;">${b.bkg}</td>
+          <td style="${colorClass} font-size: 0.7rem;">${b.status}</td>
           <td style="color: var(--subtext-light);">${b.gp20 || '-'}</td>
           <td style="color: var(--orange);">${b.hq40 || '-'}</td>
           <td style="color: var(--pink);">${b.spl || '-'}</td>
           <td style="color: var(--text-light); font-weight: 700;">${b.cntrs}</td>
         </tr>
-      `).join("");
+      `}).join("");
       
       unpickedList.innerHTML = html;
     }
@@ -1453,16 +1378,13 @@
       document.getElementById("statSpl").textContent = Math.round(curSpl).toLocaleString();
       document.getElementById("statVolume").textContent = Math.round(curTeus).toLocaleString();
       
-      // Pass main metrics to global state for the 0.1s INR loop
       globalCurMargin = curMargin;
       globalCurCntrs = curCntrs;
 
-      // USD Calculation instantly
       document.getElementById("statMargin").textContent = "$" + Math.round(curMargin).toLocaleString();
       const yieldPerCntr = curCntrs > 0 ? Math.round(curMargin / curCntrs) : 0;
       document.getElementById("statYield").textContent = `YIELD: $${yieldPerCntr.toLocaleString()} / CNTR`;
       
-      // Initial INR Load
       updateInrUI();
 
       document.getElementById("trendBkgs").innerHTML = getTrendHTML(curBkgs, prevBkgs, showTrend);
@@ -1603,9 +1525,9 @@
     }
 
     document.getElementById("summaryChartContainer").style.display = "block";
-    setInterval(fetchMasterSheet, 5 * 60 * 1000);
+    fetchMasterSheet();
     document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchMasterSheet(); });
-    window.addEventListener("DOMContentLoaded", fetchMasterSheet);
+    window.addEventListener("DOMContentLoaded", () => fetchMasterSheet());
   </script>
 </body>
 </html>
