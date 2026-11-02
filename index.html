@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Fixed viewport to strictly prevent iOS Auto-Zoom and overscroll glitching -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
@@ -39,10 +40,10 @@
       --table-border: rgba(255, 255, 255, 0.05);
       --overlay-bg: rgba(0, 0, 0, 0.7);
 
-      /* Ambient Light */
-      --ambient-1: rgba(56, 189, 248, 0.14);
-      --ambient-2: rgba(168, 85, 247, 0.12);
-      --ambient-3: rgba(45, 212, 191, 0.10);
+      /* Ambient Light (Dark Mode Only) */
+      --ambient-bg: radial-gradient(circle at 18% 22%, rgba(56, 189, 248, 0.14) 0%, transparent 42%),
+                    radial-gradient(circle at 82% 65%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.10) 0%, transparent 45%);
 
       /* Accents */
       --accent: #5eead4;      
@@ -57,7 +58,7 @@
       --radius-pill: 14px;
     }
 
-    /* LIGHT MODE OVERRIDES */
+    /* LIGHT MODE OVERRIDES - FIXED AMBIENT SHADOW */
     body.light-mode {
       --bg-main: #f3f4f6;
       --text-main: #111827;
@@ -74,9 +75,8 @@
       --table-border: rgba(0, 0, 0, 0.08);
       --overlay-bg: rgba(255, 255, 255, 0.75);
       
-      --ambient-1: rgba(56, 189, 248, 0.25);
-      --ambient-2: rgba(168, 85, 247, 0.15);
-      --ambient-3: rgba(45, 212, 191, 0.25);
+      /* Completely kill the dark ambient glow in light mode */
+      --ambient-bg: none; 
       
       --accent-blue: #2563eb;
       --purple: #9333ea;
@@ -96,19 +96,21 @@
       -webkit-font-smoothing: antialiased;
     }
     
-    html, body { background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; }
-    body {
-      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
-      min-height: 100vh; position: relative; overflow-x: hidden;
+    /* Apply background to HTML to prevent overscroll boundary glitches */
+    html {
+      background-color: var(--bg-main); 
+      transition: background-color 0.3s ease;
     }
-    
-    body::before {
-      content: ""; position: fixed; top: -15%; left: -15%; width: 130%; height: 130%;
-      background: 
-        radial-gradient(circle at 18% 22%, var(--ambient-1) 0%, transparent 42%),
-        radial-gradient(circle at 82% 65%, var(--ambient-2) 0%, transparent 45%),
-        radial-gradient(circle at 50% 90%, var(--ambient-3) 0%, transparent 45%);
-      filter: blur(50px); z-index: -2; pointer-events: none; transition: background 0.3s ease;
+
+    body {
+      color: var(--text-main); 
+      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
+      min-height: 100vh; 
+      position: relative; 
+      overflow-x: hidden;
+      transition: color 0.3s ease;
+      background: var(--ambient-bg); /* Attached directly to body instead of a pseudo-element */
+      background-attachment: fixed;
     }
 
     .liquid-glass {
@@ -205,7 +207,6 @@
       cursor: pointer; user-select: none;
     }
 
-    /* Light Mode Custom SVGs */
     body.light-mode select.filter-select, 
     body.light-mode .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -283,7 +284,6 @@
     .entity-type.port { color: var(--orange); }
     .entity-type.vessel { color: var(--purple); }
 
-    /* DETAIL OVERLAY PAGE */
     #detailOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main);
       z-index: 3000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -355,7 +355,7 @@
     .fade-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(128,128,128,0.3); transition: background 0.4s; }
     .fade-dots .dot.active { background: var(--text-main); opacity: 0.8; }
 
-    /* PERFECT SCROLLING NATIVE DATA TABLES - FOR NON-PICKED LIST ONLY */
+    /* SCROLLABLE NATIVE DATA TABLES - FOR NON-PICKED LIST ONLY */
     .table-scroll-container {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
       -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
@@ -383,14 +383,13 @@
     }
     table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 130px; }
     
-    /* NON-PICKED TABLE ALIGNMENT FIX (Perfectly Center-Aligned Data) */
     table.unpicked-table th:nth-child(3), table.unpicked-table td:nth-child(3) { width: 170px; text-align: center; } 
     table.unpicked-table th:nth-child(4), table.unpicked-table td:nth-child(4) { width: 60px; text-align: center; } 
     table.unpicked-table th:nth-child(5), table.unpicked-table td:nth-child(5) { width: 60px; text-align: center; } 
     table.unpicked-table th:nth-child(6), table.unpicked-table td:nth-child(6) { width: 60px; text-align: center; } 
     table.unpicked-table th:nth-child(7), table.unpicked-table td:nth-child(7) { width: 70px; text-align: center; } 
 
-    /* FIXED MASTER TABLE CSS (No scroll, clean truncated list) */
+    /* FIXED MASTER TABLE CSS */
     .customer-table-wrap {
       overflow: hidden; padding-bottom: 6px; border-radius: var(--radius-main); margin-top: 14px; margin-bottom: 20px;
     }
@@ -439,7 +438,6 @@
     }
   </style>
   <script>
-    // PREVENT WHITE FLASH ON LOAD
     if(localStorage.getItem("dashboardTheme") === "light") {
       document.documentElement.classList.add("light-mode");
     }
@@ -564,7 +562,6 @@
         <div class="value teu-val" id="detTeus">--</div>
       </div>
       
-      <!-- DETAIL VIEW: FADING EARNING CARD -->
       <div class="stat-card liquid-glass fade-container" style="background: var(--glass-bg);">
         <div class="fade-panel active" id="detUsdPanel">
           <div class="label-row"><div class="label">EARNING</div></div>
@@ -622,7 +619,6 @@
     </div>
     
     <div class="header-right">
-      <!-- THEME TOGGLE BUTTON -->
       <button class="icon-btn" onclick="window.toggleTheme()" id="themeToggleBtn">
         <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
           <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
@@ -675,7 +671,6 @@
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     
-    <!-- MAIN DASHBOARD: FADING EARNING CARD -->
     <div class="stat-card liquid-glass fade-container" style="background: var(--glass-bg);">
       <div class="fade-panel active" id="mainUsdPanel">
         <div class="label-row"><div class="label">EARNING</div><div id="trendProfit"></div></div>
@@ -709,7 +704,7 @@
         <table class="data-table unpicked-table">
           <thead>
             <tr>
-              <th>Customer Name</th>
+              <th>Customer</th>
               <th>Booking No.</th>
               <th>Status</th>
               <th>20</th>
@@ -873,22 +868,6 @@
         triggerRateAnimation();
       }
     }
-
-    // AUTO-FADING CARDS LOOP (Every 10 Seconds)
-    setInterval(() => {
-        const mainUsd = document.getElementById("mainUsdPanel");
-        const mainInr = document.getElementById("mainInrPanel");
-        if(mainUsd && mainInr) {
-            mainUsd.classList.toggle("active");
-            mainInr.classList.toggle("active");
-        }
-        const detUsd = document.getElementById("detUsdPanel");
-        const detInr = document.getElementById("detInrPanel");
-        if(detUsd && detInr) {
-            detUsd.classList.toggle("active");
-            detInr.classList.toggle("active");
-        }
-    }, 10000);
 
     window.fetchMasterSheet = async function(isAuto = false) {
       if (isAuto && isFetching) return; 
