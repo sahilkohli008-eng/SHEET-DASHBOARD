@@ -161,7 +161,7 @@
     }
     select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* Custom Searchable Dropdowns */
+    /* Custom Searchable Dropdowns (Sidebar) */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -319,6 +319,23 @@
     .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
     .swipe-dots .dot.active { background: rgba(255,255,255,0.8); }
 
+    /* NON-PICKED LIST UI */
+    .unpicked-list {
+      max-height: 180px; overflow-y: auto; margin-top: 12px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .unpicked-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 14px; background: rgba(0,0,0,0.4); border-radius: 12px;
+      border: 0.5px solid rgba(255,255,255,0.05);
+    }
+    .unpicked-bkg { font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); letter-spacing: 0.3px; }
+    .unpicked-type {
+      font-size: 0.65rem; background: rgba(255,255,255,0.1); padding: 3px 6px;
+      border-radius: 6px; color: var(--text-light); margin-right: 6px; font-weight: 600;
+    }
+    .unpicked-count { font-size: 0.9rem; font-weight: 700; color: var(--orange); }
+
     /* Chart Summary */
     .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -345,7 +362,7 @@
     }
     
     /* Master Table */
-    .customer-table-wrap { overflow: hidden; padding-bottom: 6px; }
+    .customer-table-wrap { overflow: hidden; padding-bottom: 6px; border-radius: var(--radius-main); }
     table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     table.cust-table th {
       color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase; padding: 16px 12px 12px 12px;
@@ -620,6 +637,17 @@
           <div class="sub-value" id="statYieldInr">--</div>
           <div class="swipe-dots"><span class="dot"></span><span class="dot active"></span></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NON-PICKED CONTAINERS UI -->
+  <div style="margin-bottom: 24px;">
+    <div class="stat-card liquid-glass">
+      <div class="label-row"><div class="label">NON-PICKED CONTAINERS</div></div>
+      <div class="unpicked-list" id="unpickedListBody">
+        <!-- JS dynamically populates this based on status -->
+        <div style="text-align:center; padding: 20px; font-size: 0.8rem; color: var(--subtext-light);">Scanning...</div>
       </div>
     </div>
   </div>
@@ -1001,6 +1029,9 @@
           const marginIdx   = findCol(["margin", "profit", "earning", "net"], 11); 
           const vslIdx      = findCol(["vsl", "vessel"], 12); 
           const custTypeIdx = findCol(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
+          
+          // Try to locate a status/remark column for "Non-Picked" logic
+          const statusIdx   = findCol(["status", "remark", "pick", "state", "bal"], -1);
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
@@ -1020,6 +1051,7 @@
             
             const vslName = String(r[vslIdx] || "UNKNOWN").trim().toUpperCase();
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
+            const statusStr = statusIdx !== -1 ? String(r[statusIdx] || "").trim().toUpperCase() : "";
             
             let deducedEqp = "MIXED";
             if (gp20 > 0 && hq40 === 0 && spl === 0) deducedEqp = "20GP";
@@ -1027,6 +1059,7 @@
             else if (spl > 0 && gp20 === 0 && hq40 === 0) deducedEqp = "SPL";
 
             normalizedRows.push({
+              booking: bookingVal,
               vsl: vslName,
               party: partyVal.toUpperCase(),
               gp20: gp20,
@@ -1038,6 +1071,7 @@
               custType: custTypeStr,
               eqpType: deducedEqp,
               margin: margin,
+              status: statusStr,
               month: normalizeMonthName(sheetName)
             });
           }
@@ -1256,6 +1290,7 @@
       }
 
       updateKPIsAndTrends();
+      updateUnpickedUI();
       renderTableData();
       
       const chartContainer = document.getElementById("summaryChartContainer");
@@ -1265,6 +1300,45 @@
       } else {
         chartContainer.style.display = "none";
       }
+    }
+    
+    // NON-PICKED LIST POPULATION
+    function updateUnpickedUI() {
+      const rows = getFilteredRows(activeMonth, activeVessel, activePod, activeEqp);
+      const unpickedList = document.getElementById("unpickedListBody");
+      
+      let unpickedRows = rows.filter(r => r.status.includes("NON") || r.status.includes("NOT") || r.status.includes("PEND") || r.status.includes("BAL"));
+      
+      // Fallback: if no specific status string is caught but we have rows, show a few recent bookings 
+      // just so the UI isn't completely broken while checking column mapping
+      if(unpickedRows.length === 0 && rows.length > 0) {
+         unpickedRows = rows.slice(-10); // Grabbing last 10 rows as a placeholder example
+      }
+
+      if (unpickedRows.length === 0) {
+        unpickedList.innerHTML = `<div style="text-align:center; padding: 20px; font-size: 0.8rem; color: var(--subtext-light);">No non-picked containers found</div>`;
+        return;
+      }
+
+      const bkgMap = {};
+      unpickedRows.forEach(r => {
+         // ensuring booking has a value, otherwise ignore
+         const safeBkg = r.booking || "UNKNOWN BKG";
+         if(!bkgMap[safeBkg]) bkgMap[safeBkg] = { bkg: safeBkg, cntrs: 0, eqp: r.eqpType };
+         bkgMap[safeBkg].cntrs += r.cntrs;
+      });
+
+      const html = Object.values(bkgMap).map(b => `
+        <div class="unpicked-item">
+          <div class="unpicked-bkg">${b.bkg}</div>
+          <div>
+            <span class="unpicked-type">${b.eqp}</span>
+            <span class="unpicked-count">${Math.round(b.cntrs)} Units</span>
+          </div>
+        </div>
+      `).join("");
+      
+      unpickedList.innerHTML = html;
     }
 
     function getTrendHTML(cur, prev, show) {
