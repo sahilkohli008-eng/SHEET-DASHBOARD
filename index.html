@@ -702,7 +702,10 @@
     let globalCurCntrs = 0;
     let globalDetMargin = 0;
     let globalDetCntrs = 0;
+    
+    // Engine State for Safe Background Polling
     let isFetching = false;
+    let fetchTimeout; 
 
     const svgUp = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M12 3l7 7"/></svg>`;
     const svgDown = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 21l-7-7"/></svg>`;
@@ -739,11 +742,12 @@
       }
     }
 
-    // EXPLICIT SAFE SCANNER FOR HEADERS
+    // NORMALIZES ALL WHITESPACE/NEWLINES TO FIND COLUMNS SAFELY
     function findExactCol(rawRows, exactNames) {
-      for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+      for (let r = 0; r < Math.min(6, rawRows.length); r++) {
         if (!rawRows[r]) continue; 
-        const rowArr = rawRows[r].map(h => String(h || "").trim().toLowerCase());
+        const rowArr = rawRows[r].map(h => String(h || "").replace(/\n/g, " ").replace(/\s+/g, " ").trim().toLowerCase());
+        
         for (let name of exactNames) {
           const idx = rowArr.indexOf(name);
           if (idx !== -1) return idx;
@@ -761,9 +765,11 @@
       return false;
     }
 
+    // SMART BACKGROUND POLLING ENGINE (Waits 3s after previous fetch ends to avoid 429 Google Quota errors)
     async function fetchMasterSheet(isAuto = false) {
       if (isFetching) return; 
       isFetching = true;
+      clearTimeout(fetchTimeout); // Stop any pending loops
 
       const statusEl = document.getElementById("lastUpdated");
       const refreshIcon = document.getElementById("refresh-icon");
@@ -785,7 +791,7 @@
         try {
           rawJson = JSON.parse(text);
         } catch (parseError) {
-          throw new Error("Invalid format returned by Google");
+          throw new Error("Invalid format returned by Google (Check sharing permissions or wait a few seconds).");
         }
 
         if (rawJson.error) throw new Error("Error: " + rawJson.error);
@@ -830,13 +836,14 @@
           const vslIdx      = findColInFirst5Rows(["vsl", "vessel"], 12); 
           const custTypeIdx = findColInFirst5Rows(["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
           
-          const allotIdx = findExactCol(rawRows, ["allotment status", "allotment", "allot"]);
+          // EXACT TARGETING of the new headers to avoid the blank text columns
+          const allotIdx = findExactCol(rawRows, ["allotment status"]);
           const pickIdx = findExactCol(rawRows, ["pickup status"]);
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
             const r = rawRows[i];
-            if (!r) continue;
+            if (!r) continue; // Skip totally empty rows to prevent crashing
             
             const bookingVal = bookIdx !== -1 ? String(r[bookIdx] || "").trim() : "";
             const partyVal = partyIdx !== -1 ? String(r[partyIdx] || "").trim() : "";
@@ -854,10 +861,11 @@
             const vslName = vslIdx !== -1 ? String(r[vslIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
+            // Evaluates booleans or text versions of TRUE/FALSE/CHECKED directly from the exact status columns
             let pickupStatus = "PICKED"; 
-            if (allotIdx !== -1 || pickIdx !== -1) {
-                const isAllotted = allotIdx !== -1 ? isTruthy(r[allotIdx]) : false;
-                const isPicked = pickIdx !== -1 ? isTruthy(r[pickIdx]) : false;
+            if (allotIdx !== -1 && pickIdx !== -1) { 
+                const isAllotted = isTruthy(r[allotIdx]);
+                const isPicked = isTruthy(r[pickIdx]);
                 
                 if (isAllotted && isPicked) {
                     pickupStatus = "PICKED";
@@ -866,7 +874,7 @@
                 } else if (!isAllotted && !isPicked) {
                     pickupStatus = "NOT PICKED";
                 } else if (!isAllotted && isPicked) {
-                    pickupStatus = "PICKED";
+                    pickupStatus = "PICKED"; 
                 }
             }
 
@@ -912,17 +920,18 @@
       } catch (err) {
         console.error(err);
         if(!isAuto) statusEl.textContent = err.message || "Error fetching data";
-        document.getElementById("unpickedListBody").innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--red); padding: 20px;">Data Error. Please refresh.</td></tr>`;
+        document.getElementById("unpickedListBody").innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--red); padding: 20px;">Data Error: ${err.message}</td></tr>`;
       } finally {
         if (!isAuto && refreshIcon) refreshIcon.classList.remove("spinning");
         isFetching = false;
+        // Schedule next safe silent refresh
+        fetchTimeout = setTimeout(() => {
+          if (!document.hidden) fetchMasterSheet(true);
+        }, 5000); // 5 seconds is the maximum safe threshold for continuous Google sheet polling
       }
     }
 
-    setInterval(() => {
-        if (!document.hidden) fetchMasterSheet(true);
-    }, 100);
-
+    // 0.1s (100ms) Real-Time UI Render Loop for INR Cards
     function updateInrUI() {
       let arrowHtml = '';
       let colorClass = 'rate-neutral';
@@ -1308,6 +1317,7 @@
       const unpickedList = document.getElementById("unpickedListBody");
       const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
       
+      // Filter out ONLY the explicitly "PICKED" ones.
       let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
 
       if (unpickedRows.length === 0) {
@@ -1544,9 +1554,10 @@
     }
 
     document.getElementById("summaryChartContainer").style.display = "block";
+    
+    // Kick off smart background polling safely
     fetchMasterSheet();
     document.addEventListener("visibilitychange", () => { if (!document.hidden) fetchMasterSheet(); });
-    window.addEventListener("DOMContentLoaded", () => fetchMasterSheet());
   </script>
 </body>
 </html>
