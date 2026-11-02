@@ -161,7 +161,7 @@
     }
     select.filter-select option { background-color: #07090e; color: #ffffff; }
 
-    /* Custom Searchable Dropdowns (Sidebar) */
+    /* Custom Searchable Dropdowns */
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -223,8 +223,7 @@
     
     .clear-main-search-btn {
       background: rgba(255,255,255,0.15); color: var(--text-light); border: none; 
-      width: 26px; height: 26px; border-radius: 50%;
-      display: none; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%; display: none; align-items: center; justify-content: center;
       cursor: pointer; transition: transform 0.1s; z-index: 10;
     }
     .clear-main-search-btn:active { transform: scale(0.9); }
@@ -264,33 +263,24 @@
     .stat-card .label { font-size: 0.68rem; color: var(--subtext-light); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
     .stat-card.small-card .label { font-size: 0.6rem; }
     
-    /* Live Rate Elements */
-    @keyframes livePulse {
-      0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
-      70% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-    }
-    .live-badge {
-      font-size: 0.55rem; background: rgba(74, 222, 128, 0.15); color: var(--green); padding: 3px 6px;
-      border-radius: 6px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;
-      animation: livePulse 2s infinite;
-    }
+    /* Live Rate Elements & Pulse Animation */
     .live-rate-text {
-      font-size: 0.72rem; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px;
-      font-variant-numeric: tabular-nums; margin-right: 6px; display: flex; align-items: center; gap: 4px;
+      font-size: 0.75rem; color: var(--text-light); font-weight: 700; letter-spacing: 0.5px;
+      font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end;
     }
+    .rate-val { display: flex; align-items: center; gap: 3px; transition: color 0.3s ease; }
     
     /* Arrow Animation */
-    @keyframes pop {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.5); }
-      100% { transform: scale(1); }
+    @keyframes ratePulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    .rate-arrow { font-size: 0.6rem; transition: color 0.3s ease; }
-    .rate-up { color: var(--green); }
-    .rate-down { color: var(--red); }
-    .rate-neutral { color: var(--subtext-light); }
-    .animate-pop { animation: pop 0.4s ease; }
+    .rate-up { color: var(--green); text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
+    .rate-down { color: var(--red); text-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
+    .rate-neutral { color: var(--text-light); }
+    .rate-icon { width: 13px; height: 13px; margin-bottom: 1px; }
+    .animate-rate { animation: ratePulse 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
     .trend-badge {
       font-size: 0.62rem; padding: 3px 7px; border-radius: var(--radius-pill); font-weight: 700; display: inline-flex; align-items: center;
@@ -314,9 +304,7 @@
     .sub-value { font-size: 0.7rem; color: var(--subtext-light); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
 
     /* SWIPEABLE CARD CSS */
-    .swipe-container {
-      overflow: hidden; position: relative; padding: 0 !important; 
-    }
+    .swipe-container { overflow: hidden; position: relative; padding: 0 !important; }
     .swipe-wrapper {
       display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; 
       -ms-overflow-style: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: 100%;
@@ -513,9 +501,8 @@
           <div class="swipe-panel">
             <div class="label-row">
               <div class="label">EARNING</div>
-              <div style="display: flex; align-items: center; justify-content: flex-end;">
-                <span class="live-rate-text" id="detExchangeRateDisp">-- <span class="rate-arrow">-</span></span>
-                <span class="live-badge">Live</span>
+              <div class="live-rate-text" id="detExchangeRateDisp">
+                <span class="rate-val rate-neutral">94.86</span>
               </div>
             </div>
             <div class="value margin-val" id="detProfitInr" style="font-size: 1.4rem;">--</div>
@@ -625,9 +612,8 @@
         <div class="swipe-panel">
           <div class="label-row">
             <div class="label">EARNING</div>
-            <div style="display: flex; align-items: center; justify-content: flex-end;">
-              <span class="live-rate-text" id="mainExchangeRateDisp">-- <span class="rate-arrow">-</span></span>
-              <span class="live-badge">Live</span>
+            <div class="live-rate-text" id="mainExchangeRateDisp">
+              <span class="rate-val rate-neutral">94.86</span>
             </div>
           </div>
           <div class="value margin-val" id="statMarginInr" style="font-size: 1.4rem;">--</div>
@@ -706,18 +692,22 @@
     
     // Engine State for 0.1s Local INR Refresh & Arrow Tracking
     let previousUsdToInrRate = 94.86;
-    let liveUsdToInrRate = 94.86; // User-requested exact baseline
+    let liveUsdToInrRate = 94.86;
     let globalCurMargin = 0;
     let globalCurCntrs = 0;
     let globalDetMargin = 0;
     let globalDetCntrs = 0;
 
+    // Arrow SVGs (Matches the Reference Image style)
+    const svgUp = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M12 3l7 7"/></svg>`;
+    const svgDown = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 21l-7-7"/></svg>`;
+
     function triggerRateAnimation() {
-      const arrows = document.querySelectorAll('.rate-arrow');
-      arrows.forEach(a => {
-        a.classList.remove('animate-pop');
-        void a.offsetWidth; 
-        a.classList.add('animate-pop');
+      const rateElements = document.querySelectorAll('.rate-val');
+      rateElements.forEach(el => {
+        el.classList.remove('animate-rate');
+        void el.offsetWidth; // trigger reflow
+        el.classList.add('animate-rate');
       });
     }
 
@@ -749,20 +739,24 @@
 
     // 0.1s (100ms) Real-Time UI Render Loop for INR Cards
     function updateInrUI() {
-      let arrowHtml = '<span class="rate-arrow rate-neutral">-</span>';
+      let arrowHtml = '';
+      let colorClass = 'rate-neutral';
+
       if (liveUsdToInrRate > previousUsdToInrRate) {
-        arrowHtml = '<span class="rate-arrow rate-up">▲</span>';
+        arrowHtml = svgUp;
+        colorClass = 'rate-up';
       } else if (liveUsdToInrRate < previousUsdToInrRate) {
-        arrowHtml = '<span class="rate-arrow rate-down">▼</span>';
+        arrowHtml = svgDown;
+        colorClass = 'rate-down';
       }
 
-      const rateText = liveUsdToInrRate.toFixed(2) + " " + arrowHtml;
+      const rateText = `<span class="rate-val ${colorClass}">${liveUsdToInrRate.toFixed(2)} ${arrowHtml}</span>`;
       
       const mainDisp = document.getElementById("mainExchangeRateDisp");
-      if(mainDisp) mainDisp.innerHTML = rateText;
+      if(mainDisp && mainDisp.innerHTML !== rateText) mainDisp.innerHTML = rateText;
       
       const detDisp = document.getElementById("detExchangeRateDisp");
-      if(detDisp) detDisp.innerHTML = rateText;
+      if(detDisp && detDisp.innerHTML !== rateText) detDisp.innerHTML = rateText;
 
       if (globalCurCntrs > 0) {
         const yieldPerCntr = Math.round(globalCurMargin / globalCurCntrs);
