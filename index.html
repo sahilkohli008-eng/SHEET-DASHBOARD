@@ -306,26 +306,24 @@
 
     /* PERFECT SCROLLING NATIVE DATA TABLES - 100% Free of Sticky Glitches */
     .table-scroll-container, .customer-table-wrap {
-      width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; 
-      border-radius: var(--radius-main); margin-top: 14px;
+      width: 100%; overflow-x: auto; overflow-y: auto; max-height: 260px;
+      -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
+      display: block; white-space: nowrap;
     }
     .table-scroll-container::-webkit-scrollbar, .customer-table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
     .table-scroll-container::-webkit-scrollbar-thumb, .customer-table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     
     table.data-table, table.cust-table {
-      width: max-content; /* This ensures the table naturally flows without squeezing text */
-      min-width: 100%; 
-      border-collapse: collapse; 
-      font-size: 0.85rem;
+      width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.85rem;
     }
     table.data-table th, table.cust-table th {
       color: var(--subtext-light); font-size: 0.65rem; text-transform: uppercase;
       padding: 16px 14px; text-align: right; border-bottom: 0.5px solid rgba(255, 255, 255, 0.15);
-      font-weight: 700; letter-spacing: 0.5px;
+      font-weight: 700; letter-spacing: 0.5px; background: rgba(0,0,0,0.2);
     }
     table.data-table td, table.cust-table td {
       padding: 14px; border-bottom: 0.5px solid rgba(255, 255, 255, 0.05); text-align: right; font-weight: 600; vertical-align: middle;
-      white-space: nowrap; /* Forces content onto a single line for smooth swiping */
+      white-space: nowrap;
     }
     table.data-table tr:last-child td, table.cust-table tr:last-child td { border-bottom: none; }
     
@@ -628,7 +626,7 @@
     <div class="stat-card liquid-glass" style="padding: 16px 12px;">
       <div class="label-row" style="padding: 0 4px;">
         <div class="label">NON-PICKED CONTAINERS</div>
-        <div class="label" style="color: var(--orange); font-weight: 800;" id="unpickedTotalCount">0 UNITS</div>
+        <div class="label" style="color: var(--orange); font-weight: 800; cursor: pointer;" id="unpickedTotalCount" onclick="showColumnDiagnostics()">0 UNITS</div>
       </div>
       
       <!-- Smooth Scrolling Native Data Table -->
@@ -718,6 +716,7 @@
     let activeEqp = "ALL";
     let sortBy = "teu"; 
     let lineChartInstance = null;
+    let columnDiagnosticsLog = {};
     
     // Engine State for 0.1s Local INR Refresh & Arrow Tracking
     let previousUsdToInrRate = 94.86;
@@ -731,6 +730,14 @@
     // Arrow SVGs
     const svgUp = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M12 3l7 7"/></svg>`;
     const svgDown = `<svg class="rate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 21l-7-7"/></svg>`;
+
+    function showColumnDiagnostics() {
+      const m = activeMonth === "ALL" ? Object.keys(columnDiagnosticsLog)[0] : activeMonth;
+      const info = columnDiagnosticsLog[m];
+      if (info) {
+        alert(`Sheet [${m}] Checkbox Detection:\nAllotment Col: "${info.allotName}" (Col Index ${info.allotIdx})\nPickup Col: "${info.pickName}" (Col Index ${info.pickIdx})`);
+      }
+    }
 
     function triggerRateAnimation() {
       const rateElements = document.querySelectorAll('.rate-val');
@@ -764,6 +771,8 @@
         triggerRateAnimation();
       }
     }
+
+    setInterval(fetchLiveExchangeRate, 10000);
 
     // 0.1s (100ms) Real-Time UI Render Loop for INR Cards
     function updateInrUI() {
@@ -838,7 +847,6 @@
       }
     }
 
-    // Global Search Interactive Close
     function toggleGlobalSearch() {
       const searchOverlay = document.getElementById("globalSearchOverlay");
       searchOverlay.classList.toggle("active");
@@ -966,22 +974,140 @@
       return isNaN(parsed) ? fallback : parsed;
     }
     
-    // Deep Search for columns across first 5 rows
-    function findColInFirst5Rows(rawRows, keywords) {
-        for (let r = 0; r < Math.min(5, rawRows.length); r++) {
-            const rowArr = rawRows[r].map(h => String(h).trim().toLowerCase());
-            const idx = rowArr.findIndex(h => keywords.some(k => h.includes(k)));
-            if (idx !== -1) return idx;
-        }
-        return -1;
+    function findColInFirst5Rows(rawRows, keywords, fallbackIdx = -1) {
+      for (let r = 0; r < Math.min(5, rawRows.length); r++) {
+        const rowArr = rawRows[r].map(h => String(h).trim().toLowerCase());
+        const idx = rowArr.findIndex(h => keywords.some(k => h.includes(k)));
+        if (idx !== -1) return idx;
+      }
+      return fallbackIdx;
     }
     
-    // Google Sheets Checkbox Truthy Validator
+    // Ultra-wide Google Sheets Checkbox & Value Truthy Validator
     function isTruthy(val) {
-        if (val === true || val === 1 || val === "1") return true;
-        if (!val) return false;
-        const str = String(val).trim().toUpperCase();
-        return str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE";
+      if (val === true || val === 1 || val === "1") return true;
+      if (val === false || val === 0 || val === "0" || val === null || val === undefined) return false;
+      const str = String(val).trim().toUpperCase();
+      if (!str || str === "FALSE" || str === "NO" || str === "N" || str === "-" || str === "PENDING" || str === "NOT PICKED" || str === "UNPICKED" || str === "☐" || str === "✗" || str === "✘") return false;
+      if (str === "TRUE" || str === "YES" || str === "Y" || str === "CHECKED" || str === "DONE" || str === "PICKED" || str === "ALLOTTED" || str === "ALLOTED" || str === "OK" || str === "✓" || str === "✔" || str === "☑" || str === "X") return true;
+      return false;
+    }
+
+    // Intelligent Data-Driven Checkbox Column Detector
+    function detectCheckboxColumns(rawRows, headerRowIdx) {
+      const maxCols = Math.max(...rawRows.slice(0, Math.min(15, rawRows.length)).map(r => r ? r.length : 0));
+      const colNames = [];
+      for (let c = 0; c < maxCols; c++) {
+        let parts = [];
+        for (let r = 0; r <= headerRowIdx; r++) {
+          if (rawRows[r] && rawRows[r][c] !== undefined && rawRows[r][c] !== "") {
+            parts.push(String(rawRows[r][c]).trim().toLowerCase());
+          }
+        }
+        colNames[c] = parts.join(" ");
+      }
+
+      // Inspect actual row data to see which columns contain boolean checkboxes
+      const colStats = [];
+      for (let c = 0; c < maxCols; c++) {
+        let boolCount = 0;
+        let trueCount = 0;
+        let totalChecked = 0;
+        for (let i = headerRowIdx + 1; i < Math.min(headerRowIdx + 60, rawRows.length); i++) {
+          if (!rawRows[i]) continue;
+          const val = rawRows[i][c];
+          const str = String(val ?? "").trim().toUpperCase();
+          if (val !== "" && val !== null && val !== undefined) {
+            totalChecked++;
+            if (typeof val === "boolean" || ["TRUE", "FALSE", "YES", "NO", "✓", "✔", "☑", "☐"].includes(str)) {
+              boolCount++;
+            }
+            if (isTruthy(val)) trueCount++;
+          }
+        }
+        colStats[c] = {
+          name: colNames[c] || `Col_${c}`,
+          isCheckboxCol: totalChecked > 0 && (boolCount / totalChecked) >= 0.4,
+          boolCount,
+          trueCount
+        };
+      }
+
+      const allotKeywords = ["allot", "allotment", "alot", "alotment"];
+      const pickKeywords = ["pickup", "pick up", "picked", "pkup", "p/u", "gate out", "gateout", "lifted", "pick"];
+      const excludeKeywords = ["date", "dt", "depot", "yard", "loc", "place", "no", "num", "time", "days", "charge", "cost", "rate", "amt", "free", "valid"];
+
+      let allotIdx = -1;
+      let pickIdx = -1;
+
+      // Pass 1: Match Header Keyword + Confirmed Boolean Data
+      for (let c = 0; c < maxCols; c++) {
+        const name = colStats[c].name;
+        if (allotIdx === -1 && allotKeywords.some(k => name.includes(k)) && colStats[c].isCheckboxCol) {
+          allotIdx = c;
+        }
+      }
+      for (let c = 0; c < maxCols; c++) {
+        if (c === allotIdx) continue;
+        const name = colStats[c].name;
+        if (pickIdx === -1 && pickKeywords.some(k => name.includes(k)) && colStats[c].isCheckboxCol) {
+          pickIdx = c;
+        }
+      }
+
+      // Pass 2: Match Header Keyword (excluding date/depot columns)
+      if (allotIdx === -1) {
+        for (let c = 0; c < maxCols; c++) {
+          const name = colStats[c].name;
+          if (allotKeywords.some(k => name.includes(k)) && !excludeKeywords.some(ex => name.includes(ex))) {
+            allotIdx = c;
+            break;
+          }
+        }
+      }
+      if (pickIdx === -1) {
+        // If Allotment was found, check immediate neighbor columns first!
+        if (allotIdx !== -1) {
+          if (allotIdx + 1 < maxCols && (colStats[allotIdx + 1].isCheckboxCol || pickKeywords.some(k => colStats[allotIdx + 1].name.includes(k)))) {
+            pickIdx = allotIdx + 1;
+          } else if (allotIdx + 2 < maxCols && colStats[allotIdx + 2].isCheckboxCol) {
+            pickIdx = allotIdx + 2;
+          }
+        }
+        if (pickIdx === -1) {
+          for (let c = 0; c < maxCols; c++) {
+            if (c === allotIdx) continue;
+            const name = colStats[c].name;
+            if (pickKeywords.some(k => name.includes(k)) && !excludeKeywords.some(ex => name.includes(ex))) {
+              pickIdx = c;
+              break;
+            }
+          }
+        }
+      }
+
+      // Pass 3: Pure Boolean Column Fallback (if headers are blank or icons)
+      const pureCheckboxCols = [];
+      for (let c = 0; c < maxCols; c++) {
+        if (colStats[c].isCheckboxCol) pureCheckboxCols.push(c);
+      }
+      if (allotIdx === -1 && pickIdx === -1 && pureCheckboxCols.length >= 2) {
+        allotIdx = pureCheckboxCols[0];
+        pickIdx = pureCheckboxCols[1];
+      } else if (allotIdx !== -1 && pickIdx === -1) {
+        const nextBool = pureCheckboxCols.find(c => c > allotIdx);
+        if (nextBool !== undefined) pickIdx = nextBool;
+      } else if (pickIdx !== -1 && allotIdx === -1) {
+        const prevBool = [...pureCheckboxCols].reverse().find(c => c < pickIdx);
+        if (prevBool !== undefined) allotIdx = prevBool;
+      }
+
+      return {
+        allotIdx,
+        pickIdx,
+        allotName: allotIdx !== -1 ? colStats[allotIdx].name : "Not Found",
+        pickName: pickIdx !== -1 ? colStats[pickIdx].name : "Not Found"
+      };
     }
 
     // Main Fetch Engine with 0.1s Polling Support
@@ -1015,7 +1141,7 @@
 
         if (rawJson.error) throw new Error("Error: " + rawJson.error);
 
-        dataByMonth = {};
+        const newDataByMonth = {};
         const sheetNames = Object.keys(rawJson);
         if (sheetNames.length === 0) throw new Error("Spreadsheet is empty");
 
@@ -1023,7 +1149,6 @@
           const rawRows = rawJson[sheetName];
           if (!Array.isArray(rawRows) || rawRows.length < 2) return;
 
-          // Locate actual header row index (where Bookings start)
           let headerRowIdx = 0;
           for (let r = 0; r < Math.min(5, rawRows.length); r++) {
             const rowText = rawRows[r].join(" ").toLowerCase();
@@ -1033,26 +1158,40 @@
             }
           }
           
-          // Deep-scan for exact columns regardless of merged headers
-          const bookIdx     = findColInFirst5Rows(rawRows, ["booking", "bkg", "bl", "sr"]); 
-          const partyIdx    = findColInFirst5Rows(rawRows, ["party", "customer", "shipper", "forwarder", "client", "company", "name"]); 
-          const gp20Idx     = findColInFirst5Rows(rawRows, ["20gp", "20'", "20st", "20 dv"]); 
-          const hq40Idx     = findColInFirst5Rows(rawRows, ["40hq", "40hc", "40'", "40 hc"]); 
-          const splIdx      = findColInFirst5Rows(rawRows, ["spl", "special", "45", "flat", "open"]); 
-          const cntrIdx     = findColInFirst5Rows(rawRows, ["cntr", "container", "box", "total units", "units"]); 
-          const teuIdx      = findColInFirst5Rows(rawRows, ["teu", "vol", "qty", "volume"]); 
-          const podIdx      = findColInFirst5Rows(rawRows, ["pod", "port", "dest", "discharge"]); 
-          const marginIdx   = findColInFirst5Rows(rawRows, ["margin", "profit", "earning", "net"]); 
-          const vslIdx      = findColInFirst5Rows(rawRows, ["vsl", "vessel"]); 
-          const custTypeIdx = findColInFirst5Rows(rawRows, ["forwarder", "shipper", "cust type", "type", "customer type"]); 
+          const bookIdx     = findColInFirst5Rows(rawRows, ["booking", "bkg", "bl", "sr"], 0); 
+          const partyIdx    = findColInFirst5Rows(rawRows, ["party", "customer", "shipper", "forwarder", "client", "company", "name"], 1); 
+          const gp20Idx     = findColInFirst5Rows(rawRows, ["20gp", "20'", "20st", "20 dv"], 2); 
+          const hq40Idx     = findColInFirst5Rows(rawRows, ["40hq", "40hc", "40'", "40 hc"], 3); 
+          const splIdx      = findColInFirst5Rows(rawRows, ["spl", "special", "45", "flat", "open"], 4); 
+          const cntrIdx     = findColInFirst5Rows(rawRows, ["cntr", "container", "box", "total units", "units"], 5); 
+          const teuIdx      = findColInFirst5Rows(rawRows, ["teu", "vol", "qty", "volume"], 6); 
+          const podIdx      = findColInFirst5Rows(rawRows, ["pod", "port", "dest", "discharge"], 9); 
+          const marginIdx   = findColInFirst5Rows(rawRows, ["margin", "profit", "earning", "net"], 11); 
+          const vslIdx      = findColInFirst5Rows(rawRows, ["vsl", "vessel"], 12); 
+          const custTypeIdx = findColInFirst5Rows(rawRows, ["forwarder", "shipper", "cust type", "type", "customer type"], 15); 
           
-          // Robust Checkbox Extractors
-          const allotIdx    = findColInFirst5Rows(rawRows, ["allot", "allotment"]);
-          const pickIdx     = findColInFirst5Rows(rawRows, ["pick", "pickup", "pick up", "pkup"]);
+          // Smart Detection of Allotment & Pickup Checkbox Columns
+          const mKey = normalizeMonthName(sheetName);
+          const cbCols = detectCheckboxColumns(rawRows, headerRowIdx);
+          const allotIdx = cbCols.allotIdx;
+          const pickIdx = cbCols.pickIdx;
+          columnDiagnosticsLog[mKey] = cbCols;
+
+          // Check if this sheet actually uses checkboxes (prevents un-tracked historical sheets from flooding list)
+          let anyCheckboxCheckedInSheet = false;
+          for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
+            const r = rawRows[i];
+            if (!r) continue;
+            if ((allotIdx !== -1 && isTruthy(r[allotIdx])) || (pickIdx !== -1 && isTruthy(r[pickIdx]))) {
+              anyCheckboxCheckedInSheet = true;
+              break;
+            }
+          }
 
           const normalizedRows = [];
           for (let i = headerRowIdx + 1; i < rawRows.length; i++) {
             const r = rawRows[i];
+            if (!r) continue;
             const bookingVal = bookIdx !== -1 ? String(r[bookIdx] || "").trim() : "";
             const partyVal = partyIdx !== -1 ? String(r[partyIdx] || "").trim() : "";
 
@@ -1069,24 +1208,21 @@
             const vslName = vslIdx !== -1 ? String(r[vslIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             const custTypeStr = custTypeIdx !== -1 ? String(r[custTypeIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN";
             
-            // Core Checkbox Logic
-            let pickupStatus = "PICKED"; // Default hidden if columns completely missing
-            if (allotIdx !== -1 || pickIdx !== -1) {
-                const allotRaw = allotIdx !== -1 ? r[allotIdx] : false;
-                const pickRaw = pickIdx !== -1 ? r[pickIdx] : false;
-                
-                const isAllotted = isTruthy(allotRaw);
-                const isPicked = isTruthy(pickRaw);
-                
-                if (isAllotted && isPicked) {
-                    pickupStatus = "PICKED";
-                } else if (isAllotted && !isPicked) {
-                    pickupStatus = "ALLOTTED BUT NOT PICKED";
-                } else if (!isAllotted && !isPicked) {
-                    pickupStatus = "NOT PICKED";
-                } else if (!isAllotted && isPicked) {
-                    pickupStatus = "PICKED";
-                }
+            // Exact Allotment & Pickup Evaluation
+            let pickupStatus = "PICKED";
+            if ((allotIdx !== -1 || pickIdx !== -1) && anyCheckboxCheckedInSheet) {
+              const isAllotted = allotIdx !== -1 ? isTruthy(r[allotIdx]) : false;
+              const isPicked = pickIdx !== -1 ? isTruthy(r[pickIdx]) : false;
+              
+              if (isAllotted && isPicked) {
+                pickupStatus = "PICKED";
+              } else if (isAllotted && !isPicked) {
+                pickupStatus = "ALLOTTED BUT NOT PICKED";
+              } else if (!isAllotted && !isPicked) {
+                pickupStatus = "NOT PICKED";
+              } else if (!isAllotted && isPicked) {
+                pickupStatus = "PICKED";
+              }
             }
 
             let deducedEqp = "MIXED";
@@ -1103,22 +1239,22 @@
               spl: spl,
               cntrs: cntrs,
               teus: teus,
-              pod: String(r[podIdx] || "UNKNOWN").trim().toUpperCase(),
+              pod: podIdx !== -1 ? String(r[podIdx] || "UNKNOWN").trim().toUpperCase() : "UNKNOWN",
               custType: custTypeStr,
               eqpType: deducedEqp,
               margin: margin,
               pickupStatus: pickupStatus,
-              month: normalizeMonthName(sheetName)
+              month: mKey
             });
           }
 
           if (normalizedRows.length > 0) {
-            const mKey = normalizeMonthName(sheetName);
-            if (!dataByMonth[mKey]) dataByMonth[mKey] = [];
-            dataByMonth[mKey] = dataByMonth[mKey].concat(normalizedRows);
+            if (!newDataByMonth[mKey]) newDataByMonth[mKey] = [];
+            newDataByMonth[mKey] = newDataByMonth[mKey].concat(normalizedRows);
           }
         });
 
+        dataByMonth = newDataByMonth;
         populateFilterDropdowns();
         buildGlobalSearchIndex();
         applyGlobalFilters();
@@ -1348,7 +1484,7 @@
       let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
 
       if (unpickedRows.length === 0) {
-        unpickedList.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--subtext-light); padding: 20px;">All containers picked!</td></tr>`;
+        unpickedList.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--green); padding: 20px;">All containers picked!</td></tr>`;
         unpickedTotalLabel.textContent = "0 UNITS";
         return;
       }
@@ -1356,15 +1492,16 @@
       const bkgMap = {};
       let totalPending = 0;
 
-      unpickedRows.forEach(r => {
-         const safeBkg = r.booking || "UNKNOWN BKG";
-         if(!bkgMap[safeBkg]) {
-            bkgMap[safeBkg] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0, status: r.pickupStatus };
+      unpickedRows.forEach((r, idx) => {
+         const safeBkg = r.booking || `ROW-${idx + 1}`;
+         const key = `${r.month}_${safeBkg}`;
+         if(!bkgMap[key]) {
+            bkgMap[key] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0, status: r.pickupStatus };
          }
-         bkgMap[safeBkg].gp20 += r.gp20;
-         bkgMap[safeBkg].hq40 += r.hq40;
-         bkgMap[safeBkg].spl += r.spl;
-         bkgMap[safeBkg].cntrs += r.cntrs;
+         bkgMap[key].gp20 += r.gp20;
+         bkgMap[key].hq40 += r.hq40;
+         bkgMap[key].spl += r.spl;
+         bkgMap[key].cntrs += r.cntrs;
          totalPending += r.cntrs;
       });
 
