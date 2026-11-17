@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
-  <meta name="theme-color" id="metaThemeColor" content="#030508" />
+  <meta name="theme-color" id="metaThemeColor" content="#000000" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -19,68 +19,66 @@
 
   <style>
     :root {
-      /* Flat Futuristic Obsidian Dark Palette */
-      --bg-main: #030508;
-      --text-main: #f8fafc;
-      --text-muted: #64748b;
+      /* Pitch-Black OLED Dark Mode */
+      --bg-main: #000000;
+      --text-main: #ffffff;
+      --text-muted: #8e98a8;
 
-      /* Flat Glossy Surface (Zero 3D Drop Shadows) */
-      --glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.005) 100%);
-      --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-      --glass-shadow: none;
-      --glass-blur: blur(20px) saturate(200%);
-      --specular-line: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.22) 35%, rgba(56, 189, 248, 0.35) 50%, rgba(255, 255, 255, 0.22) 65%, transparent 95%);
+      /* Deep Frosted Glass Cards & Tables */
+      --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.04) 100%);
+      --table-frost-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.05) 100%);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.14);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18);
+      --glass-blur: blur(36px) saturate(210%);
+      --specular-line: linear-gradient(90deg, transparent 8%, rgba(255, 255, 255, 0.32) 50%, transparent 92%);
       
-      --menu-bg: rgba(7, 11, 18, 0.96);
-      --input-bg: rgba(255, 255, 255, 0.03);
-      --input-border: rgba(255, 255, 255, 0.1);
-      --table-header-bg: rgba(255, 255, 255, 0.02);
-      --table-border: rgba(255, 255, 255, 0.05);
-      --overlay-bg: rgba(3, 5, 8, 0.82);
+      --menu-bg: rgba(12, 14, 18, 0.92);
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-border: rgba(255, 255, 255, 0.15);
+      --table-header-bg: rgba(255, 255, 255, 0.07);
+      --table-row-hover: rgba(255, 255, 255, 0.03);
+      --table-border: rgba(255, 255, 255, 0.09);
+      --overlay-bg: rgba(0, 0, 0, 0.85);
 
-      --ambient-bg: radial-gradient(circle at 50% -10%, rgba(14, 165, 233, 0.12) 0%, transparent 55%),
-                    radial-gradient(circle at 95% 40%, rgba(168, 85, 247, 0.06) 0%, transparent 45%);
-
-      /* High-Tech Telemetry Accents */
+      /* High-Contrast Telemetry Accents */
       --accent: #00f5d4;      
       --accent-blue: #38bdf8; 
       --purple: #c084fc;      
       --green: #10b981;
-      --orange: #f59e0b;
+      --orange: #fb923c;
       --pink: #f43f5e;
       --red: #ef4444;
       
-      --radius-main: 14px;
-      --radius-pill: 10px;
+      --radius-main: 16px;
+      --radius-pill: 11px;
     }
 
-    /* FUTURISTIC FROSTED-TITANIUM LIGHT MODE (Bound to both HTML & BODY so background never turns black) */
+    /* SEAMLESS FROSTED LIGHT MODE (Zero Top Partition) */
     html.light-mode,
     body.light-mode {
-      --bg-main: #eef2f6;
+      --bg-main: #f1f5f9;
       --text-main: #0f172a;
-      --text-muted: #475569;
+      --text-muted: #64748b;
       
-      --glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%);
+      --glass-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 100%);
+      --table-frost-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%);
       --glass-border: 1px solid rgba(15, 23, 42, 0.09);
-      --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-      --specular-line: linear-gradient(90deg, transparent 5%, rgba(14, 165, 233, 0.28) 35%, rgba(255, 255, 255, 0.95) 50%, rgba(14, 165, 233, 0.28) 65%, transparent 95%);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 1);
+      --specular-line: linear-gradient(90deg, transparent 8%, rgba(255, 255, 255, 1) 50%, transparent 92%);
       
-      --menu-bg: rgba(255, 255, 255, 0.97);
-      --input-bg: rgba(15, 23, 42, 0.04);
+      --menu-bg: rgba(255, 255, 255, 0.94);
+      --input-bg: rgba(15, 23, 42, 0.05);
       --input-border: rgba(15, 23, 42, 0.12);
-      --table-header-bg: rgba(15, 23, 42, 0.035);
-      --table-border: rgba(15, 23, 42, 0.07);
-      --overlay-bg: rgba(238, 242, 246, 0.85);
-      
-      --ambient-bg: radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.14) 0%, transparent 55%),
-                    radial-gradient(circle at 95% 35%, rgba(139, 92, 246, 0.06) 0%, transparent 45%);
+      --table-header-bg: rgba(15, 23, 42, 0.045);
+      --table-row-hover: rgba(15, 23, 42, 0.02);
+      --table-border: rgba(15, 23, 42, 0.08);
+      --overlay-bg: rgba(241, 245, 249, 0.85);
       
       --accent-blue: #0284c7;
       --purple: #7c3aed;
       --green: #059669;
       --accent: #0d9488;
-      --orange: #d97706;
+      --orange: #ea580c;
       --pink: #e11d48;
       --red: #dc2626;
     }
@@ -94,25 +92,22 @@
       -webkit-font-smoothing: antialiased;
     }
     
-    html {
+    /* Solid Seamless Background on HTML & Body removes the top status bar partition line */
+    html, body {
       background-color: var(--bg-main);
+      background-image: none;
       color: var(--text-main);
       transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     body {
-      background-color: var(--bg-main);
-      color: var(--text-main); 
       padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 28px);
       min-height: 100vh; 
       position: relative; 
       overflow-x: hidden;
-      transition: background-color 0.25s ease, color 0.25s ease;
-      background-image: var(--ambient-bg); 
-      background-attachment: fixed;
     }
 
-    /* Flat Glossy Card Architecture */
+    /* Flat Frosted Glass Architecture */
     .liquid-glass {
       position: relative;
       background: var(--glass-bg);
@@ -139,7 +134,27 @@
     .liquid-pill { border-radius: var(--radius-pill) !important; }
     .liquid-pill::after { display: none; }
 
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; position: relative; z-index: 100;}
+    /* Extra Frosty Surface for Tables */
+    .frosty-table-card {
+      background: var(--table-frost-bg) !important;
+      backdrop-filter: blur(42px) saturate(220%) !important;
+      -webkit-backdrop-filter: blur(42px) saturate(220%) !important;
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    /* Seamless Top Bar Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 100;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
     .header-left, .header-right { display: flex; align-items: center; gap: 8px; }
     
     .menu-btn, button.icon-btn {
@@ -147,11 +162,12 @@
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
       border-radius: var(--radius-pill);
       color: var(--text-main);
       cursor: pointer;
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -165,14 +181,14 @@
     button.icon-btn svg { width: 16px; height: 16px; transform-origin: center; }
     
     .title-dropdown-wrapper { position: relative; display: flex; align-items: center; gap: 6px; cursor: pointer; padding-left: 2px; }
-    h1 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.3px; margin: 0; text-transform: uppercase; color: var(--text-main); }
-    .title-chevron { width: 14px; height: 14px; color: var(--accent-blue); transition: transform 0.2s; }
+    h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.4px; margin: 0; text-transform: uppercase; color: var(--text-main); }
+    .title-chevron { width: 15px; height: 15px; color: var(--accent-blue); transition: transform 0.2s; }
     .title-dropdown-wrapper.active .title-chevron { transform: rotate(180deg); }
 
     .title-menu {
       position: absolute; top: calc(100% + 8px); left: 0;
       background: var(--menu-bg); border: var(--glass-border); border-radius: var(--radius-main);
-      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      backdrop-filter: blur(36px); -webkit-backdrop-filter: blur(36px);
       width: 200px; max-height: 300px; overflow-y: auto;
       opacity: 0; visibility: hidden; transform: translateY(-6px);
       transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -184,14 +200,14 @@
       border-bottom: 1px solid var(--table-border); cursor: pointer; letter-spacing: 0.3px;
     }
     .title-option:last-child { border-bottom: none; }
-    .title-option.selected { color: var(--accent-blue); background: rgba(56, 189, 248, 0.08); }
+    .title-option.selected { color: var(--accent-blue); background: rgba(56, 189, 248, 0.1); }
 
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
 
     #overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay-bg);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 998;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 998;
       opacity: 0; visibility: hidden; transition: opacity 0.25s ease;
     }
     #overlay.active { opacity: 1; visibility: visible; }
@@ -199,7 +215,7 @@
     #sidebar {
       position: fixed; top: 0; left: 0; bottom: 0; width: 78vw; max-width: 310px;
       background: var(--menu-bg);
-      backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
       border-right: var(--glass-border);
       z-index: 999; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       padding: calc(env(safe-area-inset-top) + 20px) 18px 20px; display: flex; flex-direction: column;
@@ -225,14 +241,14 @@
     select.filter-select {
       color: var(--text-main); padding: 10px 32px 10px 12px; font-size: 14px; font-weight: 600;
       outline: none; -webkit-appearance: none; appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(100,116,139,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(142,152,168,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 11px center; background-size: 13px; width: 100%;
     }
     select.filter-select option { background-color: var(--bg-main); color: var(--text-main); }
 
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(100,116,139,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(142,152,168,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 11px center; background-size: 13px;
       padding: 10px 32px 10px 12px; color: var(--text-main); font-size: 14px; font-weight: 600;
       cursor: pointer; user-select: none;
@@ -256,7 +272,7 @@
     .search-input-wrapper input::placeholder { color: var(--text-muted); }
     
     .clear-search-btn {
-      position: absolute; right: 14px; background: rgba(128,128,128,0.15); border: none; border-radius: 50%;
+      position: absolute; right: 14px; background: rgba(128,128,128,0.2); border: none; border-radius: 50%;
       width: 22px; height: 22px; display: none; align-items: center; justify-content: center;
       cursor: pointer; color: var(--text-main); z-index: 10;
     }
@@ -268,11 +284,11 @@
       border-bottom: 1px solid var(--table-border); cursor: pointer;
     }
     .custom-option:last-child { border-bottom: none; }
-    .custom-option:hover, .custom-option.selected { background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); font-weight: 700; }
+    .custom-option:hover, .custom-option.selected { background: rgba(56, 189, 248, 0.12); color: var(--accent-blue); font-weight: 700; }
 
     #globalSearchOverlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay-bg);
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 2000;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); z-index: 2000;
       opacity: 0; visibility: hidden; transition: opacity 0.25s ease;
       display: flex; flex-direction: column; align-items: center; padding: calc(env(safe-area-inset-top) + 20px) 14px 20px;
     }
@@ -289,7 +305,7 @@
     .search-capsule input::placeholder { color: var(--text-muted); font-weight: 500; }
     
     .clear-main-search-btn {
-      background: rgba(128,128,128,0.15); color: var(--text-main); border: none; 
+      background: rgba(128,128,128,0.2); color: var(--text-main); border: none; 
       width: 24px; height: 24px; border-radius: 50%; display: none; align-items: center; justify-content: center;
       cursor: pointer; z-index: 10;
     }
@@ -347,11 +363,11 @@
 
     .trend-badge {
       font-size: 0.56rem; padding: 2px 5px; border-radius: 4px; font-weight: 700; display: inline-flex; align-items: center;
-      background: rgba(128, 128, 128, 0.06); border: 1px solid var(--table-border); letter-spacing: 0.2px;
+      background: rgba(128, 128, 128, 0.08); border: 1px solid var(--table-border); letter-spacing: 0.2px;
     }
     .stat-card.small-card .trend-badge { font-size: 0.5rem; padding: 1px 4px; }
-    .trend-badge.up { color: var(--green); border-color: rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.08); }
-    .trend-badge.down { color: var(--red); border-color: rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.08); }
+    .trend-badge.up { color: var(--green); border-color: rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.1); }
+    .trend-badge.down { color: var(--red); border-color: rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.1); }
     .trend-badge.neutral { color: var(--text-muted); }
 
     .stat-card .value { font-size: 1.55rem; font-weight: 700; margin-top: 7px; letter-spacing: -0.6px; font-variant-numeric: tabular-nums; line-height: 1.05; }
@@ -382,14 +398,15 @@
     .swipe-dots .dot { width: 10px; height: 2px; border-radius: 2px; background: rgba(148, 163, 184, 0.35); transition: all 0.3s ease; }
     .swipe-dots .dot.active { width: 16px; background: var(--accent); }
 
-    /* FUTURISTIC HUD PICKED VS NON-PICKED SUMMARY BAR */
+    /* FROSTY HUD PICKED VS NON-PICKED SUMMARY BAR */
     .pickup-minimal-bar {
       display: grid;
       grid-template-columns: 1fr 1fr;
       margin-top: 11px;
-      padding: 11px 2px 10px;
-      border-top: 1px solid var(--table-border);
-      border-bottom: 1px solid var(--table-border);
+      padding: 11px 10px 10px;
+      background: var(--table-header-bg);
+      border: 1px solid var(--table-border);
+      border-radius: 11px;
       gap: 12px;
     }
     .pickup-minimal-col:first-child {
@@ -448,11 +465,13 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* SCROLLABLE NATIVE DATA TABLES - FOR NON-PICKED LIST ONLY */
+    /* SCROLLABLE FROSTY DATA TABLES - FOR NON-PICKED LIST ONLY */
     .table-scroll-container {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
-      -webkit-overflow-scrolling: touch; border-radius: 10px; margin-top: 6px;
+      -webkit-overflow-scrolling: touch; border-radius: 12px; margin-top: 10px;
       padding-bottom: 4px; transform: translate3d(0,0,0);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--table-border);
     }
     .table-scroll-container::-webkit-scrollbar { height: 3px; width: 3px; }
     .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 4px; }
@@ -462,8 +481,8 @@
     }
     table.data-table th {
       color: var(--text-muted); font-size: 0.56rem; text-transform: uppercase;
-      padding: 10px 10px; text-align: right; border-bottom: 1px solid var(--table-border);
-      font-weight: 700; letter-spacing: 1px; background: transparent;
+      padding: 11px 10px; text-align: right; border-bottom: 1px solid var(--table-border);
+      font-weight: 700; letter-spacing: 1px; background: var(--table-header-bg);
     }
     table.data-table td {
       padding: 11px 10px; border-bottom: 1px solid var(--table-border); text-align: right; font-weight: 600; vertical-align: middle;
@@ -472,7 +491,7 @@
     table.data-table tr:last-child td { border-bottom: none; }
     
     table.data-table th:first-child, table.data-table td:first-child {
-      text-align: left; padding-left: 4px; color: var(--text-main); width: 175px;
+      text-align: left; padding-left: 10px; color: var(--text-main); width: 175px;
     }
     table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 118px; text-align: left; }
     
@@ -493,7 +512,7 @@
       letter-spacing: 0.4px;
     }
 
-    /* FIXED MASTER CUSTOMER TABLE CSS */
+    /* FIXED MASTER CUSTOMER FROSTY TABLE CSS */
     .customer-table-wrap {
       width: 100%;
       overflow: hidden;
@@ -512,7 +531,7 @@
       color: var(--text-muted);
       font-size: 0.56rem;
       text-transform: uppercase;
-      padding: 12px 6px 10px 6px;
+      padding: 13px 6px 11px 6px;
       text-align: right;
       border-bottom: 1px solid var(--table-border);
       font-weight: 700;
@@ -521,7 +540,7 @@
       white-space: nowrap;
     }
     table.cust-table td {
-      padding: 11px 6px;
+      padding: 12px 6px;
       border-bottom: 1px solid var(--table-border);
       text-align: right;
       font-weight: 600;
@@ -586,15 +605,15 @@
       padding: 7px 13px; font-size: 0.74rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.18s ease; letter-spacing: 0.3px;
     }
     .switch-btn.active {
-      color: var(--accent-blue); background: rgba(2, 132, 199, 0.1);
-      border: 1px solid rgba(2, 132, 199, 0.25);
+      color: var(--accent-blue); background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.3);
     }
   </style>
   <script>
     if(localStorage.getItem("dashboardTheme") === "light") {
       document.documentElement.classList.add("light-mode");
       var metaTc = document.getElementById("metaThemeColor");
-      if(metaTc) metaTc.setAttribute("content", "#eef2f6");
+      if(metaTc) metaTc.setAttribute("content", "#f1f5f9");
     }
   </script>
 </head>
@@ -744,7 +763,7 @@
     </div>
     
     <div class="filter-label" style="margin-bottom: 6px;">Activity Breakdown</div>
-    <div class="customer-table-wrap liquid-glass">
+    <div class="customer-table-wrap liquid-glass frosty-table-card">
       <table class="cust-table detail-cust-table">
         <thead>
           <tr>
@@ -854,15 +873,15 @@
     </div>
   </div>
 
-  <!-- FUTURISTIC FLAT NON-PICKED CONTAINERS UI -->
+  <!-- FROSTY GLASS NON-PICKED CONTAINERS UI -->
   <div style="margin-bottom: 14px;">
-    <div class="stat-card liquid-glass" style="padding: 14px 13px;">
+    <div class="stat-card liquid-glass frosty-table-card" style="padding: 14px 13px;">
       <div class="label-row" style="padding: 0 2px;">
         <div class="label">NON-PICKED CONTAINERS</div>
         <div class="label" style="color: var(--orange); font-weight: 700; letter-spacing: 0.6px;" id="unpickedTotalCount">0 TEUs · 0 TOTAL</div>
       </div>
 
-      <!-- MINIMALIST HUD PICKED VS NON-PICKED STRIP -->
+      <!-- FROSTED HUD PICKED VS NON-PICKED STRIP -->
       <div class="pickup-minimal-bar">
         <div class="pickup-minimal-col">
           <div class="pickup-minimal-top">
@@ -942,7 +961,7 @@
     </div>
   </div>
 
-  <div id="summaryChartContainer" class="chart-container liquid-glass">
+  <div id="summaryChartContainer" class="chart-container liquid-glass frosty-table-card">
     <div class="chart-header">
       <div class="chart-title">Monthly Trends</div>
       <select id="chartMetricSelect" class="filter-select liquid-glass liquid-pill mini-select" onchange="window.renderLineChart()">
@@ -973,7 +992,7 @@
     </div>
   </div>
 
-  <div class="customer-table-wrap liquid-glass" style="margin-bottom: 20px;">
+  <div class="customer-table-wrap liquid-glass frosty-table-card" style="margin-bottom: 20px;">
     <table class="cust-table">
       <thead>
         <tr>
@@ -1856,7 +1875,7 @@
       localStorage.setItem("dashboardTheme", isLight ? "light" : "dark");
       
       const metaTc = document.getElementById("metaThemeColor");
-      if(metaTc) metaTc.setAttribute("content", isLight ? "#eef2f6" : "#030508");
+      if(metaTc) metaTc.setAttribute("content", isLight ? "#f1f5f9" : "#000000");
 
       const icon = document.getElementById("themeIcon");
       if(isLight) {
@@ -1871,9 +1890,9 @@
       if (activeMonth !== "ALL") return;
 
       const isLight = document.body.classList.contains("light-mode");
-      const tickColor = isLight ? 'rgba(15,23,42,0.55)' : 'rgba(148,163,184,0.6)';
-      const gridColor = isLight ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.04)';
-      const pointBorderColor = isLight ? '#ffffff' : '#030508';
+      const tickColor = isLight ? 'rgba(15,23,42,0.55)' : 'rgba(142,152,168,0.7)';
+      const gridColor = isLight ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.06)';
+      const pointBorderColor = isLight ? '#ffffff' : '#000000';
 
       const metric = document.getElementById("chartMetricSelect").value;
       const labels = [];
@@ -1904,7 +1923,7 @@
       else if (metric === 'teus') color = isLight ? "#7c3aed" : "#c084fc"; 
       else if (metric === 'cntrs') color = isLight ? "#0284c7" : "#38bdf8"; 
       else if (metric === 'gp20') color = isLight ? "#0284c7" : "#38bdf8"; 
-      else if (metric === 'hq40') color = isLight ? "#d97706" : "#f59e0b"; 
+      else if (metric === 'hq40') color = isLight ? "#ea580c" : "#fb923c"; 
       else if (metric === 'spl') color = isLight ? "#e11d48" : "#f43f5e";  
 
       lineChartInstance = new Chart(ctx, {
@@ -1915,7 +1934,7 @@
             label: metric.toUpperCase(),
             data: dataPoints,
             borderColor: color,
-            backgroundColor: color + '18', 
+            backgroundColor: color + '20', 
             borderWidth: 2,
             pointBackgroundColor: color,
             pointRadius: 3.5,
