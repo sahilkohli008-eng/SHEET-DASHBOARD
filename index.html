@@ -328,50 +328,98 @@
     .stat-card .value.spl-val { color: var(--pink); }
     .sub-value { font-size: 0.7rem; color: var(--text-muted); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
 
-    /* FADE ANIMATION CARD CSS */
-    .fade-container { overflow: hidden; position: relative; padding: 0 !important; min-height: 110px; }
-    .fade-panel {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      padding: 16px; display: flex; flex-direction: column;
-      opacity: 0; visibility: hidden; transition: opacity 0.8s ease, visibility 0.8s ease;
+    /* SWIPE & AUTO-SCROLL CSS */
+    .swipe-container { overflow: hidden; position: relative; padding: 0 !important; min-height: 110px; }
+    .swipe-wrapper {
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; 
+      -ms-overflow-style: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: 100%;
     }
-    .fade-panel.active { opacity: 1; visibility: visible; }
-    .fade-dots {
+    .swipe-wrapper::-webkit-scrollbar { display: none; }
+    .swipe-panel {
+      flex: 0 0 100%; width: 100%; scroll-snap-align: start; padding: 16px; display: flex; flex-direction: column; position: relative;
+    }
+    .swipe-dots {
       display: flex; justify-content: center; gap: 5px; position: absolute; bottom: 12px; right: 16px;
     }
-    .fade-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(128,128,128,0.3); transition: background 0.4s; }
-    .fade-dots .dot.active { background: var(--text-main); opacity: 0.8; }
+    .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(128,128,128,0.3); transition: background 0.4s; }
+    .swipe-dots .dot.active { background: var(--text-main); opacity: 0.8; }
 
-    .table-scroll-container, .customer-table-wrap {
+    /* PICKED VS NON-PICKED SUMMARY BAR */
+    .pickup-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      padding: 0 2px;
+    }
+    .pickup-summary-box {
+      background: var(--table-header-bg);
+      border: 0.5px solid var(--table-border);
+      border-radius: 14px;
+      padding: 10px 10px;
+    }
+    .pickup-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .pickup-summary-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .pickup-metric-item {
+      background: rgba(128, 128, 128, 0.06);
+      border-radius: 8px;
+      padding: 5px 2px;
+    }
+    .pickup-metric-lbl {
+      display: block;
+      font-size: 0.54rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .pickup-metric-val {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* SCROLLABLE NATIVE DATA TABLES - FOR NON-PICKED LIST ONLY */
+    .table-scroll-container {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
-      -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 14px;
+      -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 12px;
       padding-bottom: 8px; transform: translate3d(0,0,0);
     }
-    .table-scroll-container::-webkit-scrollbar, .customer-table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
-    .table-scroll-container::-webkit-scrollbar-thumb, .customer-table-wrap::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 10px; }
+    .table-scroll-container::-webkit-scrollbar { height: 6px; width: 6px; }
+    .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 10px; }
     
-    table.data-table, table.cust-table {
+    table.data-table {
       width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed;
     }
-    
-    table.data-table th, table.cust-table th {
+    table.data-table th {
       color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;
       padding: 16px 14px; text-align: right; border-bottom: 0.5px solid var(--table-border);
       font-weight: 700; letter-spacing: 0.5px; background: var(--table-header-bg);
     }
-    
-    table.data-table td, table.cust-table td {
+    table.data-table td {
       padding: 14px; border-bottom: 0.5px solid var(--table-border); text-align: right; font-weight: 600; vertical-align: middle;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    table.data-table tr:last-child td { border-bottom: none; }
     
-    table.data-table tr:last-child td, table.cust-table tr:last-child td { border-bottom: none; }
-    
-    table.data-table th:first-child, table.data-table td:first-child,
-    table.cust-table th:first-child, table.cust-table td:first-child {
+    table.data-table th:first-child, table.data-table td:first-child {
       text-align: left; padding-left: 18px; color: var(--text-main); width: 180px;
     }
-    
     table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 130px; }
     
     /* NON-PICKED TABLE ALIGNMENT FIX */
@@ -381,21 +429,88 @@
     table.unpicked-table th:nth-child(6), table.unpicked-table td:nth-child(6) { width: 60px; text-align: center; } 
     table.unpicked-table th:nth-child(7), table.unpicked-table td:nth-child(7) { width: 70px; text-align: center; } 
 
-    .customer-table-wrap {
-      overflow: hidden; padding-bottom: 6px; border-radius: var(--radius-main); margin-top: 14px; margin-bottom: 20px;
+    table.unpicked-table tfoot td {
+      background: var(--table-header-bg);
+      border-top: 1px solid var(--glass-border);
+      font-weight: 800;
+      padding: 12px 14px;
     }
-    table.cust-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    table.cust-table th {
-      color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;
-      padding: 16px 12px 12px 12px; text-align: right; border-bottom: 0.5px solid var(--table-border); font-weight: 700; letter-spacing: 0.5px;
-    }
-    table.cust-table th:first-child { text-align: left; padding-left: 18px; }
-    table.cust-table td { padding: 14px 12px; border-bottom: 0.5px solid var(--table-border); text-align: right; font-weight: 600; vertical-align: middle; }
-    table.cust-table tr:last-child td { border-bottom: none; }
-    table.cust-table td:first-child { text-align: left; padding-left: 18px; color: var(--text-main); font-weight: 600; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .cell-main { display: block; font-size: 0.9rem; font-weight: 700; }
-    .cell-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+    /* FIXED MASTER CUSTOMER TABLE CSS (Full digits visible, zero truncation on Earning) */
+    .customer-table-wrap {
+      width: 100%;
+      overflow: hidden;
+      padding-bottom: 6px;
+      border-radius: var(--radius-main);
+      margin-top: 14px;
+      margin-bottom: 20px;
+    }
+    table.cust-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      table-layout: fixed;
+    }
+    table.cust-table th {
+      color: var(--text-muted);
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      padding: 14px 6px 12px 6px;
+      text-align: right;
+      border-bottom: 0.5px solid var(--table-border);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      background: var(--table-header-bg);
+      white-space: nowrap;
+    }
+    table.cust-table td {
+      padding: 13px 6px;
+      border-bottom: 0.5px solid var(--table-border);
+      text-align: right;
+      font-weight: 600;
+      vertical-align: middle;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    table.cust-table tr:last-child td { border-bottom: none; }
+
+    /* Proportional Column Widths so Earning never clips */
+    table.cust-table th:nth-child(1),
+    table.cust-table td:nth-child(1) {
+      width: 38%;
+      text-align: left;
+      padding-left: 14px;
+      padding-right: 6px;
+      color: var(--text-main);
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    table.cust-table th:nth-child(2),
+    table.cust-table td:nth-child(2) { width: 12%; }
+    table.cust-table th:nth-child(3),
+    table.cust-table td:nth-child(3) { width: 13%; }
+    table.cust-table th:nth-child(4),
+    table.cust-table td:nth-child(4) { width: 13%; }
+    table.cust-table th:nth-child(5),
+    table.cust-table td:nth-child(5) {
+      width: 24%;
+      padding-right: 14px;
+      overflow: visible;
+    }
+
+    /* Detail Overlay 4-Column Table Adjustments */
+    table.detail-cust-table th:nth-child(1),
+    table.detail-cust-table td:nth-child(1) { width: 22%; padding-left: 14px; }
+    table.detail-cust-table th:nth-child(2),
+    table.detail-cust-table td:nth-child(2) { width: 38%; text-align: left; overflow: hidden; text-overflow: ellipsis; }
+    table.detail-cust-table th:nth-child(3),
+    table.detail-cust-table td:nth-child(3) { width: 16%; }
+    table.detail-cust-table th:nth-child(4),
+    table.detail-cust-table td:nth-child(4) { width: 24%; padding-right: 14px; }
+
+    .cell-main { display: block; font-size: 0.86rem; font-weight: 700; line-height: 1.15; }
+    .cell-sub { display: block; font-size: 0.64rem; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
 
     .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
     .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -545,30 +660,32 @@
         <div class="value teu-val" id="detTeus">--</div>
       </div>
       
-      <div class="stat-card liquid-glass fade-container" style="background: var(--glass-bg);">
-        <div class="fade-panel active" id="detUsdPanel">
-          <div class="label-row"><div class="label">EARNING</div></div>
-          <div class="value margin-val" id="detProfit">--</div>
-          <div class="sub-value" id="detYield">--</div>
-          <div class="fade-dots"><span class="dot active"></span><span class="dot"></span></div>
-        </div>
-        <div class="fade-panel" id="detInrPanel">
-          <div class="label-row">
-            <div class="label">EARNING</div>
-            <div class="live-rate-text" id="detExchangeRateDisp">
-              <span class="rate-val rate-neutral">94.86</span>
-            </div>
+      <div class="stat-card liquid-glass swipe-container" id="detEarningCard" style="background: var(--glass-bg);">
+        <div class="swipe-wrapper">
+          <div class="swipe-panel">
+            <div class="label-row"><div class="label">EARNING</div></div>
+            <div class="value margin-val" id="detProfit">--</div>
+            <div class="sub-value" id="detYield">--</div>
+            <div class="swipe-dots"><span class="dot active"></span><span class="dot"></span></div>
           </div>
-          <div class="value margin-val" id="detProfitInr" style="font-size: 1.4rem;">--</div>
-          <div class="sub-value" id="detYieldInr">--</div>
-          <div class="fade-dots"><span class="dot"></span><span class="dot active"></span></div>
+          <div class="swipe-panel">
+            <div class="label-row">
+              <div class="label">EARNING</div>
+              <div class="live-rate-text" id="detExchangeRateDisp">
+                <span class="rate-val rate-neutral">94.86</span>
+              </div>
+            </div>
+            <div class="value margin-val" id="detProfitInr" style="font-size: 1.4rem;">--</div>
+            <div class="sub-value" id="detYieldInr">--</div>
+            <div class="swipe-dots"><span class="dot"></span><span class="dot active"></span></div>
+          </div>
         </div>
       </div>
     </div>
     
     <div class="filter-label" style="margin-bottom: 8px;">Activity Breakdown</div>
     <div class="customer-table-wrap liquid-glass">
-      <table class="cust-table">
+      <table class="cust-table detail-cust-table">
         <thead>
           <tr>
             <th>Month</th>
@@ -654,40 +771,96 @@
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     
-    <div class="stat-card liquid-glass fade-container" style="background: var(--glass-bg);">
-      <div class="fade-panel active" id="mainUsdPanel">
-        <div class="label-row"><div class="label">EARNING</div><div id="trendProfit"></div></div>
-        <div class="value margin-val" id="statMargin">--</div>
-        <div class="sub-value" id="statYield">--</div>
-        <div class="fade-dots"><span class="dot active"></span><span class="dot"></span></div>
-      </div>
-      <div class="fade-panel" id="mainInrPanel">
-        <div class="label-row">
-          <div class="label">EARNING</div>
-          <div class="live-rate-text" id="mainExchangeRateDisp">
-            <span class="rate-val rate-neutral">94.86</span>
-          </div>
+    <!-- MAIN DASHBOARD: SWIPE & AUTO-SCROLL EARNING CARD -->
+    <div class="stat-card liquid-glass swipe-container" id="mainEarningCard" style="background: var(--glass-bg);">
+      <div class="swipe-wrapper">
+        <div class="swipe-panel">
+          <div class="label-row"><div class="label">EARNING</div><div id="trendProfit"></div></div>
+          <div class="value margin-val" id="statMargin">--</div>
+          <div class="sub-value" id="statYield">--</div>
+          <div class="swipe-dots"><span class="dot active"></span><span class="dot"></span></div>
         </div>
-        <div class="value margin-val" id="statMarginInr" style="font-size: 1.4rem;">--</div>
-        <div class="sub-value" id="statYieldInr">--</div>
-        <div class="fade-dots"><span class="dot"></span><span class="dot active"></span></div>
+        <div class="swipe-panel">
+          <div class="label-row">
+            <div class="label">EARNING</div>
+            <div class="live-rate-text" id="mainExchangeRateDisp">
+              <span class="rate-val rate-neutral">94.86</span>
+            </div>
+          </div>
+          <div class="value margin-val" id="statMarginInr" style="font-size: 1.4rem;">--</div>
+          <div class="sub-value" id="statYieldInr">--</div>
+          <div class="swipe-dots"><span class="dot"></span><span class="dot active"></span></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- NON-PICKED CONTAINERS UI -->
+  <!-- NON-PICKED CONTAINERS UI + PICKED/NON-PICKED BREAKDOWN -->
   <div style="margin-bottom: 24px;">
     <div class="stat-card liquid-glass" style="padding: 16px 12px;">
       <div class="label-row" style="padding: 0 4px;">
         <div class="label">NON-PICKED CONTAINERS</div>
         <div class="label" style="color: var(--orange); font-weight: 800;" id="unpickedTotalCount">0 UNITS</div>
       </div>
+
+      <!-- 20GP & 40HC PICKED VS NON-PICKED TOTAL FIGURES -->
+      <div class="pickup-summary-grid">
+        <div class="pickup-summary-box">
+          <div class="pickup-summary-header" style="color: var(--green);">
+            <span>PICKED</span>
+            <span id="pickedTotalBadge">0 UNITS</span>
+          </div>
+          <div class="pickup-summary-metrics">
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">20GP</span>
+              <span class="pickup-metric-val" style="color: var(--accent-blue);" id="picked20Val">0</span>
+            </div>
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">40HC</span>
+              <span class="pickup-metric-val" style="color: var(--orange);" id="picked40Val">0</span>
+            </div>
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">SPL</span>
+              <span class="pickup-metric-val" style="color: var(--pink);" id="pickedSplVal">0</span>
+            </div>
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">TOTAL</span>
+              <span class="pickup-metric-val" style="color: var(--green);" id="pickedTotalVal">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pickup-summary-box">
+          <div class="pickup-summary-header" style="color: var(--orange);">
+            <span>NON-PICKED</span>
+            <span id="unpickedTotalBadge">0 UNITS</span>
+          </div>
+          <div class="pickup-summary-metrics">
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">20GP</span>
+              <span class="pickup-metric-val" style="color: var(--accent-blue);" id="unpicked20Val">0</span>
+            </div>
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">40HC</span>
+              <span class="pickup-metric-val" style="color: var(--orange);" id="unpicked40Val">0</span>
+            </div>
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">SPL</span>
+              <span class="pickup-metric-val" style="color: var(--pink);" id="unpickedSplVal">0</span>
+            </div>
+            <div class="pickup-metric-item">
+              <span class="pickup-metric-lbl">TOTAL</span>
+              <span class="pickup-metric-val" style="color: var(--orange);" id="unpickedTotalBoxVal">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="table-scroll-container">
         <table class="data-table unpicked-table">
           <thead>
             <tr>
-              <th>Customer Name</th>
+              <th>Customer</th>
               <th>Booking No.</th>
               <th>Status</th>
               <th>20</th>
@@ -699,6 +872,7 @@
           <tbody id="unpickedListBody">
             <tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--text-muted);">Scanning...</td></tr>
           </tbody>
+          <tfoot id="unpickedListFoot"></tfoot>
         </table>
       </div>
     </div>
@@ -739,7 +913,7 @@
     <table class="cust-table">
       <thead>
         <tr>
-          <th id="colHeaderName">Customer Name</th>
+          <th id="colHeaderName">Customer</th>
           <th>Bkgs</th>
           <th>Cntrs</th>
           <th>TEUs</th>
@@ -754,7 +928,8 @@
     // =========================================================
     // 1. USER CONFIGURATION
     // =========================================================
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpx5kemA_-QV09b_op1YZSkKJtpLG_VSvCxwXf8Is-n2czAdMyxYkXaiYfVC_T2fh9Jw/exec
+";
 
     // =========================================================
     // 2. PWA BULLETPROOF GLOBAL NAMESPACE
@@ -852,19 +1027,32 @@
       }
     };
 
+    // SYNC MANUAL SWIPE DOTS
+    window.setupSwipeDots = function(cardId) {
+      const wrapper = document.querySelector(`#${cardId} .swipe-wrapper`);
+      if(!wrapper) return;
+      wrapper.addEventListener('scroll', () => {
+        const index = Math.round(wrapper.scrollLeft / wrapper.clientWidth);
+        const panels = wrapper.querySelectorAll('.swipe-panel');
+        panels.forEach(panel => {
+          const dots = panel.querySelectorAll('.dot');
+          dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+        });
+      });
+    };
+
+    // AUTO-SCROLL EARNING CARDS EVERY 10 SECONDS
     setInterval(() => {
-        const mainUsd = document.getElementById("mainUsdPanel");
-        const mainInr = document.getElementById("mainInrPanel");
-        if(mainUsd && mainInr) {
-            mainUsd.classList.toggle("active");
-            mainInr.classList.toggle("active");
+      ['mainEarningCard', 'detEarningCard'].forEach(cardId => {
+        const wrapper = document.querySelector(`#${cardId} .swipe-wrapper`);
+        if(wrapper && wrapper.clientWidth > 0) {
+          const isAtStart = wrapper.scrollLeft < (wrapper.clientWidth / 2);
+          wrapper.scrollTo({
+            left: isAtStart ? wrapper.clientWidth : 0,
+            behavior: 'smooth'
+          });
         }
-        const detUsd = document.getElementById("detUsdPanel");
-        const detInr = document.getElementById("detInrPanel");
-        if(detUsd && detInr) {
-            detUsd.classList.toggle("active");
-            detInr.classList.toggle("active");
-        }
+      });
     }, 10000);
 
     window.fetchMasterSheet = async function(isAuto = false) {
@@ -1382,12 +1570,44 @@
     window.updateUnpickedUI = function() {
       const rows = window.getFilteredRows(activeMonth, activeVessel, activePod, activeEqp);
       const unpickedList = document.getElementById("unpickedListBody");
+      const unpickedFoot = document.getElementById("unpickedListFoot");
       const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
+
+      // Calculate Picked vs Non-Picked 20GP / 40HC / SPL Totals
+      let p20 = 0, p40 = 0, pSpl = 0, pTot = 0;
+      let u20 = 0, u40 = 0, uSpl = 0, uTot = 0;
+
+      rows.forEach(r => {
+        if (r.pickupStatus === "PICKED") {
+          p20 += r.gp20;
+          p40 += r.hq40;
+          pSpl += r.spl;
+          pTot += r.cntrs;
+        } else {
+          u20 += r.gp20;
+          u40 += r.hq40;
+          uSpl += r.spl;
+          uTot += r.cntrs;
+        }
+      });
+
+      document.getElementById("picked20Val").textContent = Math.round(p20).toLocaleString();
+      document.getElementById("picked40Val").textContent = Math.round(p40).toLocaleString();
+      document.getElementById("pickedSplVal").textContent = Math.round(pSpl).toLocaleString();
+      document.getElementById("pickedTotalVal").textContent = Math.round(pTot).toLocaleString();
+      document.getElementById("pickedTotalBadge").textContent = Math.round(pTot) + " UNITS";
+
+      document.getElementById("unpicked20Val").textContent = Math.round(u20).toLocaleString();
+      document.getElementById("unpicked40Val").textContent = Math.round(u40).toLocaleString();
+      document.getElementById("unpickedSplVal").textContent = Math.round(uSpl).toLocaleString();
+      document.getElementById("unpickedTotalBoxVal").textContent = Math.round(uTot).toLocaleString();
+      document.getElementById("unpickedTotalBadge").textContent = Math.round(uTot) + " UNITS";
       
       let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
 
       if (unpickedRows.length === 0) {
         unpickedList.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--green); padding: 20px;">All containers picked!</td></tr>`;
+        unpickedFoot.innerHTML = "";
         unpickedTotalLabel.textContent = "0 UNITS";
         return;
       }
@@ -1425,6 +1645,17 @@
       `}).join("");
       
       unpickedList.innerHTML = html;
+      unpickedFoot.innerHTML = `
+        <tr>
+          <td style="color: var(--text-main); font-weight: 800;">TOTAL NON-PICKED</td>
+          <td></td>
+          <td style="text-align: center; color: var(--orange); font-size: 0.7rem;">${Object.keys(bkgMap).length} BKGS</td>
+          <td style="text-align: center; color: var(--accent-blue);">${Math.round(u20) || '-'}</td>
+          <td style="text-align: center; color: var(--orange);">${Math.round(u40) || '-'}</td>
+          <td style="text-align: center; color: var(--pink);">${Math.round(uSpl) || '-'}</td>
+          <td style="text-align: center; color: var(--text-main);">${Math.round(uTot)}</td>
+        </tr>
+      `;
     };
 
     window.getTrendHTML = function(cur, prev, show) {
@@ -1502,7 +1733,7 @@
       const groupBy = document.getElementById("groupBySelect").value;
       const headerNameEl = document.getElementById("colHeaderName");
 
-      if (groupBy === "party") headerNameEl.textContent = "Customer Name";
+      if (groupBy === "party") headerNameEl.textContent = "Customer";
       else if (groupBy === "pod") headerNameEl.textContent = "Port";
       else if (groupBy === "vsl") headerNameEl.textContent = "Vessel";
       else if (groupBy === "custType") headerNameEl.textContent = "Customer Type";
@@ -1647,10 +1878,11 @@
            icon.innerHTML = `<path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
         }
         
+        window.setupSwipeDots('mainEarningCard');
+        window.setupSwipeDots('detEarningCard');
         window.fetchMasterSheet(false);
     }
     
-    // GUARANTEED SAFE BOOTLOADER FOR SAFARI PWAs
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initApp);
     } else {
