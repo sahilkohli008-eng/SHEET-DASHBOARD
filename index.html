@@ -21,23 +21,23 @@
     :root {
       --bg-main: #07090e;
       --text-main: #ffffff;
-      --text-muted: rgba(255, 255, 255, 0.62);
+      --text-muted: rgba(255, 255, 255, 0.56);
 
-      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
-      --glass-border: 0.5px solid rgba(255, 255, 255, 0.15);
-      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 8px 24px rgba(0, 0, 0, 0.4);
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%);
+      --glass-border: 0.5px solid rgba(255, 255, 255, 0.12);
+      --glass-shadow: inset 0 1px 0.5px rgba(255, 255, 255, 0.15), 0 8px 24px rgba(0, 0, 0, 0.35);
       --glass-blur: blur(24px) saturate(180%);
       
       --menu-bg: #0f141e;
       --input-bg: rgba(0, 0, 0, 0.4);
-      --input-border: rgba(255, 255, 255, 0.15);
-      --table-header-bg: rgba(0,0,0,0.2);
-      --table-border: rgba(255, 255, 255, 0.05);
+      --input-border: rgba(255, 255, 255, 0.14);
+      --table-header-bg: rgba(255, 255, 255, 0.025);
+      --table-border: rgba(255, 255, 255, 0.06);
       --overlay-bg: rgba(0, 0, 0, 0.7);
 
-      --ambient-bg: radial-gradient(circle at 18% 22%, rgba(56, 189, 248, 0.14) 0%, transparent 42%),
-                    radial-gradient(circle at 82% 65%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
-                    radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.10) 0%, transparent 45%);
+      --ambient-bg: radial-gradient(circle at 18% 22%, rgba(56, 189, 248, 0.12) 0%, transparent 42%),
+                    radial-gradient(circle at 82% 65%, rgba(168, 85, 247, 0.10) 0%, transparent 45%),
+                    radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.08) 0%, transparent 45%);
 
       --accent: #5eead4;      
       --accent-blue: #60a5fa; 
@@ -47,30 +47,30 @@
       --pink: #fb7185;
       --red: #f87171;
       
-      --radius-main: 22px;
-      --radius-pill: 14px;
+      --radius-main: 20px;
+      --radius-pill: 13px;
     }
 
     body.light-mode {
-      --bg-main: #f3f4f6;
-      --text-main: #111827;
-      --text-muted: rgba(0, 0, 0, 0.6);
+      --bg-main: #f4f5f7;
+      --text-main: #0f172a;
+      --text-muted: rgba(15, 23, 42, 0.55);
       
-      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
-      --glass-border: 0.5px solid rgba(0, 0, 0, 0.1);
-      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 8px 24px rgba(0, 0, 0, 0.05);
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.7) 100%);
+      --glass-border: 0.5px solid rgba(0, 0, 0, 0.08);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 4px 18px rgba(0, 0, 0, 0.04);
       
       --menu-bg: #ffffff;
       --input-bg: rgba(0, 0, 0, 0.04);
       --input-border: rgba(0, 0, 0, 0.1);
-      --table-header-bg: rgba(0, 0, 0, 0.04);
-      --table-border: rgba(0, 0, 0, 0.08);
+      --table-header-bg: rgba(0, 0, 0, 0.025);
+      --table-border: rgba(0, 0, 0, 0.06);
       --overlay-bg: rgba(255, 255, 255, 0.75);
       
       --ambient-bg: none; 
       
       --accent-blue: #2563eb;
-      --purple: #9333ea;
+      --purple: #7e22ce;
       --green: #16a34a;
       --accent: #0f766e;
       --orange: #ea580c;
@@ -91,7 +91,7 @@
 
     body {
       color: var(--text-main); 
-      padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
+      padding: calc(env(safe-area-inset-top) + 14px) 15px calc(env(safe-area-inset-bottom) + 28px);
       min-height: 100vh; 
       position: relative; 
       overflow-x: hidden;
@@ -107,27 +107,27 @@
     }
     .liquid-pill { border-radius: var(--radius-pill) !important; }
 
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; position: relative; z-index: 100;}
-    .header-left, .header-right { display: flex; align-items: center; gap: 10px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 100;}
+    .header-left, .header-right { display: flex; align-items: center; gap: 8px; }
     
     .menu-btn, button.icon-btn {
       background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
       border: var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-pill);
-      color: var(--text-main); cursor: pointer; width: 40px; height: 40px;
+      color: var(--text-main); cursor: pointer; width: 38px; height: 38px;
       display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
     }
-    .menu-btn:active, button.icon-btn:active { transform: scale(0.95); }
-    .menu-btn svg, button.icon-btn svg { width: 22px; height: 22px; stroke: currentColor; }
-    button.icon-btn svg { width: 18px; height: 18px; transform-origin: center; }
+    .menu-btn:active, button.icon-btn:active { transform: scale(0.94); }
+    .menu-btn svg, button.icon-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+    button.icon-btn svg { width: 17px; height: 17px; transform-origin: center; }
     
-    .title-dropdown-wrapper { position: relative; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.4px; margin: 0; }
-    .title-chevron { width: 16px; height: 16px; color: var(--text-muted); margin-top: 4px; transition: transform 0.2s; }
+    .title-dropdown-wrapper { position: relative; display: flex; align-items: center; gap: 5px; cursor: pointer; padding-left: 2px; }
+    h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.5px; margin: 0; }
+    .title-chevron { width: 15px; height: 15px; color: var(--text-muted); margin-top: 3px; transition: transform 0.2s; }
     .title-dropdown-wrapper.active .title-chevron { transform: rotate(180deg); }
 
     .title-menu {
-      position: absolute; top: calc(100% + 12px); left: 0;
-      background: var(--menu-bg); border: 1px solid var(--glass-border); border-radius: 16px;
+      position: absolute; top: calc(100% + 10px); left: 0;
+      background: var(--menu-bg); border: var(--glass-border); border-radius: 16px;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
       width: 200px; max-height: 300px; overflow-y: auto;
       opacity: 0; visibility: hidden; transform: translateY(-10px);
@@ -136,11 +136,11 @@
     }
     .title-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
     .title-option {
-      padding: 14px 16px; font-size: 0.9rem; font-weight: 600; color: var(--text-main);
-      border-bottom: 1px solid var(--table-border); cursor: pointer;
+      padding: 13px 16px; font-size: 0.88rem; font-weight: 600; color: var(--text-main);
+      border-bottom: 0.5px solid var(--table-border); cursor: pointer;
     }
     .title-option:last-child { border-bottom: none; }
-    .title-option.selected { color: var(--accent-blue); background: rgba(128,128,128,0.1); }
+    .title-option.selected { color: var(--accent-blue); background: rgba(128,128,128,0.08); }
 
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spinning { animation: spin 1s linear infinite; }
@@ -176,21 +176,21 @@
     
     .sidebar-content { display: flex; flex-direction: column; gap: 18px; }
     .filter-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
-    .filter-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
+    .filter-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.6px; }
 
     select.filter-select {
-      color: var(--text-main); padding: 12px 36px 12px 14px; font-size: 16px; font-weight: 600;
+      color: var(--text-main); padding: 11px 34px 11px 14px; font-size: 15px; font-weight: 600;
       outline: none; -webkit-appearance: none; appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 12px center; background-size: 15px; width: 100%;
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; width: 100%;
     }
     select.filter-select option { background-color: var(--menu-bg); color: var(--text-main); }
 
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.75)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 12px center; background-size: 15px;
-      padding: 12px 36px 12px 14px; color: var(--text-main); font-size: 16px; font-weight: 600;
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 14px;
+      padding: 11px 34px 11px 14px; color: var(--text-main); font-size: 15px; font-weight: 600;
       cursor: pointer; user-select: none;
     }
 
@@ -201,13 +201,13 @@
 
     .custom-dropdown-menu {
       display: none; flex-direction: column; position: absolute; top: calc(100% + 8px); left: 0; width: 100%;
-      background: var(--menu-bg); border: 1px solid var(--glass-border); border-radius: 18px; 
+      background: var(--menu-bg); border: var(--glass-border); border-radius: 18px; 
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4); z-index: 1000; overflow: hidden;
     }
     .custom-dropdown-menu.active { display: flex; }
     
     .search-input-wrapper { 
-      padding: 10px; border-bottom: 1px solid var(--table-border); background: var(--menu-bg); 
+      padding: 10px; border-bottom: 0.5px solid var(--table-border); background: var(--menu-bg); 
       position: relative; display: flex; align-items: center;
     }
     .search-input-wrapper input {
@@ -226,8 +226,8 @@
     
     .custom-options-list { max-height: 200px; overflow-y: auto; }
     .custom-option {
-      padding: 14px 16px; font-size: 0.85rem; font-weight: 600; color: var(--text-main);
-      border-bottom: 1px solid var(--table-border); cursor: pointer; transition: background 0.2s;
+      padding: 13px 16px; font-size: 0.85rem; font-weight: 600; color: var(--text-main);
+      border-bottom: 0.5px solid var(--table-border); cursor: pointer; transition: background 0.2s;
     }
     .custom-option:last-child { border-bottom: none; }
     .custom-option:hover, .custom-option.selected { background: rgba(128,128,128,0.1); color: var(--accent-blue); font-weight: 700; }
@@ -242,7 +242,7 @@
 
     .search-capsule {
       width: 100%; max-width: 500px; display: flex; align-items: center; background: var(--menu-bg);
-      border-radius: 999px; padding: 10px 16px 10px 20px; border: 1px solid var(--glass-border);
+      border-radius: 999px; padding: 10px 16px 10px 20px; border: var(--glass-border);
       box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 16px; position: relative;
     }
     .search-capsule input {
@@ -264,10 +264,10 @@
     }
     .search-result-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 16px; border-bottom: 1px solid var(--table-border); cursor: pointer;
+      padding: 15px 16px; border-bottom: 0.5px solid var(--table-border); cursor: pointer;
     }
-    .search-result-item .entity-name { font-size: 1rem; font-weight: 700; color: var(--text-main); }
-    .search-result-item .entity-type { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); font-weight: 700;}
+    .search-result-item .entity-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
+    .search-result-item .entity-type { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent-blue); font-weight: 700;}
     .entity-type.port { color: var(--orange); }
     .entity-type.vessel { color: var(--purple); }
 
@@ -277,172 +277,190 @@
       overflow-y: auto; padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 30px);
     }
     #detailOverlay.active { transform: translateY(0); }
-    .detail-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-    .detail-titles h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); line-height: 1.1; margin-bottom: 4px;}
-    .detail-titles .badge { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(128,128,128,0.1); color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;}
+    .detail-header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .detail-titles h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); line-height: 1.1; margin-bottom: 4px;}
+    .detail-titles .badge { display: inline-block; font-size: 0.62rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(128,128,128,0.1); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px;}
 
-    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
-    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
-    .stat-card { padding: 16px; border-radius: var(--radius-main); }
-    .stat-card.small-card { padding: 14px 12px; border-radius: var(--radius-main); }
+    .card-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+    .card-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+    .stat-card { padding: 15px 16px; border-radius: var(--radius-main); }
+    .stat-card.small-card { padding: 13px 12px; border-radius: var(--radius-main); }
     
     .stat-card .label-row { display: flex; justify-content: space-between; align-items: center; }
-    .stat-card .label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    .stat-card.small-card .label { font-size: 0.6rem; }
+    .stat-card .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+    .stat-card.small-card .label { font-size: 0.58rem; }
     
     .live-rate-text {
-      font-size: 0.75rem; color: var(--text-main); font-weight: 700; letter-spacing: 0.5px;
+      font-size: 0.72rem; color: var(--text-main); font-weight: 700; letter-spacing: 0.3px;
       font-variant-numeric: tabular-nums; display: flex; align-items: center; justify-content: flex-end;
     }
-    .rate-val { display: flex; align-items: center; gap: 3px; transition: color 0.3s ease; }
+    .rate-val { display: flex; align-items: center; gap: 2px; transition: color 0.3s ease; }
     
     @keyframes ratePulse {
       0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.8; }
+      50% { transform: scale(1.12); opacity: 0.85; }
       100% { transform: scale(1); opacity: 1; }
     }
-    .rate-up { color: var(--green); text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
-    .rate-down { color: var(--red); text-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
+    .rate-up { color: var(--green); }
+    .rate-down { color: var(--red); }
     .rate-neutral { color: var(--text-main); }
-    .rate-icon { width: 13px; height: 13px; margin-bottom: 1px; }
+    .rate-icon { width: 12px; height: 12px; margin-bottom: 1px; }
     .animate-rate { animation: ratePulse 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
     .trend-badge {
-      font-size: 0.62rem; padding: 3px 7px; border-radius: var(--radius-pill); font-weight: 700; display: inline-flex; align-items: center;
-      background: var(--glass-bg); border: 0.5px solid var(--glass-border);
+      font-size: 0.58rem; padding: 2px 6px; border-radius: 999px; font-weight: 700; display: inline-flex; align-items: center;
+      background: rgba(128, 128, 128, 0.08); border: 0.5px solid var(--table-border);
     }
-    .stat-card.small-card .trend-badge { font-size: 0.54rem; padding: 2px 5px; }
+    .stat-card.small-card .trend-badge { font-size: 0.52rem; padding: 2px 5px; }
     .trend-badge.up { color: var(--green); }
     .trend-badge.down { color: var(--red); }
     .trend-badge.neutral { color: var(--text-muted); }
 
-    .stat-card .value { font-size: 1.65rem; font-weight: 700; margin-top: 8px; letter-spacing: -0.4px; }
-    .stat-card.small-card .value { font-size: 1.25rem; margin-top: 6px; }
+    .stat-card .value { font-size: 1.6rem; font-weight: 700; margin-top: 6px; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+    .stat-card.small-card .value { font-size: 1.22rem; margin-top: 5px; }
     
     .stat-card .value.bkg-val { color: var(--accent-blue); }
     .stat-card .value.cntr-val { color: var(--text-main); }
     .stat-card .value.teu-val { color: var(--purple); }
-    .stat-card .value.margin-val { color: var(--accent); font-size: 1.7rem; }
+    .stat-card .value.margin-val { color: var(--accent); font-size: 1.6rem; }
     .stat-card .value.gp-val { color: var(--accent-blue); }
     .stat-card .value.hq-val { color: var(--orange); }
     .stat-card .value.spl-val { color: var(--pink); }
-    .sub-value { font-size: 0.7rem; color: var(--text-muted); margin-top: 5px; font-weight: 600; letter-spacing: 0.2px; }
+    .sub-value { font-size: 0.66rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; letter-spacing: 0.2px; }
 
     /* SWIPE & AUTO-SCROLL CSS */
-    .swipe-container { overflow: hidden; position: relative; padding: 0 !important; min-height: 110px; }
+    .swipe-container { overflow: hidden; position: relative; padding: 0 !important; min-height: 104px; }
     .swipe-wrapper {
       display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; 
       -ms-overflow-style: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: 100%;
     }
     .swipe-wrapper::-webkit-scrollbar { display: none; }
     .swipe-panel {
-      flex: 0 0 100%; width: 100%; scroll-snap-align: start; padding: 16px; display: flex; flex-direction: column; position: relative;
+      flex: 0 0 100%; width: 100%; scroll-snap-align: start; padding: 15px 16px; display: flex; flex-direction: column; position: relative;
     }
     .swipe-dots {
-      display: flex; justify-content: center; gap: 5px; position: absolute; bottom: 12px; right: 16px;
+      display: flex; justify-content: center; gap: 4px; position: absolute; bottom: 11px; right: 14px;
     }
-    .swipe-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(128,128,128,0.3); transition: background 0.4s; }
-    .swipe-dots .dot.active { background: var(--text-main); opacity: 0.8; }
+    .swipe-dots .dot { width: 4.5px; height: 4.5px; border-radius: 50%; background: rgba(128,128,128,0.3); transition: background 0.4s; }
+    .swipe-dots .dot.active { background: var(--text-main); opacity: 0.85; }
 
-    /* PICKED VS NON-PICKED SUMMARY BAR */
-    .pickup-summary-grid {
+    /* MINIMALIST MODERN PICKED VS NON-PICKED SUMMARY BAR */
+    .pickup-minimal-bar {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: 1fr 1fr;
       margin-top: 12px;
-      padding: 0 2px;
+      padding: 12px 2px 10px;
+      border-top: 0.5px solid var(--table-border);
+      border-bottom: 0.5px solid var(--table-border);
+      gap: 14px;
     }
-    .pickup-summary-box {
-      background: var(--table-header-bg);
-      border: 0.5px solid var(--table-border);
-      border-radius: 14px;
-      padding: 10px 10px;
+    .pickup-minimal-col:first-child {
+      border-right: 0.5px solid var(--table-border);
+      padding-right: 14px;
     }
-    .pickup-summary-header {
+    .pickup-minimal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .pickup-minimal-status {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .pickup-minimal-teus {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--purple);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.2px;
+    }
+    .pickup-minimal-stats {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.62rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      text-align: left;
     }
-    .pickup-summary-metrics {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-      text-align: center;
+    .pm-stat {
+      display: flex;
+      flex-direction: column;
     }
-    .pickup-metric-item {
-      background: rgba(128, 128, 128, 0.06);
-      border-radius: 8px;
-      padding: 5px 2px;
-    }
-    .pickup-metric-lbl {
-      display: block;
-      font-size: 0.54rem;
+    .pm-lbl {
+      font-size: 0.52rem;
       color: var(--text-muted);
       font-weight: 700;
+      letter-spacing: 0.3px;
       text-transform: uppercase;
     }
-    .pickup-metric-val {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 800;
-      margin-top: 2px;
+    .pm-val {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-top: 1px;
       font-variant-numeric: tabular-nums;
     }
 
     /* SCROLLABLE NATIVE DATA TABLES - FOR NON-PICKED LIST ONLY */
     .table-scroll-container {
       width: 100%; overflow-x: auto; overflow-y: hidden; 
-      -webkit-overflow-scrolling: touch; border-radius: var(--radius-main); margin-top: 12px;
-      padding-bottom: 8px; transform: translate3d(0,0,0);
+      -webkit-overflow-scrolling: touch; border-radius: 14px; margin-top: 8px;
+      padding-bottom: 6px; transform: translate3d(0,0,0);
     }
-    .table-scroll-container::-webkit-scrollbar { height: 6px; width: 6px; }
+    .table-scroll-container::-webkit-scrollbar { height: 5px; width: 5px; }
     .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 10px; }
     
     table.data-table {
-      width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed;
+      width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.82rem; table-layout: fixed;
     }
     table.data-table th {
-      color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;
-      padding: 16px 14px; text-align: right; border-bottom: 0.5px solid var(--table-border);
-      font-weight: 700; letter-spacing: 0.5px; background: var(--table-header-bg);
+      color: var(--text-muted); font-size: 0.6rem; text-transform: uppercase;
+      padding: 12px 12px; text-align: right; border-bottom: 0.5px solid var(--table-border);
+      font-weight: 700; letter-spacing: 0.5px; background: transparent;
     }
     table.data-table td {
-      padding: 14px; border-bottom: 0.5px solid var(--table-border); text-align: right; font-weight: 600; vertical-align: middle;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 12px 12px; border-bottom: 0.5px solid var(--table-border); text-align: right; font-weight: 600; vertical-align: middle;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums;
     }
     table.data-table tr:last-child td { border-bottom: none; }
     
     table.data-table th:first-child, table.data-table td:first-child {
-      text-align: left; padding-left: 18px; color: var(--text-main); width: 180px;
+      text-align: left; padding-left: 8px; color: var(--text-main); width: 175px;
     }
-    table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 130px; }
+    table.data-table th:nth-child(2), table.data-table td:nth-child(2) { width: 120px; text-align: left; }
     
-    /* NON-PICKED TABLE ALIGNMENT FIX */
-    table.unpicked-table th:nth-child(3), table.unpicked-table td:nth-child(3) { width: 170px; text-align: center; } 
-    table.unpicked-table th:nth-child(4), table.unpicked-table td:nth-child(4) { width: 60px; text-align: center; } 
-    table.unpicked-table th:nth-child(5), table.unpicked-table td:nth-child(5) { width: 60px; text-align: center; } 
-    table.unpicked-table th:nth-child(6), table.unpicked-table td:nth-child(6) { width: 60px; text-align: center; } 
-    table.unpicked-table th:nth-child(7), table.unpicked-table td:nth-child(7) { width: 70px; text-align: center; } 
+    /* NON-PICKED TABLE ALIGNMENT (8 Columns including TEUs) */
+    table.unpicked-table th:nth-child(3), table.unpicked-table td:nth-child(3) { width: 155px; text-align: center; } 
+    table.unpicked-table th:nth-child(4), table.unpicked-table td:nth-child(4) { width: 52px; text-align: center; } 
+    table.unpicked-table th:nth-child(5), table.unpicked-table td:nth-child(5) { width: 52px; text-align: center; } 
+    table.unpicked-table th:nth-child(6), table.unpicked-table td:nth-child(6) { width: 52px; text-align: center; } 
+    table.unpicked-table th:nth-child(7), table.unpicked-table td:nth-child(7) { width: 62px; text-align: center; } 
+    table.unpicked-table th:nth-child(8), table.unpicked-table td:nth-child(8) { width: 62px; text-align: center; } 
 
     table.unpicked-table tfoot td {
       background: var(--table-header-bg);
-      border-top: 1px solid var(--glass-border);
+      border-top: 0.5px solid var(--glass-border);
       font-weight: 800;
-      padding: 12px 14px;
+      padding: 11px 12px;
+      font-size: 0.78rem;
     }
 
-    /* FIXED MASTER CUSTOMER TABLE CSS (Full digits visible, zero truncation on Earning) */
+    /* FIXED MASTER CUSTOMER TABLE CSS */
     .customer-table-wrap {
       width: 100%;
       overflow: hidden;
-      padding-bottom: 6px;
+      padding-bottom: 4px;
       border-radius: var(--radius-main);
-      margin-top: 14px;
+      margin-top: 12px;
       margin-bottom: 20px;
     }
     table.cust-table {
@@ -453,18 +471,18 @@
     }
     table.cust-table th {
       color: var(--text-muted);
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      padding: 14px 6px 12px 6px;
+      padding: 14px 6px 11px 6px;
       text-align: right;
       border-bottom: 0.5px solid var(--table-border);
       font-weight: 700;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
       background: var(--table-header-bg);
       white-space: nowrap;
     }
     table.cust-table td {
-      padding: 13px 6px;
+      padding: 12px 6px;
       border-bottom: 0.5px solid var(--table-border);
       text-align: right;
       font-weight: 600;
@@ -474,7 +492,6 @@
     }
     table.cust-table tr:last-child td { border-bottom: none; }
 
-    /* Proportional Column Widths so Earning never clips */
     table.cust-table th:nth-child(1),
     table.cust-table td:nth-child(1) {
       width: 38%;
@@ -499,7 +516,6 @@
       overflow: visible;
     }
 
-    /* Detail Overlay 4-Column Table Adjustments */
     table.detail-cust-table th:nth-child(1),
     table.detail-cust-table td:nth-child(1) { width: 22%; padding-left: 14px; }
     table.detail-cust-table th:nth-child(2),
@@ -509,17 +525,17 @@
     table.detail-cust-table th:nth-child(4),
     table.detail-cust-table td:nth-child(4) { width: 24%; padding-right: 14px; }
 
-    .cell-main { display: block; font-size: 0.86rem; font-weight: 700; line-height: 1.15; }
-    .cell-sub { display: block; font-size: 0.64rem; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
+    .cell-main { display: block; font-size: 0.85rem; font-weight: 700; line-height: 1.15; }
+    .cell-sub { display: block; font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
 
-    .chart-container { padding: 18px; margin-bottom: 20px; border-radius: var(--radius-main); display: none; }
-    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .chart-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; color: var(--text-main); }
-    select.mini-select { padding: 8px 30px 8px 12px; font-size: 16px; width: auto; }
-    canvas { width: 100%; max-height: 220px; }
+    .chart-container { padding: 16px; margin-bottom: 18px; border-radius: var(--radius-main); display: none; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .chart-title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.2px; color: var(--text-main); }
+    select.mini-select { padding: 7px 28px 7px 12px; font-size: 14px; width: auto; }
+    canvas { width: 100%; max-height: 210px; }
 
-    .controls-bar { margin-bottom: 14px; }
-    .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .controls-bar { margin-bottom: 12px; }
+    .controls-top-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .controls-top-row select { flex: 1; }
     
     .switch-track {
@@ -528,11 +544,11 @@
     }
     .switch-btn {
       background: transparent; color: var(--text-muted); border: 0.5px solid transparent;
-      padding: 8px 16px; font-size: 0.8rem; font-weight: 600; border-radius: 11px; cursor: pointer; transition: all 0.2s ease;
+      padding: 7px 14px; font-size: 0.78rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;
     }
     .switch-btn.active {
       color: var(--text-main); background: rgba(128,128,128,0.15);
-      border: 0.5px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 0.5px solid var(--glass-border); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
   </style>
   <script>
@@ -654,7 +670,7 @@
       </div>
     </div>
 
-    <div class="card-row-2" style="margin-bottom: 24px;">
+    <div class="card-row-2" style="margin-bottom: 20px;">
       <div class="stat-card liquid-glass">
         <div class="label-row"><div class="label">TOTAL TEUs</div></div>
         <div class="value teu-val" id="detTeus">--</div>
@@ -675,7 +691,7 @@
                 <span class="rate-val rate-neutral">94.86</span>
               </div>
             </div>
-            <div class="value margin-val" id="detProfitInr" style="font-size: 1.4rem;">--</div>
+            <div class="value margin-val" id="detProfitInr" style="font-size: 1.35rem;">--</div>
             <div class="sub-value" id="detYieldInr">--</div>
             <div class="swipe-dots"><span class="dot"></span><span class="dot active"></span></div>
           </div>
@@ -765,13 +781,12 @@
     </div>
   </div>
 
-  <div class="card-row-2" style="margin-bottom: 24px;">
+  <div class="card-row-2" style="margin-bottom: 18px;">
     <div class="stat-card liquid-glass">
       <div class="label-row"><div class="label">TOTAL TEUs</div><div id="trendTeus"></div></div>
       <div class="value teu-val" id="statVolume">--</div>
     </div>
     
-    <!-- MAIN DASHBOARD: SWIPE & AUTO-SCROLL EARNING CARD -->
     <div class="stat-card liquid-glass swipe-container" id="mainEarningCard" style="background: var(--glass-bg);">
       <div class="swipe-wrapper">
         <div class="swipe-panel">
@@ -787,7 +802,7 @@
               <span class="rate-val rate-neutral">94.86</span>
             </div>
           </div>
-          <div class="value margin-val" id="statMarginInr" style="font-size: 1.4rem;">--</div>
+          <div class="value margin-val" id="statMarginInr" style="font-size: 1.35rem;">--</div>
           <div class="sub-value" id="statYieldInr">--</div>
           <div class="swipe-dots"><span class="dot"></span><span class="dot active"></span></div>
         </div>
@@ -795,62 +810,66 @@
     </div>
   </div>
 
-  <!-- NON-PICKED CONTAINERS UI + PICKED/NON-PICKED BREAKDOWN -->
-  <div style="margin-bottom: 24px;">
-    <div class="stat-card liquid-glass" style="padding: 16px 12px;">
-      <div class="label-row" style="padding: 0 4px;">
+  <!-- MINIMALIST NON-PICKED CONTAINERS UI + PICKED/NON-PICKED TEUs & TOTAL -->
+  <div style="margin-bottom: 18px;">
+    <div class="stat-card liquid-glass" style="padding: 15px 14px;">
+      <div class="label-row" style="padding: 0 2px;">
         <div class="label">NON-PICKED CONTAINERS</div>
-        <div class="label" style="color: var(--orange); font-weight: 800;" id="unpickedTotalCount">0 UNITS</div>
+        <div class="label" style="color: var(--orange); font-weight: 800; letter-spacing: 0.3px;" id="unpickedTotalCount">0 TEUs · 0 TOTAL</div>
       </div>
 
-      <!-- 20GP & 40HC PICKED VS NON-PICKED TOTAL FIGURES -->
-      <div class="pickup-summary-grid">
-        <div class="pickup-summary-box">
-          <div class="pickup-summary-header" style="color: var(--green);">
-            <span>PICKED</span>
-            <span id="pickedTotalBadge">0 UNITS</span>
+      <!-- MINIMALIST MODERN PICKED VS NON-PICKED STRIP -->
+      <div class="pickup-minimal-bar">
+        <div class="pickup-minimal-col">
+          <div class="pickup-minimal-top">
+            <span class="pickup-minimal-status" style="color: var(--green);">
+              <span class="status-dot" style="background: var(--green);"></span>PICKED
+            </span>
+            <span class="pickup-minimal-teus" id="pickedTeusBadge">0 TEUs</span>
           </div>
-          <div class="pickup-summary-metrics">
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">20GP</span>
-              <span class="pickup-metric-val" style="color: var(--accent-blue);" id="picked20Val">0</span>
+          <div class="pickup-minimal-stats">
+            <div class="pm-stat">
+              <span class="pm-lbl">20GP</span>
+              <span class="pm-val" style="color: var(--accent-blue);" id="picked20Val">0</span>
             </div>
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">40HC</span>
-              <span class="pickup-metric-val" style="color: var(--orange);" id="picked40Val">0</span>
+            <div class="pm-stat">
+              <span class="pm-lbl">40HC</span>
+              <span class="pm-val" style="color: var(--orange);" id="picked40Val">0</span>
             </div>
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">SPL</span>
-              <span class="pickup-metric-val" style="color: var(--pink);" id="pickedSplVal">0</span>
+            <div class="pm-stat">
+              <span class="pm-lbl">SPL</span>
+              <span class="pm-val" style="color: var(--pink);" id="pickedSplVal">0</span>
             </div>
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">TOTAL</span>
-              <span class="pickup-metric-val" style="color: var(--green);" id="pickedTotalVal">0</span>
+            <div class="pm-stat">
+              <span class="pm-lbl">TOTAL</span>
+              <span class="pm-val" style="color: var(--green);" id="pickedTotalVal">0</span>
             </div>
           </div>
         </div>
 
-        <div class="pickup-summary-box">
-          <div class="pickup-summary-header" style="color: var(--orange);">
-            <span>NON-PICKED</span>
-            <span id="unpickedTotalBadge">0 UNITS</span>
+        <div class="pickup-minimal-col">
+          <div class="pickup-minimal-top">
+            <span class="pickup-minimal-status" style="color: var(--orange);">
+              <span class="status-dot" style="background: var(--orange);"></span>NON-PICKED
+            </span>
+            <span class="pickup-minimal-teus" id="unpickedTeusBadge">0 TEUs</span>
           </div>
-          <div class="pickup-summary-metrics">
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">20GP</span>
-              <span class="pickup-metric-val" style="color: var(--accent-blue);" id="unpicked20Val">0</span>
+          <div class="pickup-minimal-stats">
+            <div class="pm-stat">
+              <span class="pm-lbl">20GP</span>
+              <span class="pm-val" style="color: var(--accent-blue);" id="unpicked20Val">0</span>
             </div>
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">40HC</span>
-              <span class="pickup-metric-val" style="color: var(--orange);" id="unpicked40Val">0</span>
+            <div class="pm-stat">
+              <span class="pm-lbl">40HC</span>
+              <span class="pm-val" style="color: var(--orange);" id="unpicked40Val">0</span>
             </div>
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">SPL</span>
-              <span class="pickup-metric-val" style="color: var(--pink);" id="unpickedSplVal">0</span>
+            <div class="pm-stat">
+              <span class="pm-lbl">SPL</span>
+              <span class="pm-val" style="color: var(--pink);" id="unpickedSplVal">0</span>
             </div>
-            <div class="pickup-metric-item">
-              <span class="pickup-metric-lbl">TOTAL</span>
-              <span class="pickup-metric-val" style="color: var(--orange);" id="unpickedTotalBoxVal">0</span>
+            <div class="pm-stat">
+              <span class="pm-lbl">TOTAL</span>
+              <span class="pm-val" style="color: var(--orange);" id="unpickedTotalBoxVal">0</span>
             </div>
           </div>
         </div>
@@ -867,10 +886,11 @@
               <th>40</th>
               <th>SPL</th>
               <th>Total</th>
+              <th>TEUs</th>
             </tr>
           </thead>
           <tbody id="unpickedListBody">
-            <tr><td colspan="7" style="text-align:center; padding: 20px; color: var(--text-muted);">Scanning...</td></tr>
+            <tr><td colspan="8" style="text-align:center; padding: 20px; color: var(--text-muted);">Scanning...</td></tr>
           </tbody>
           <tfoot id="unpickedListFoot"></tfoot>
         </table>
@@ -1211,7 +1231,7 @@
       } catch (err) {
         console.error(err);
         if(!isAuto) statusEl.textContent = err.message || "Error fetching data";
-        document.getElementById("unpickedListBody").innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--red); padding: 20px;">Data Error: ${err.message}</td></tr>`;
+        document.getElementById("unpickedListBody").innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--red); padding: 20px;">Data Error: ${err.message}</td></tr>`;
       } finally {
         isFetching = false;
         fetchTimeout = setTimeout(() => {
@@ -1572,21 +1592,24 @@
       const unpickedFoot = document.getElementById("unpickedListFoot");
       const unpickedTotalLabel = document.getElementById("unpickedTotalCount");
 
-      // Calculate Picked vs Non-Picked 20GP / 40HC / SPL Totals
-      let p20 = 0, p40 = 0, pSpl = 0, pTot = 0;
-      let u20 = 0, u40 = 0, uSpl = 0, uTot = 0;
+      // Calculate Picked vs Non-Picked 20GP / 40HC / SPL / Total / TEUs
+      let p20 = 0, p40 = 0, pSpl = 0, pTot = 0, pTeus = 0;
+      let u20 = 0, u40 = 0, uSpl = 0, uTot = 0, uTeus = 0;
 
       rows.forEach(r => {
+        const rowTeus = r.teus > 0 ? r.teus : (r.gp20 + (r.hq40 * 2) + (r.spl * 2));
         if (r.pickupStatus === "PICKED") {
           p20 += r.gp20;
           p40 += r.hq40;
           pSpl += r.spl;
           pTot += r.cntrs;
+          pTeus += rowTeus;
         } else {
           u20 += r.gp20;
           u40 += r.hq40;
           uSpl += r.spl;
           uTot += r.cntrs;
+          uTeus += rowTeus;
         }
       });
 
@@ -1594,40 +1617,44 @@
       document.getElementById("picked40Val").textContent = Math.round(p40).toLocaleString();
       document.getElementById("pickedSplVal").textContent = Math.round(pSpl).toLocaleString();
       document.getElementById("pickedTotalVal").textContent = Math.round(pTot).toLocaleString();
-      document.getElementById("pickedTotalBadge").textContent = Math.round(pTot) + " UNITS";
+      document.getElementById("pickedTeusBadge").textContent = Math.round(pTeus).toLocaleString() + " TEUs";
 
       document.getElementById("unpicked20Val").textContent = Math.round(u20).toLocaleString();
       document.getElementById("unpicked40Val").textContent = Math.round(u40).toLocaleString();
       document.getElementById("unpickedSplVal").textContent = Math.round(uSpl).toLocaleString();
       document.getElementById("unpickedTotalBoxVal").textContent = Math.round(uTot).toLocaleString();
-      document.getElementById("unpickedTotalBadge").textContent = Math.round(uTot) + " UNITS";
+      document.getElementById("unpickedTeusBadge").textContent = Math.round(uTeus).toLocaleString() + " TEUs";
       
       let unpickedRows = rows.filter(r => r.pickupStatus !== "PICKED");
 
       if (unpickedRows.length === 0) {
-        unpickedList.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--green); padding: 20px;">All containers picked!</td></tr>`;
+        unpickedList.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--green); padding: 20px;">All containers picked!</td></tr>`;
         unpickedFoot.innerHTML = "";
-        unpickedTotalLabel.textContent = "0 UNITS";
+        unpickedTotalLabel.textContent = "0 TEUs · 0 TOTAL";
         return;
       }
 
       const bkgMap = {};
-      let totalPending = 0;
+      let totalPendingCntrs = 0;
+      let totalPendingTeus = 0;
 
       unpickedRows.forEach((r, idx) => {
          const safeBkg = r.booking || `ROW-${idx + 1}`;
          const key = `${r.month}_${safeBkg}`;
+         const rowTeus = r.teus > 0 ? r.teus : (r.gp20 + (r.hq40 * 2) + (r.spl * 2));
          if(!bkgMap[key]) {
-            bkgMap[key] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0, status: r.pickupStatus };
+            bkgMap[key] = { bkg: safeBkg, party: r.party, gp20: 0, hq40: 0, spl: 0, cntrs: 0, teus: 0, status: r.pickupStatus };
          }
          bkgMap[key].gp20 += r.gp20;
          bkgMap[key].hq40 += r.hq40;
          bkgMap[key].spl += r.spl;
          bkgMap[key].cntrs += r.cntrs;
-         totalPending += r.cntrs;
+         bkgMap[key].teus += rowTeus;
+         totalPendingCntrs += r.cntrs;
+         totalPendingTeus += rowTeus;
       });
 
-      unpickedTotalLabel.textContent = Math.round(totalPending) + " UNITS";
+      unpickedTotalLabel.textContent = `${Math.round(totalPendingTeus)} TEUs · ${Math.round(totalPendingCntrs)} TOTAL`;
 
       const html = Object.values(bkgMap).map(b => {
         const colorClass = b.status === "NOT PICKED" ? "color: var(--red);" : "color: var(--orange);";
@@ -1635,11 +1662,12 @@
         <tr>
           <td style="color: var(--text-main); font-weight: 700;">${b.party}</td>
           <td style="color: var(--accent-blue); font-weight: 700;">${b.bkg}</td>
-          <td style="${colorClass} font-size: 0.7rem;">${b.status}</td>
+          <td style="${colorClass} font-size: 0.68rem;">${b.status}</td>
           <td style="color: var(--text-muted);">${b.gp20 || '-'}</td>
           <td style="color: var(--orange);">${b.hq40 || '-'}</td>
           <td style="color: var(--pink);">${b.spl || '-'}</td>
-          <td style="color: var(--text-main); font-weight: 700;">${b.cntrs}</td>
+          <td style="color: var(--text-main); font-weight: 700;">${Math.round(b.cntrs)}</td>
+          <td style="color: var(--purple); font-weight: 700;">${Math.round(b.teus)}</td>
         </tr>
       `}).join("");
       
@@ -1648,11 +1676,12 @@
         <tr>
           <td style="color: var(--text-main); font-weight: 800;">TOTAL NON-PICKED</td>
           <td></td>
-          <td style="text-align: center; color: var(--orange); font-size: 0.7rem;">${Object.keys(bkgMap).length} BKGS</td>
+          <td style="text-align: center; color: var(--orange); font-size: 0.68rem;">${Object.keys(bkgMap).length} BKGS</td>
           <td style="text-align: center; color: var(--accent-blue);">${Math.round(u20) || '-'}</td>
           <td style="text-align: center; color: var(--orange);">${Math.round(u40) || '-'}</td>
           <td style="text-align: center; color: var(--pink);">${Math.round(uSpl) || '-'}</td>
           <td style="text-align: center; color: var(--text-main);">${Math.round(uTot)}</td>
+          <td style="text-align: center; color: var(--purple);">${Math.round(uTeus)}</td>
         </tr>
       `;
     };
@@ -1795,9 +1824,9 @@
       if (activeMonth !== "ALL") return;
 
       const isLight = document.body.classList.contains("light-mode");
-      const tickColor = isLight ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)';
-      const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
-      const pointBorderColor = isLight ? '#f3f4f6' : '#ffffff';
+      const tickColor = isLight ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.55)';
+      const gridColor = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+      const pointBorderColor = isLight ? '#f4f5f7' : '#ffffff';
 
       const metric = document.getElementById("chartMetricSelect").value;
       const labels = [];
@@ -1825,7 +1854,7 @@
 
       let color = isLight ? "#0f766e" : "#5eead4"; 
       if (metric === 'profit') color = isLight ? "#16a34a" : "#4ade80"; 
-      else if (metric === 'teus') color = isLight ? "#9333ea" : "#c084fc"; 
+      else if (metric === 'teus') color = isLight ? "#7e22ce" : "#c084fc"; 
       else if (metric === 'cntrs') color = isLight ? "#2563eb" : "#60a5fa"; 
       else if (metric === 'gp20') color = isLight ? "#2563eb" : "#60a5fa"; 
       else if (metric === 'hq40') color = isLight ? "#ea580c" : "#fb923c"; 
@@ -1839,10 +1868,10 @@
             label: metric.toUpperCase(),
             data: dataPoints,
             borderColor: color,
-            backgroundColor: color + '28', 
-            borderWidth: 2.5,
+            backgroundColor: color + '24', 
+            borderWidth: 2.2,
             pointBackgroundColor: color,
-            pointRadius: 4.5,
+            pointRadius: 4,
             pointBorderColor: pointBorderColor,
             pointBorderWidth: 1.5,
             fill: true,
