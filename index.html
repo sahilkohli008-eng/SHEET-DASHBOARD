@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Dashboard</title>
 
-  <meta name="theme-color" content="#030508" />
+  <meta name="theme-color" id="metaThemeColor" content="#030508" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -19,13 +19,13 @@
 
   <style>
     :root {
-      /* Flat Futuristic Obsidian Palette */
+      /* Flat Futuristic Obsidian Dark Palette */
       --bg-main: #030508;
       --text-main: #f8fafc;
       --text-muted: #64748b;
 
       /* Flat Glossy Surface (Zero 3D Drop Shadows) */
-      --glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.012) 45%, rgba(255, 255, 255, 0.002) 100%);
+      --glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(255, 255, 255, 0.005) 100%);
       --glass-border: 1px solid rgba(255, 255, 255, 0.08);
       --glass-shadow: none;
       --glass-blur: blur(20px) saturate(200%);
@@ -54,27 +54,30 @@
       --radius-pill: 10px;
     }
 
+    /* FUTURISTIC FROSTED-TITANIUM LIGHT MODE (Bound to both HTML & BODY so background never turns black) */
+    html.light-mode,
     body.light-mode {
-      --bg-main: #f8fafc;
-      --text-main: #090d16;
-      --text-muted: #64748b;
+      --bg-main: #eef2f6;
+      --text-main: #0f172a;
+      --text-muted: #475569;
       
-      --glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.85) 100%);
-      --glass-border: 1px solid rgba(15, 23, 42, 0.08);
-      --glass-shadow: none;
-      --specular-line: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 1) 50%, transparent 95%);
+      --glass-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%);
+      --glass-border: 1px solid rgba(15, 23, 42, 0.09);
+      --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      --specular-line: linear-gradient(90deg, transparent 5%, rgba(14, 165, 233, 0.28) 35%, rgba(255, 255, 255, 0.95) 50%, rgba(14, 165, 233, 0.28) 65%, transparent 95%);
       
-      --menu-bg: rgba(255, 255, 255, 0.96);
-      --input-bg: rgba(15, 23, 42, 0.03);
-      --input-border: rgba(15, 23, 42, 0.1);
-      --table-header-bg: rgba(15, 23, 42, 0.025);
-      --table-border: rgba(15, 23, 42, 0.06);
-      --overlay-bg: rgba(248, 250, 252, 0.82);
+      --menu-bg: rgba(255, 255, 255, 0.97);
+      --input-bg: rgba(15, 23, 42, 0.04);
+      --input-border: rgba(15, 23, 42, 0.12);
+      --table-header-bg: rgba(15, 23, 42, 0.035);
+      --table-border: rgba(15, 23, 42, 0.07);
+      --overlay-bg: rgba(238, 242, 246, 0.85);
       
-      --ambient-bg: none; 
+      --ambient-bg: radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.14) 0%, transparent 55%),
+                    radial-gradient(circle at 95% 35%, rgba(139, 92, 246, 0.06) 0%, transparent 45%);
       
       --accent-blue: #0284c7;
-      --purple: #7e22ce;
+      --purple: #7c3aed;
       --green: #059669;
       --accent: #0d9488;
       --orange: #d97706;
@@ -91,16 +94,21 @@
       -webkit-font-smoothing: antialiased;
     }
     
-    html { background-color: var(--bg-main); transition: background-color 0.25s ease; }
+    html {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
 
     body {
+      background-color: var(--bg-main);
       color: var(--text-main); 
       padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 28px);
       min-height: 100vh; 
       position: relative; 
       overflow-x: hidden;
-      transition: color 0.25s ease;
-      background: var(--ambient-bg); 
+      transition: background-color 0.25s ease, color 0.25s ease;
+      background-image: var(--ambient-bg); 
       background-attachment: fixed;
     }
 
@@ -157,7 +165,7 @@
     button.icon-btn svg { width: 16px; height: 16px; transform-origin: center; }
     
     .title-dropdown-wrapper { position: relative; display: flex; align-items: center; gap: 6px; cursor: pointer; padding-left: 2px; }
-    h1 { font-size: 1.45rem; font-weight: 700; letter-spacing: -0.3px; margin: 0; text-transform: uppercase; }
+    h1 { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.3px; margin: 0; text-transform: uppercase; color: var(--text-main); }
     .title-chevron { width: 14px; height: 14px; color: var(--accent-blue); transition: transform 0.2s; }
     .title-dropdown-wrapper.active .title-chevron { transform: rotate(180deg); }
 
@@ -217,14 +225,14 @@
     select.filter-select {
       color: var(--text-main); padding: 10px 32px 10px 12px; font-size: 14px; font-weight: 600;
       outline: none; -webkit-appearance: none; appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(100,116,139,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 11px center; background-size: 13px; width: 100%;
     }
     select.filter-select option { background-color: var(--bg-main); color: var(--text-main); }
 
     .custom-select-wrapper { position: relative; }
     .custom-select-trigger {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(148,163,184,0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(100,116,139,0.9)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 11px center; background-size: 13px;
       padding: 10px 32px 10px 12px; color: var(--text-main); font-size: 14px; font-weight: 600;
       cursor: pointer; user-select: none;
@@ -339,14 +347,14 @@
 
     .trend-badge {
       font-size: 0.56rem; padding: 2px 5px; border-radius: 4px; font-weight: 700; display: inline-flex; align-items: center;
-      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--table-border); letter-spacing: 0.2px;
+      background: rgba(128, 128, 128, 0.06); border: 1px solid var(--table-border); letter-spacing: 0.2px;
     }
     .stat-card.small-card .trend-badge { font-size: 0.5rem; padding: 1px 4px; }
-    .trend-badge.up { color: var(--green); border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.06); }
-    .trend-badge.down { color: var(--red); border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.06); }
+    .trend-badge.up { color: var(--green); border-color: rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.08); }
+    .trend-badge.down { color: var(--red); border-color: rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.08); }
     .trend-badge.neutral { color: var(--text-muted); }
 
-    .stat-card .value { font-size: 1.55rem; font-weight: 600; margin-top: 7px; letter-spacing: -0.6px; font-variant-numeric: tabular-nums; line-height: 1.05; }
+    .stat-card .value { font-size: 1.55rem; font-weight: 700; margin-top: 7px; letter-spacing: -0.6px; font-variant-numeric: tabular-nums; line-height: 1.05; }
     .stat-card.small-card .value { font-size: 1.2rem; margin-top: 6px; }
     
     .stat-card .value.bkg-val { color: var(--accent-blue); }
@@ -371,7 +379,7 @@
     .swipe-dots {
       display: flex; justify-content: center; gap: 4px; position: absolute; bottom: 10px; right: 13px;
     }
-    .swipe-dots .dot { width: 10px; height: 2px; border-radius: 2px; background: rgba(148, 163, 184, 0.25); transition: all 0.3s ease; }
+    .swipe-dots .dot { width: 10px; height: 2px; border-radius: 2px; background: rgba(148, 163, 184, 0.35); transition: all 0.3s ease; }
     .swipe-dots .dot.active { width: 16px; background: var(--accent); }
 
     /* FUTURISTIC HUD PICKED VS NON-PICKED SUMMARY BAR */
@@ -435,7 +443,7 @@
     }
     .pm-val {
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       margin-top: 2px;
       font-variant-numeric: tabular-nums;
     }
@@ -447,7 +455,7 @@
       padding-bottom: 4px; transform: translate3d(0,0,0);
     }
     .table-scroll-container::-webkit-scrollbar { height: 3px; width: 3px; }
-    .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 4px; }
+    .table-scroll-container::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 4px; }
     
     table.data-table {
       width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.8rem; table-layout: fixed;
@@ -556,7 +564,7 @@
     table.detail-cust-table th:nth-child(4),
     table.detail-cust-table td:nth-child(4) { width: 24%; padding-right: 14px; }
 
-    .cell-main { display: block; font-size: 0.84rem; font-weight: 600; line-height: 1.15; }
+    .cell-main { display: block; font-size: 0.84rem; font-weight: 700; line-height: 1.15; }
     .cell-sub { display: block; font-size: 0.6rem; color: var(--text-muted); margin-top: 2px; font-weight: 500; }
 
     .chart-container { padding: 15px; margin-bottom: 14px; border-radius: var(--radius-main); display: none; }
@@ -578,19 +586,24 @@
       padding: 7px 13px; font-size: 0.74rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.18s ease; letter-spacing: 0.3px;
     }
     .switch-btn.active {
-      color: var(--accent-blue); background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent-blue); background: rgba(2, 132, 199, 0.1);
+      border: 1px solid rgba(2, 132, 199, 0.25);
     }
   </style>
   <script>
     if(localStorage.getItem("dashboardTheme") === "light") {
       document.documentElement.classList.add("light-mode");
+      var metaTc = document.getElementById("metaThemeColor");
+      if(metaTc) metaTc.setAttribute("content", "#eef2f6");
     }
   </script>
 </head>
 <body class="">
   <script>
-    if(localStorage.getItem("dashboardTheme") === "light") document.body.classList.add("light-mode");
+    if(localStorage.getItem("dashboardTheme") === "light") {
+      document.documentElement.classList.add("light-mode");
+      document.body.classList.add("light-mode");
+    }
   </script>
 
   <div id="overlay" onclick="window.toggleSidebar()"></div>
@@ -854,7 +867,7 @@
         <div class="pickup-minimal-col">
           <div class="pickup-minimal-top">
             <span class="pickup-minimal-status" style="color: var(--green);">
-              <span class="status-dot" style="background: var(--green); box-shadow: 0 0 6px var(--green);"></span>PICKED
+              <span class="status-dot" style="background: var(--green); box-shadow: 0 0 5px var(--green);"></span>PICKED
             </span>
             <span class="pickup-minimal-teus" id="pickedTeusBadge">0 TEUs</span>
           </div>
@@ -881,7 +894,7 @@
         <div class="pickup-minimal-col">
           <div class="pickup-minimal-top">
             <span class="pickup-minimal-status" style="color: var(--orange);">
-              <span class="status-dot" style="background: var(--orange); box-shadow: 0 0 6px var(--orange);"></span>NON-PICKED
+              <span class="status-dot" style="background: var(--orange); box-shadow: 0 0 5px var(--orange);"></span>NON-PICKED
             </span>
             <span class="pickup-minimal-teus" id="unpickedTeusBadge">0 TEUs</span>
           </div>
@@ -1837,10 +1850,14 @@
     };
 
     window.toggleTheme = function() {
+      document.documentElement.classList.toggle("light-mode");
       document.body.classList.toggle("light-mode");
       const isLight = document.body.classList.contains("light-mode");
       localStorage.setItem("dashboardTheme", isLight ? "light" : "dark");
       
+      const metaTc = document.getElementById("metaThemeColor");
+      if(metaTc) metaTc.setAttribute("content", isLight ? "#eef2f6" : "#030508");
+
       const icon = document.getElementById("themeIcon");
       if(isLight) {
         icon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
@@ -1854,8 +1871,8 @@
       if (activeMonth !== "ALL") return;
 
       const isLight = document.body.classList.contains("light-mode");
-      const tickColor = isLight ? 'rgba(15,23,42,0.5)' : 'rgba(148,163,184,0.6)';
-      const gridColor = isLight ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.04)';
+      const tickColor = isLight ? 'rgba(15,23,42,0.55)' : 'rgba(148,163,184,0.6)';
+      const gridColor = isLight ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.04)';
       const pointBorderColor = isLight ? '#ffffff' : '#030508';
 
       const metric = document.getElementById("chartMetricSelect").value;
@@ -1884,7 +1901,7 @@
 
       let color = isLight ? "#0d9488" : "#00f5d4"; 
       if (metric === 'profit') color = isLight ? "#059669" : "#10b981"; 
-      else if (metric === 'teus') color = isLight ? "#7e22ce" : "#c084fc"; 
+      else if (metric === 'teus') color = isLight ? "#7c3aed" : "#c084fc"; 
       else if (metric === 'cntrs') color = isLight ? "#0284c7" : "#38bdf8"; 
       else if (metric === 'gp20') color = isLight ? "#0284c7" : "#38bdf8"; 
       else if (metric === 'hq40') color = isLight ? "#d97706" : "#f59e0b"; 
